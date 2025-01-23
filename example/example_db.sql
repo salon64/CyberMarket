@@ -89,7 +89,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`Transaction Log` (
   `TransID` INT NOT NULL,
-  `ItemID` INT NOT NULL,
+  `TLItemID` INT NOT NULL,
   `Price` INT NOT NULL,
   `Date` DATE NOT NULL,
   `Seller` VARCHAR(45) NULL,

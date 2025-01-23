@@ -3,3 +3,14 @@ services:
     build: backend/.
     ports:
       - "80:80"
+  mysql:
+    image: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      # this imports the example data tables
+      - ./example/example_db.sql:/docker-entrypoint-initdb.d/example_db.sql
+      # this is where the data is stored
+      - ./db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: pswd
