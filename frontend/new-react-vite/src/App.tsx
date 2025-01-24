@@ -1,70 +1,26 @@
-import { useState } from 'react'
-import validator from 'validator'
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router";
+import Layout from "./pages/Layout";
+import Login from "./pages/login";
+import Marketplace from "./pages/Marketplace";
+import Contact from "./pages/Contact";
+import NoPage from "./pages/NoPage";
 //import reactLogo from './assets/react.svg'
 //import viteLogo from '/vite.svg'
 import './App.css'
-
 const App = () => {
-  const [emailError, setEmailError] = useState("");
-  const validateEmail = (e) => {
-      const email = e.target.value;
-
-      if (validator.isEmail(email)) {
-          setEmailError(" ");
-      } else {
-          setEmailError("Enter valid Email!");
-      }
-  };
-
   return (
-
-      <div style={{
-        margin: "auto",
-        display: "block",
-      }}>
-          <pre>
-              <h1>Cybermarket</h1>
-              <span style={{color:"aqua"}}>Enter Email: </span>
-              <input
-                  type="text"
-                  id="userEmail"
-                  onChange={(e) => validateEmail(e)}
-              ></input>{" "}
-              
-              <span
-                  style={{
-                      fontFamily: "Rajdhani",
-                      
-                      color: "red"
-                  }}
-              >
-                  {emailError}
-                  <br />
-              </span>
-              <span style={{color:"aqua"}}>Enter Password: </span>
-              <input
-                  
-                  type="password"
-                  id="userEmail"
-                  onChange={(e) => validateEmail(e)}
-              ></input>{" "}
-              
-              <span
-                  style={{
-                      fontFamily: "Rajdhani",
-                      
-                      color: "red"
-                  }}
-              >
-                  {emailError}
-                  <br />
-              </span>
-              <br />
-              <button>
-                Login
-              </button>
-          </pre>
-      </div>
+    
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Layout />}>
+                <Route index element={<Login />} />
+                <Route path="Marketplace" element={<Marketplace />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="*" element={<NoPage />} />
+                </Route>
+            </Routes>
+        </BrowserRouter>
   );
 };
 
