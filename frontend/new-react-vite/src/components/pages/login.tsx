@@ -1,5 +1,6 @@
 import { Outlet, Link } from "react-router";
 import "./pageCss/login.css"
+import CyberNav from "./CyberNav";
 function handleSubmit(e) {
     // Prevent the browser from reloading the page
     e.preventDefault();
@@ -17,6 +18,7 @@ function handleSubmit(e) {
   }
 const Login = () => {
     return (
+      
         <pre>
         <h1>Cybermarket</h1>
         <form method="post" onSubmit={handleSubmit}>

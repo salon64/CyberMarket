@@ -1,20 +1,10 @@
 import { Outlet, Link } from "react-router";
+import CyberNav from "./CyberNav";
 
 const Layout = () => {
   return (
     <>
-      <nav>
-        
-          
-            <Link to="/">Login </Link>
-          
-            <Link to="/Marketplace">Marketplace </Link>
-     
-            <Link to="/Inventory">Inventory</Link>
-        
-    
-      </nav>
-
+      <CyberNav></CyberNav>
       <Outlet />
     </>
   )
