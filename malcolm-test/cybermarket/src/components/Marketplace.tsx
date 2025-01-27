@@ -1,8 +1,8 @@
-import "./App.css";
+import "./Marketplace.css";
 import "./cyberpunk-css-main/cyberpunk.css";
 
 
-function App() {
+function Marketplace() {
   return (
     
   <body>
@@ -80,48 +80,4 @@ function App() {
 }
 
 
-export default App;
-
-// <body>
-    //   <header className="cyber-h cyberpunk-font" >
-    //     CyberMarket
-    //   </header>
-
-    //   <footer>
-    //     <div className="cyber-razor-bottom">footer</div>
-    //   </footer>
-    // </body>
-
-
-// function App() {
-//   return (
-//       <div className="crt-screen">
-//         <div className="crt-content">
-//           <h1>Cyberpunk is like really preem</h1>
-//           <p>But retro might be cooler, idk?</p>
-//         </div>
-//       </div>
-//   );
-// }
-
-// import Alert from "./components/Alert";
-// import ListGroup from "./components/ListGroup";
-
-// function App() {
-//   let devs = ["Malcolm", "shaya", "Olle"];
-
-//   const handleSelectItem = (item: string) => {
-//     console.log(item)
-//   }
-
-//   return <div><ListGroup items={devs} heading="Devs" onSelectItem={handleSelectItem}/></div>;
-// }
-// function App() {
-//   return (
-//     <div>
-//       <Alert> 
-//         Hello <span>World</span>
-//       </Alert>
-//     </div>
-//   );
-// }
+export default Marketplace;

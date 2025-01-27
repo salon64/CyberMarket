@@ -1,0 +1,86 @@
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; 
+}
+
+.top {
+    flex: 0 0 auto; 
+    background-color: black; /* Optional: Background for the top */
+    color: white;
+    padding: 0 3%; 
+}
+.top-elements {
+    display: flex; 
+    align-items: center; /* center vertically */
+    justify-content: space-between; 
+    gap: 20px; 
+}
+.top-navbar {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: flex; 
+    gap: 30px; 
+}
+
+
+
+.left-right-container {
+    display: flex;
+    flex: 1; 
+}
+
+
+
+.left {
+    flex: 1; 
+    background-color: #e0e0e0; /* Optional: Background color for the left */
+    display: flex;
+    flex-direction: column; /* Stack divs inside left */
+}
+.left-elements {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 20px;
+}
+.sorting {
+    /* background-color: cyan; */
+    margin-left: 10px;
+}
+.tags {
+    display: flex;
+    background-color: blue;
+    flex-grow: 1;
+}
+
+.right {
+    flex: 4; /* Right side takes more space */
+    background-color: #d0d0d0; /* Optional: Background color for the right */
+    padding: 10px; /* Add padding inside the right section */
+}
+.store-table {
+    width: 100%; /* Force table to fill the entire width of the container */
+    border-collapse: collapse;
+}
+th:nth-child(1) {
+    width: 10%; /* First column (Header 1) takes 10% */
+}
+
+th:nth-child(2) {
+    width: 30%; /* Second column (Header 2) takes 30% */
+}
+
+th:nth-child(3) {
+    width: auto; /* Remaining space (Header 3) takes the rest */
+}
+
+
+
+
+
+
+
+
