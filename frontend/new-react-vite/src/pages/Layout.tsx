@@ -6,11 +6,11 @@ const Layout = () => {
       <nav>
         
           
-            <Link to="/">Login</Link>
+            <Link to="/">Login </Link>
           
-            <Link to="/Marketplace">Marketplace</Link>
+            <Link to="/Marketplace">Marketplace </Link>
      
-            <Link to="/contact">Contact</Link>
+            <Link to="/Inventory">Inventory</Link>
         
     
       </nav>
