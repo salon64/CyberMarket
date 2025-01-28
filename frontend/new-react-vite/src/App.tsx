@@ -1,10 +1,10 @@
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
-import Layout from "./components/pages/Layout";
-import Login from "./components/pages/login";
-import Marketplace from "./components/pages/Marketplace";
-import Inventory from "./components/pages/Inventory";
-import NoPage from "./components/pages/NoPage";
+import Layout from "./components/Layout";
+import Login from "./components/Login/login";
+import Marketplace from "./components/Marketplace/Marketplace";
+import Inventory from "./components/Inventory/Inventory";
+import NoPage from "./components/NoPage";
 //import reactLogo from './assets/react.svg'
 //import viteLogo from '/vite.svg'
 import './App.css'
