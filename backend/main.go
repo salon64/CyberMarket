@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,6 +13,10 @@ import (
 )
 
 var db *sql.DB
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
 
 func main() {
 
@@ -74,7 +79,62 @@ func main() {
 		fmt.Fprintf(w, "%s ", os.Getenv("DBUSER"))
 	})
 
-	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+	// function that returns an array containing PubUser struct {id,name} in json format
+	http.HandleFunc("GET /users", func(w http.ResponseWriter, r *http.Request) {
+		// allow CORS
+		enableCors(&w)
+
+		// execute sql query to get username id pairs
+		row, err := db.Query("select userid, username from Users")
+
+		// write error if the query returned error
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, err.Error())
+			return
+		}
+		// close the row connection when function exits
+		defer row.Close()
+
+		// where to store result
+		// note this was chosen instead of printing each row after read
+		// this allows for retuning error if any row parsing fails.
+		// the con of this that the result is buffered, which leads to an memory overhead
+		var pubUsers []PubUser
+
+		// prepare for next read
+		for row.Next() {
+			var user PubUser
+			// read data into user struct
+			err := row.Scan(&user.Id, &user.Name)
+
+			// write error and exit if scan fails
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprint(w, err.Error())
+				return
+			}
+			// push user to the array
+			pubUsers = append(pubUsers, user)
+		}
+
+		// convert to json
+		// using MarshalIndent to make result pretty for debugging
+		json, err := json.MarshalIndent(pubUsers, "", "    ")
+
+		// write error and exit if json fails
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, err.Error())
+			return
+		}
+
+		// send json
+		fmt.Fprint(w, string(json))
+	})
+
+	http.HandleFunc("GET /test", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
 		row, err := db.Query("SHOW TABLES;")
 
 		if err != nil {

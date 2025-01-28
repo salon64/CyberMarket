@@ -11,7 +11,7 @@ WORKDIR /usr/app
 COPY . .
 
 # build our executable
-RUN go build -o ./main main.go
+RUN go build -o ./main .
 
 # run the executable /usr/app/main
 CMD [ "./main" ]
