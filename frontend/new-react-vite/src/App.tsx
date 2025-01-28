@@ -7,28 +7,29 @@ import Inventory from "./components/Inventory/Inventory";
 import NoPage from "./components/NoPage";
 //import reactLogo from './assets/react.svg'
 //import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
 
 const App = () => {
   return (
-
-    <div style={{
+    <div
+      style={{
         color: "white",
-        
-    }}>
-      
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Layout />}>
-                <Route index element={<Login />} />
-                <Route path="Marketplace" element={<Marketplace />} />
-                <Route path="Inventory" element={<Inventory />} />
-                <Route path="*" element={<NoPage />} />
-                </Route>
-            </Routes>
-        </BrowserRouter>
-    </div>
+      }}
+    >
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route path="Marketplace" element={<Marketplace />} />
+            <Route path="Inventory" element={<Inventory />} />
+            <Route path="*" element={<NoPage />} />
+          </Route>
 
+          
+          <Route index element={<Login />} />
+          
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 };
 
