@@ -5,6 +5,7 @@ import Login from "./components/Login/login";
 import Marketplace from "./components/Marketplace/Marketplace";
 import Inventory from "./components/Inventory/Inventory";
 import NoPage from "./components/NoPage";
+import Profile from "./components/Profile/Profile";
 //import reactLogo from './assets/react.svg'
 //import viteLogo from '/vite.svg'
 import "./App.css";
@@ -21,6 +22,7 @@ const App = () => {
           <Route path="/" element={<Layout />}>
             <Route path="Marketplace" element={<Marketplace />} />
             <Route path="Inventory" element={<Inventory />} />
+            <Route path="Profile" element={<Profile/>} />
             <Route path="*" element={<NoPage />} />
           </Route>
 
