@@ -3,8 +3,14 @@ services:
     build: backend/.
     ports:
       - "80:80"
+    environment:
+      # Setting upp the connection info for the data base
+      - DBHOST=mysql:3306
+      - DBUSER=root
+      - DBPASS=pswd
+
   mysql:
-    image: mysql
+    image: mysql:8.0
     ports:
       - "3306:3306"
     volumes:
