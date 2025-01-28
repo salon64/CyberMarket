@@ -133,6 +133,47 @@ func main() {
 		fmt.Fprint(w, string(json))
 	})
 
+	http.HandleFunc("POST /user", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+
+		// parse the form and return if err
+		err := r.ParseForm()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "Malformed request %s", err.Error())
+			return
+		}
+
+		// read pswd and name if either is empty return error
+		pswd := r.Form.Get("pswd")
+		username := r.Form.Get("name")
+		if pswd == "" || username == "" {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintln(w, "Malformed request")
+			return
+		}
+
+		// add the user to Users
+		res, err := db.Exec("insert into Users(Username,`Password(Hash)`,Wallet, role) values (?, ?, 0, 0);", username, pswd)
+		// if error write error and exit
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintln(w, err.Error())
+			return
+		}
+		// get the id if the row
+		id, err := res.LastInsertId()
+		// if error write error and exit
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintln(w, err.Error())
+			return
+		}
+
+		// return the id
+		fmt.Fprintf(w, "%d", id)
+	})
+
 	http.HandleFunc("GET /test", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		row, err := db.Query("SHOW TABLES;")
