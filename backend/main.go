@@ -18,6 +18,17 @@ func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
+// if error is not nil, then the error is written to log, response and true is returned
+func isErrLog(w *http.ResponseWriter, err error) bool {
+	if err != nil {
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(*w, err.Error())
+		log.Print(err.Error())
+		return true
+	}
+	return false
+}
+
 func main() {
 
 	cfg := mysql.Config{
@@ -88,9 +99,7 @@ func main() {
 		row, err := db.Query("select userid, username from Users")
 
 		// write error if the query returned error
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, err.Error())
+		if isErrLog(&w, err) {
 			return
 		}
 		// close the row connection when function exits
@@ -136,28 +145,38 @@ func main() {
 	http.HandleFunc("POST /user", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 
-		// parse the form and return if err
-		err := r.ParseForm()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "Malformed request %s", err.Error())
+		var useradd AddUser
+
+		if r.Body == nil {
+			log.Print("body was nil")
 			return
 		}
 
-		// read pswd and name if either is empty return error
-		pswd := r.Form.Get("pswd")
-		username := r.Form.Get("name")
-		if pswd == "" || username == "" {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintln(w, "Malformed request")
+		decoder := json.NewDecoder(r.Body)
+		decoder.DisallowUnknownFields()
+		err := decoder.Decode(&useradd)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "Error parsing json: %s", err.Error())
+			log.Printf("Error parsing json: %s", err.Error())
+			return
+		}
+
+		// test if values aer empty strings
+		if useradd.Name == "" || useradd.Pswd == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprint(w, "Either Name or Pswd is an empty string")
+			log.Print("Either Name or Pswd is an empty string")
 			return
 		}
 
 		// add the user to Users
-		res, err := db.Exec("insert into Users(Username,`Password(Hash)`,Wallet, role) values (?, ?, 0, 0);", username, pswd)
+		res, err := db.Exec("insert into Users(Username,`Password(Hash)`,Wallet, role) values (?, ?, 0, 0);", useradd.Name, useradd.Pswd)
 		// if error write error and exit
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			log.Printf("add user error: %s", err)
 			fmt.Fprintln(w, err.Error())
 			return
 		}
