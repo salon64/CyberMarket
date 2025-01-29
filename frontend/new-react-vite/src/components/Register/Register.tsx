@@ -13,13 +13,20 @@ async function handleSubmit(e) {
     console.log(formData)
     // You can pass formData as a fetch body directly:
 
-  
     // Or you can work with it as a plain object:
     const formJson = Object.fromEntries(formData.entries());
-    console.log(JSON.stringify(formJson));
-    fetch("http://ronstad.se/user", { method: "POST", body: JSON.stringify(formJson), mode: "no-cors"})
-    .then(response => response.text())
-    // .then(data => console.log(data));
+    //console.log(JSON.stringify(formJson));
+    fetch("http://ronstad.se/user", { method: "POST", body: JSON.stringify(formJson)})
+    .then(response => {
+      if (response.ok === true){
+        console.log("Valid")
+        alert("Account has been succesfully registered");
+      }
+      else {
+        console.log("Invalid")
+        alert("Invalid account information, try another username/password");
+      }})
+    .then(data => console.log(data));
   }
 
 

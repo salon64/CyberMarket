@@ -1,7 +1,37 @@
 import React, { useState, useEffect, Component, useRef } from "react";
 import MyImage from "./aswedishtiger.png";
 import "../cyberpunk-css-main/cyberpunk.css";
-
+async function handleSubmit(e) {
+  // Prevent the browser from reloading the page
+  e.preventDefault();
+  alert("test1")
+  // Read the form data
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  console.log(formData)
+  // You can pass formData as a fetch body directly:
+  let userID: string = (document.getElementById("nameChangeFormID") as HTMLInputElement).value;
+  userID = "http://ronstad.se/users/" + userID
+  console.log(userID);
+  // Or you can work with it as a plain object:
+  const formJson = Object.fromEntries(formData.entries());
+  console.log(JSON.stringify(formJson));
+  fetch(userID, { method: "POST", body: JSON.stringify(formJson)})
+  .then(response => {
+    if (response.ok === true){
+      console.log("Valid")
+      alert("Account has been succesfully registered");
+    }
+    else {
+      console.log("Invalid")
+      alert("Invalid account information, try another username/password");
+    }})
+  .then(data => console.log(data));
+  fetch("http://ronstad.se/users", { method: "GET" })
+  .then((response) => response.json())
+  .then(res => console.log(res))
+}
 function Profile() {
   const nameForm = useRef(null);
   const [data, setData] = useState(null);
@@ -17,11 +47,10 @@ function Profile() {
       console.log(tmp)
     }, []);
 
-  const handleClickEvent = () => {
-    let newName = (document.getElementById("nameChangeFormID") as HTMLInputElement).value;
-    console.log(newName);
+  // const handleClickEvent = () => {
+
     
-  };
+  // };
   // function myFunction(event: React.FormEvent<HTMLFormElement>) { 
   //   event.preventDefault(); 
   //   const form = event.currentTarget; 
@@ -38,14 +67,24 @@ function Profile() {
           <img src={MyImage} alt="User data"></img>
         )}
       </div>
-
+      
       <div>
-        <form ref={nameForm}>
           <div className="cyber-input">
-            <input type="text" placeholder="New name..." id="nameChangeFormID"/>
+            
+            <input type="text" placeholder="Enter ID..." id="nameChangeFormID"></input>
+            <form method="post" onSubmit={handleSubmit}>
+            <label>
+            <input name="Name" type="text" placeholder="Enter new username..."/>
+            </label>
+            <br></br>
+            <label>
+            <input name="Pswd" type="password" placeholder="Enter new password..."/>
+            </label>
+          <button>Save changes</button>
+          </form>
           </div>
-        </form>
-        <button onClick={handleClickEvent}>Save changes</button>
+
+
       </div>
 
       {/* <div className="cyber-input">

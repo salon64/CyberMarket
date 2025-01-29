@@ -1,4 +1,3 @@
-import CyberNav from "./CyberNav";
 import "./Marketplace.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 

@@ -1,6 +1,6 @@
 import "./CyberNav.css";
 import "./cyberpunk-css-main/cyberpunk.css";
-import { Outlet, Link } from "react-router";
+import {  Link } from "react-router";
 
 function CyberNav() {
     return (
