@@ -30,6 +30,8 @@ This would return a token that could be used for authenticating the user
 > Host: example.org
 > User-Agent: curl/7.81.0
 > Accept: */*
+> Content-Length: 23
+> Content-Type: application/json
 >
 {
     "username" : "john_doe"
@@ -90,7 +92,7 @@ Note that the max length of both pswd and name is 45 bytes
 > User-Agent: curl/7.81.0
 > Accept: */*
 > Content-Length: 23
-> Content-Type: application/x-www-form-urlencoded
+> Content-Type: application/json
 >
 {
     "name": "john_doe",
@@ -118,7 +120,7 @@ to update the user send a PATCH request to ``/users/{id}``. Possible return valu
 > User-Agent: curl/7.81.0
 > Accept: */*
 > Content-Length: 23
-> Content-Type: application/x-www-form-urlencoded
+> Content-Type: application/json
 >
 {
     "token": "00112233445566778899AABBCCDDEEFF",
