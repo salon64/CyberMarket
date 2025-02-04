@@ -3,10 +3,8 @@ import "../cyberpunk-css-main/cyberpunk.css";
 
 const Inventory = () => {
     return (
-    
-    <body>
-    <h1>My Inventory</h1>
-
+      <body>
+        <header>My Inventory</header>
     <div className="left-right-container">
       {/* <div className="left">
         <div className="left-elements">

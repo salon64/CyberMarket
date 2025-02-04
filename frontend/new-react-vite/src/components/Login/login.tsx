@@ -1,5 +1,4 @@
-import { Outlet, Link } from "react-router";
-import { useState } from "react";
+import { Link } from "react-router";
 import "./login.css";
 import CRTScreen from "../CRTScreen";
 
@@ -37,7 +36,6 @@ const Login = () => {
         </label>
         <hr />
         <button type="submit">
-        
         <Link to="/Marketplace">Log In</Link>
         </button>
         <br>

@@ -1,5 +1,6 @@
 import "./Marketplace.css";
 import "../cyberpunk-css-main/cyberpunk.css";
+import CRTScreen from "../CRTScreen";
 
 // I am really cool
 function Marketplace() {
@@ -16,9 +17,9 @@ function Marketplace() {
           <div className="cyber-input">
             <div className="cyber-select">
               <select>
-                  <option value="Price">Price</option>
-                  <option value="Newest">Newest</option>
-                  <option value="Oldest">Oldest</option>
+                  <option style={{color:"black"}}value="Price">Price</option>
+                  <option style={{color:"black"}}value="Newest">Newest</option>
+                  <option style={{color:"black"}}value="Oldest">Oldest</option>
               </select>
             </div>
           </div>
@@ -32,6 +33,7 @@ function Marketplace() {
     </div>
 
     <div className="right">
+      
       {/* store */}
       <table className="cyber-table store-table">
         <thead>
