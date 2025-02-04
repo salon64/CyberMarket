@@ -11,6 +11,27 @@ To run the docker file type
 docker compose up --build
 ```
 
+The structure of the services are as shown below
+
+```mermaid
+graph TD;
+
+    group compose(server)
+
+    service db(database)[Database] in compose
+    service backend(server)[Backend] in compose
+    service webserver(server)[Web server] in compose
+    service web(disk)[Web storage] in compose
+    service storage(disk)[Storage] in compose
+
+    db -- backend
+    db -- storage
+
+    backend -- web
+    webserver -- web
+
+```
+
 Note that you ether have run as superuser or be in the docker group
 
 ## Backend API
@@ -21,9 +42,8 @@ Note many paths require you to set the authorization header, when missing the se
 
 ### Authentication users TODO
 
-This would return a token that could be used for authenticating the user
-
-*NOT IMPLEMNTED*
+This would return a token that could be used for authenticating the user.
+*NOT IMPLEMENTED*
 
 ```curl
 > POST /auth HTTP/1.1
@@ -110,9 +130,8 @@ Note that the max length of both pswd and name is 45 bytes
 
 ## Update user info
 
-to update the user send a PATCH request to ``/users/{id}``. Possible return values are 404 if the user is not found,
-
-*Note auth is not implemented, token is ignored and assumed to be correct*
+to update the user send a PATCH request to ``/users/{id}``. Possible return values are 404 if the user is not found. 400 is returned if the token is not valid
+*Note auth is not implemented, token is ignored and assumed to be correct, return vales are also currently omitted*
 
 ```curl
 > PATCH /users/6 HTTP/1.1

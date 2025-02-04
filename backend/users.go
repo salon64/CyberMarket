@@ -8,16 +8,19 @@ import (
 	"net/http"
 )
 
+// struct used for adding a user or updating their info
 type AddUser struct {
 	Name string `json:"name,omitempty"`
 	Pswd string `json:"pswd,omitempty"`
 }
 
+// a struct containing the fields that are public for a user
 type PubUser struct {
 	Id   int
 	Name string
 }
 
+// list all the users
 func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	// execute sql query to get username id pairs
 	row, err := db.Query("select userid, username from Users")
@@ -114,4 +117,43 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// return the id
 	fmt.Fprintf(*w, "%d", id)
+}
+
+func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+
+	var data map[string]string
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&data)
+
+	if err != nil {
+		log.Printf("error decoding: %s", err.Error())
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		return
+	}
+	log.Printf("with data %v", data)
+
+	// TODO do token check
+	token := data["token"]
+	if token == "" {
+		log.Print("failed to authenticate token")
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(*w, "failed to authenticate token")
+		return
+	}
+
+	new_name, name_ok := data["new_name"]
+	new_pswd, pswd_ok := data["new_pswd"]
+
+	if name_ok {
+		db.Exec("UPDATE Users SET Username=? WHERE UserID = ?", new_name, r.PathValue("id"))
+	}
+	if pswd_ok {
+		db.Exec("UPDATE Users SET `Password(Hash)`=? WHERE UserID = ?", new_pswd, r.PathValue("id"))
+	}
+
+	// TODO return old name and pswd
+
+	(*w).WriteHeader(http.StatusOK)
 }

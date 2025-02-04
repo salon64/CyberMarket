@@ -29,6 +29,8 @@ func isErrLog(w *http.ResponseWriter, err error) bool {
 }
 
 func main() {
+	// set upp logger
+	log.SetFlags(log.Flags() | log.Lshortfile)
 
 	cfg := mysql.Config{
 		User:      os.Getenv("DBUSER"),
@@ -99,6 +101,11 @@ func main() {
 	http.HandleFunc("POST /user", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		addUser(&w, r, db)
+	})
+
+	http.HandleFunc("POST /users/{id}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		updateUserInfo(&w, r, db)
 	})
 
 	http.HandleFunc("GET /test", func(w http.ResponseWriter, r *http.Request) {
