@@ -12,7 +12,7 @@ body {
 
 .left {
     flex: 1; 
-    background-color: #e0e0e0; /* Optional: Background color for the left */
+    background-color: #4b0a0a; /* Optional: Background color for the left */
     display: flex;
     flex-direction: column; /* Stack divs inside left */
 }
@@ -28,21 +28,34 @@ body {
 }
 .tags {
     display: flex;
-    background-color: blue;
+    background-color: rgb(6, 6, 71);
     flex-grow: 1;
 }
 
 .right {
     flex: 4; /* Right side takes more space */
-    background-color: #d0d0d0; /* Optional: Background color for the right */
+    background-color: #000000; /* Optional: Background color for the right */
     padding: 10px; /* Add padding inside the right section */
 }
 .store-table {
+    
     width: 100%; /* Force table to fill the entire width of the container */
     border-collapse: collapse;
+    color: red;
+    text-shadow: 1px 1px rgb(94, 0, 0);
+    tr:not(thead):hover {
+        color: aqua;
+        text-shadow: 2px 2px rgb(94, 0, 0);
+          }
+    /* tr:hover {
+    text-shadow: 2px 2px #0072a7;
+    color: aqua;
+    } */
+
+
 }
 th:nth-child(1) {
-    width: 10%; /* First column (Header 1) takes 10% */
+    width: 5%; /* First column (Header 1) takes 10% */
 }
 
 th:nth-child(2) {

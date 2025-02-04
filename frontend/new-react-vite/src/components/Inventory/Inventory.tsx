@@ -1,4 +1,4 @@
-import "../Marketplace//Marketplace.css";
+import "./Inventory.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 
 const Inventory = () => {
@@ -8,7 +8,7 @@ const Inventory = () => {
     <h1>My Inventory</h1>
 
     <div className="left-right-container">
-      <div className="left">
+      {/* <div className="left">
         <div className="left-elements">
           <div className="sorting">
             Sort by:
@@ -28,7 +28,7 @@ const Inventory = () => {
           </div>
         </div>
         
-      </div>
+      </div> */}
   
       <div className="right">
         {/* store */}
