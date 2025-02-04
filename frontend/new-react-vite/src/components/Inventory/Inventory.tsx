@@ -31,7 +31,7 @@ const Inventory = () => {
       <div className="right">
         {/* store */}
         <table className="cyber-table store-table">
-          <thead>
+          <thead style={{backgroundColor: "bisque"}}>
             <tr>
               <th>Item</th>
               <th>Description</th>

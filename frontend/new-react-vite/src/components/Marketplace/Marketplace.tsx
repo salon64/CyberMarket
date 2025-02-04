@@ -15,7 +15,7 @@ function Marketplace() {
         <div className="sorting">
           Sort by:
           <div className="cyber-input">
-            <div className="cyber-select">
+            <div className="cyber-select ac-purple">
               <select>
                   <option style={{color:"black"}}value="Price">Price</option>
                   <option style={{color:"black"}}value="Newest">Newest</option>
@@ -26,7 +26,12 @@ function Marketplace() {
         </div>
 
         <div className="tags">
-          Tags
+          <div className="tagtext">
+            <header>Tags</header>
+            <input type="checkbox" className="cyber-radio-tags" >
+             
+            </input> Cyberware
+          </div>
         </div>
       </div>
       
@@ -37,7 +42,7 @@ function Marketplace() {
       {/* store */}
       <table className="cyber-table store-table">
         <thead>
-          <tr>
+          <tr className="thead">
             <th>Header 1</th>
             <th>Header 2</th>
             <th>Header 3</th>
