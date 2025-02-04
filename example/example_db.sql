@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `main_db`.`ItemTypes` (
 -- Table `main_db`.`Inventory`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `main_db`.`Inventory` (
-  `ItemID` INT NOT NULL,
+  `ItemID` INT NOT NULL AUTO_INCREMENT,
   `UserID` INT NOT NULL,
   `TypeID` INT NOT NULL,
 
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `main_db`.`Inventory` (
 -- Table `main_db`.`Marketplace`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `main_db`.`Marketplace` (
-  `OfferID` INT NOT NULL,
+  `OfferID` INT NOT NULL AUTO_INCREMENT,
   `ItemID` INT NOT NULL UNIQUE,
   `Price` VARCHAR(45) NOT NULL,
   `CreationDate` DATE NOT NULL,
