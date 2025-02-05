@@ -53,7 +53,7 @@ body {
     
     font-family: Oxanium;
     display: flex;
-    background-color: rgb(5, 5, 56);
+    /* background-color: rgb(5, 5, 56); */
     flex-grow: 1;
     color: white;
     text-shadow: 3px 3px rgb(0, 45, 105);

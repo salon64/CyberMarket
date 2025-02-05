@@ -1,6 +1,6 @@
 import "./cyberpunkWindow.css";
 
-function cyberpunkWindow({ children }: { children: React.ReactNode }){
+function CyberpunkWindow({ children }: { children: React.ReactNode }){
   return (
       <div className="cyberpunk-window">
           {children}
@@ -8,4 +8,4 @@ function cyberpunkWindow({ children }: { children: React.ReactNode }){
   );
 }
 
-export default cyberpunkWindow;
+export default CyberpunkWindow;

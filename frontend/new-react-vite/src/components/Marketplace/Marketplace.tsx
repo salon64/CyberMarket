@@ -1,7 +1,7 @@
 import "./Marketplace.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 import CRTScreen from "../CRTScreen";
-
+import CyberpunkWindow from "../cyberpunkWindow";
 // I am really cool
 function Marketplace() {
   return (
@@ -11,6 +11,7 @@ function Marketplace() {
 
   <div className="left-right-container">
     <div className="left">
+      <CyberpunkWindow>
       <div className="left-elements">
         <div className="sorting">
           Sort by:
@@ -25,7 +26,7 @@ function Marketplace() {
           </div>
         </div>
 
-        <div className="tags">
+        <div className="tags">            
           <div className="tagtext">
             <header>Tags</header>
             <ul>
@@ -38,6 +39,7 @@ function Marketplace() {
           </div>
         </div>
       </div>
+      </CyberpunkWindow>
       
     </div>
 
