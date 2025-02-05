@@ -82,7 +82,7 @@ html
 
 body
 {
-    background-color: var(--yellow);
+    background-color: var(--black);
     padding: 0;
     margin: 0;
 }
@@ -681,7 +681,13 @@ table.cyber-table
     display: inline-block;
     border-collapse: collapse;
 }
-
+header {
+    color: var(--cyan);
+    padding: .3rem .4rem .2rem .4rem;
+    font-family: Oxanium !important;
+    text-shadow: #f5fafb;
+    font-size: 2rem;
+}
 table.cyber-table th,
 table.cyber-table td
 {
@@ -901,6 +907,7 @@ Note: Inline svg shit doesnt work sometimes. Make sure to optimize it with https
 .cyber-select-long,
 .cyber-select-full
 {
+
     background-color: transparent !important;
 }
 
@@ -925,12 +932,14 @@ Note: Inline svg shit doesnt work sometimes. Make sure to optimize it with https
 .cyber-input-long input,
 .cyber-select-long select
 {
+    background-color: transparent;
     --input-width: 320px;
 }
 
 .cyber-input-full input,
 .cyber-select-full select
 {
+    background-color: transparent;
     --input-width: 100%;
 }
 

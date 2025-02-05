@@ -13,11 +13,7 @@ import "./App.css";
 
 const App = () => {
   return (
-    <div
-      style={{
-        color: "white",
-      }}
-    >
+    <div>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>

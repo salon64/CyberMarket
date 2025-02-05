@@ -1,5 +1,6 @@
 import "./Marketplace.css";
 import "../cyberpunk-css-main/cyberpunk.css";
+import CRTScreen from "../CRTScreen";
 
 // I am really cool
 function Marketplace() {
@@ -14,28 +15,38 @@ function Marketplace() {
         <div className="sorting">
           Sort by:
           <div className="cyber-input">
-            <div className="cyber-select">
+            <div className="cyber-select ac-purple">
               <select>
-                  <option value="Price">Price</option>
-                  <option value="Newest">Newest</option>
-                  <option value="Oldest">Oldest</option>
+                  <option style={{color:"black"}}value="Price">Price</option>
+                  <option style={{color:"black"}}value="Newest">Newest</option>
+                  <option style={{color:"black"}}value="Oldest">Oldest</option>
               </select>
             </div>
           </div>
         </div>
 
         <div className="tags">
-          Tags
+          <div className="tagtext">
+            <header>Tags</header>
+            <ul>
+              <input type="checkbox" className="cyber-check-tags" ></input> Cyberware <br></br>
+              <input type="checkbox" className="cyber-check-tags" ></input> Consumables<br></br>
+              <input type="checkbox" className="cyber-check-tags" ></input> Weapons<br></br>
+              <input type="checkbox" className="cyber-check-tags" ></input> Drugs<br></br>
+              <input type="checkbox" className="cyber-check-tags" ></input> Armor<br></br>
+            </ul>
+          </div>
         </div>
       </div>
       
     </div>
 
     <div className="right">
+      
       {/* store */}
       <table className="cyber-table store-table">
         <thead>
-          <tr>
+          <tr className="thead">
             <th>Header 1</th>
             <th>Header 2</th>
             <th>Header 3</th>

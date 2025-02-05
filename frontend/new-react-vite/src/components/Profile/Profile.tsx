@@ -4,7 +4,6 @@ import "../cyberpunk-css-main/cyberpunk.css";
 async function handleSubmit(e) {
   // Prevent the browser from reloading the page
   e.preventDefault();
-  alert("test1")
   // Read the form data
   
   const form = e.target;
@@ -21,11 +20,11 @@ async function handleSubmit(e) {
   .then(response => {
     if (response.ok === true){
       console.log("Valid")
-      alert("Account has been succesfully registered");
+      alert("Account has been succesfully updated");
     }
     else {
       console.log("Invalid")
-      alert("Invalid account information, try another username/password");
+      alert("nuh uh");
     }})
   .then(data => console.log(data));
   fetch("http://ronstad.se/users", { method: "GET" })
@@ -74,11 +73,14 @@ function Profile() {
             <input type="text" placeholder="Enter ID..." id="nameChangeFormID"></input>
             <form method="post" onSubmit={handleSubmit}>
             <label>
-            <input name="Name" type="text" placeholder="Enter new username..."/>
+            <input name="token" type="text" placeholder="token..."/>
+            </label>
+            <label>
+            <input name="new_name" type="text" placeholder="Enter new username..."/>
             </label>
             <br></br>
             <label>
-            <input name="Pswd" type="password" placeholder="Enter new password..."/>
+            <input name="new_pswd" type="password" placeholder="Enter new password..."/>
             </label>
           <button>Save changes</button>
           </form>
