@@ -1,3 +1,8 @@
+:root {
+    --checkbox-size: 21px;
+    --checkbox-inner-size: 12px;
+}
+
 body {
     margin: 0;
     display: flex;
@@ -50,7 +55,6 @@ body {
     display: flex;
     background-color: rgb(5, 5, 56);
     flex-grow: 1;
-    text-align: center;
     color: white;
     text-shadow: 3px 3px rgb(0, 45, 105);
 }
@@ -60,12 +64,12 @@ body {
 /* Optional: Background color for the right */
     padding: 50px; /* Add padding inside the right section */
 }
-.cyber-radio-tags
+.cyber-check-tags
 {
-    width: 30px;
-    height: 30px;
-    border: 2px solid black;
-    border-radius: 3px;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    border: 2px solid yellow;
+    border-radius: 1px;
     -webkit-appearance: none;
     appearance: none;
     outline: none;
@@ -73,7 +77,30 @@ body {
     margin: 0;
     cursor: pointer;
 }
+.cyber-check-tags::before
+{
+    content: "";
+    border-radius: 1px;
+    margin-left: 0.25px;
+    width: var(--checkbox-inner-size);
+    height: var(--checkbox-inner-size);
+    background-color: aqua;
+    position: relative;
+    top: calc((var(--checkbox-size) - var(--checkbox-inner-size)) / 2 - 2px);
+    left: calc((var(--checkbox-size) - var(--checkbox-inner-size)) / 2 - 2px);
+    display: block;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    -webkit-transition: 120ms transform ease-in-out;
+    transition: 120ms transform ease-in-out;
 
+}
+
+.cyber-check-tags:checked:before
+{
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
 .store-table {
     font-family: Oxanium !important;
     width: 100%; /* Force table to fill the entire width of the container */

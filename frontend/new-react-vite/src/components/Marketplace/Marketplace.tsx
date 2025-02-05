@@ -28,9 +28,13 @@ function Marketplace() {
         <div className="tags">
           <div className="tagtext">
             <header>Tags</header>
-            <input type="checkbox" className="cyber-radio-tags" >
-             
-            </input> Cyberware
+            <ul>
+              <input type="checkbox" className="cyber-check-tags" ></input> Cyberware <br></br>
+              <input type="checkbox" className="cyber-check-tags" ></input> Consumables<br></br>
+              <input type="checkbox" className="cyber-check-tags" ></input> Weapons<br></br>
+              <input type="checkbox" className="cyber-check-tags" ></input> Drugs<br></br>
+              <input type="checkbox" className="cyber-check-tags" ></input> Armor<br></br>
+            </ul>
           </div>
         </div>
       </div>
