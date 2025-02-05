@@ -14,7 +14,7 @@ docker compose up --build
 The structure of the services are as shown below
 
 ```mermaid
-graph TD;
+architecture-beta
 
     group compose(server)
 
@@ -24,11 +24,11 @@ graph TD;
     service web(disk)[Web storage] in compose
     service storage(disk)[Storage] in compose
 
-    db -- backend
-    db -- storage
+    db:B --> T:backend
+    db:R --> L:storage
 
-    backend -- web
-    webserver -- web
+    backend:R --> L:web
+    webserver:T --> B:web
 
 ```
 
