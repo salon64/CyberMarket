@@ -1,0 +1,33 @@
+.tripple {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    flex: 1;
+}
+
+.left {
+    display: flex;
+    flex: 1;
+    background-color: black;
+    flex-grow: 1;
+}
+
+.mid {
+    display: flex;
+    flex: 1;
+    background-color: aliceblue;
+    flex-grow: 1;
+}
+
+.right {
+    display: flex;
+    flex: 1;
+    background-color: black;
+    flex-grow: 1;
+}
+
+
+  
+
+  
+
