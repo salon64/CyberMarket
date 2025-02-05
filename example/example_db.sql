@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `main_db`.`Users` (
 CREATE TABLE IF NOT EXISTS `main_db`.`ItemTypes` (
   `TypeID` INT NOT NULL AUTO_INCREMENT,
   `ItemName` VARCHAR(45) NOT NULL,
-  `ItemDescription` VARCHAR(45) NOT NULL,
+  `ItemDescription` VARCHAR(45) NULL,
   `ImgURL` VARCHAR(45) NULL,
 
   PRIMARY KEY (`TypeID`)
