@@ -191,6 +191,8 @@ body
 .fg-dark { --fg: var(--dark); color: var(--dark) !important; }
 .bg-dark { --bg: var(--dark); background-color: var(--dark); }
 .ac-dark { --ac: var(--dark); }
+
+.ac-custom {--ac: rgb(255, 0, 111) }
 /*#endregion*/
 
 /*#region razor*/
