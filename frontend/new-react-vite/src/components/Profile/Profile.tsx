@@ -54,14 +54,7 @@ function Profile() {
   }, []);
 
 
-  const [userItems, setUserItems] = useState(null);
-  useEffect(() => {
-    fetch("http://ronstad.se/users", {method: "GET2"})
-    .then((response) => response.json())
-    .then(useritems => setUserItems(useritems))
-    .then(userItems => console.log(userItems))
-    .catch(error => console.error("Error2: ", error))
-  })
+ 
 
   // const handleClickEvent = () => {
 
@@ -83,12 +76,7 @@ function Profile() {
         )}
       </div>
 
-      <div>
-        {userItems ? (
-          JSON.stringify(data) ) : (
-            "could not laod user items"
-        )}
-      </div>
+      
 
       <div>
         <div className="cyber-input">

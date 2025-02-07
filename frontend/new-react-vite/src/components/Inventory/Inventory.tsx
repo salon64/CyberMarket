@@ -1,5 +1,7 @@
 import "./Inventory.css";
 import "../cyberpunk-css-main/cyberpunk.css";
+import ItemTableComponent from "../ItemTable";
+
 
 const Inventory = () => {
     return (
@@ -39,7 +41,8 @@ const Inventory = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <ItemTableComponent />
+            {/* <tr>
               <td>Row 1, Col 1</td>
               <td>Row 1, Col 2</td>
               <td>Row 1, Col 3</td>
@@ -53,7 +56,7 @@ const Inventory = () => {
               <td>Row 3, Col 1</td>
               <td>Row 3, Col 2</td>
               <td>Row 3, Col 3</td>
-            </tr>
+            </tr> */}
           </tbody>
         </table>
       </div>
