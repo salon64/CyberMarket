@@ -108,6 +108,11 @@ func main() {
 		updateUserInfo(&w, r, db)
 	})
 
+	http.HandleFunc("GET /inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		listUserItems(&w, r, db)
+	})
+
 	http.HandleFunc("GET /test", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		row, err := db.Query("SHOW TABLES;")
