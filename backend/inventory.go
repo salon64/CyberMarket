@@ -19,6 +19,8 @@ type Item struct {
 	ImgURL          *string
 }
 
+// this functions writes out a json of all the items belonging to the users which is given in the url
+// the data returned is described by the item struct
 func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// row, err := db.Query("SELECT ItemID FROM Inventory WHERE UserID = ? ODER BY ItemID", r.PathValue("id"))
 	row, err := db.Query(`
@@ -31,15 +33,20 @@ func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	if isErrLog(w, err) {
 		return
 	}
-
+	// close the read data when the function
 	defer row.Close()
 
+	// tempora storage of items before sent to client
 	var items []Item
+
+	// for each row in our result
 	for row.Next() {
 		var item Item
 
-		// write error and exit if scan fails
+		// read the columns from the row
 		err := row.Scan(&item.ItemID, &item.TypeID, &item.ItemName, &item.ItemDescription, &item.ImgURL)
+
+		// write error and exit if scan fails
 		if err != nil {
 			(*w).WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(*w, err.Error())
@@ -49,8 +56,10 @@ func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		items = append(items, item)
 	}
 
+	// to json
 	json, err := json.MarshalIndent(items, "", "    ")
 
+	// if conversion to json failed
 	if err != nil {
 		(*w).WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(*w, err.Error())
