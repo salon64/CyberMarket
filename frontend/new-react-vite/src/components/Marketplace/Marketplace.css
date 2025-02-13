@@ -17,7 +17,6 @@ body {
 }
 .tagtext {
     flex: flex;
-    padding-left: 2%;
 
 }
 .left {
@@ -33,7 +32,7 @@ body {
     );
     background-size: 100% 4px;
   
-    animation: flicker 0.001s infinite alternate;
+    animation: flicker 0.1s infinite alternate;
     background-color: #792222; 
     background-color: #4b0a0a15; /* Optional: Background color for the left */
     display: flex;
@@ -109,7 +108,7 @@ body {
     text-shadow: 1px 1px rgb(94, 0, 0);
     tr:hover {
         color: aqua;
-        text-shadow: 2px 2px rgb(94, 0, 0);
+        text-shadow: 1px 1px rgb(255, 0, 111);
     }
 }
     /* tr:hover {

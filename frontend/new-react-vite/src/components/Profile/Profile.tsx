@@ -1,7 +1,9 @@
 import React, { useState, useEffect, Component, useRef } from "react";
 import MyImage from "./aswedishtiger.png";
 import "../cyberpunk-css-main/cyberpunk.css";
-
+const getToken = () => {
+  alert("token is: " + localStorage.getItem("token"))
+}
 async function handleSubmit(e) {
   // Prevent the browser from reloading the page
   e.preventDefault();
@@ -104,7 +106,10 @@ function Profile() {
                 placeholder="Enter new password..."
               />
             </label>
-            <button>Save changes</button>
+            <button>Save changes</button> <br>
+            </br>
+            <button onClick={getToken}>Check token</button>
+            <button>Log Out</button>
           </form>
         </div>
       </div>

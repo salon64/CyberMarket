@@ -15,7 +15,10 @@ function handleSubmit(e) {
   fetch("http://ronstad.se/auth", { method: "POST", body: JSON.stringify(formJson)})
   .then(response => response.json())
   .then(data => {
-    console.log(data)});
+    console.log(data)
+    localStorage.setItem("token", JSON.stringify(data))
+    alert("Token is: "+ localStorage.getItem("token"))});
+    
 
   // Or you can work with it as a plain object:
 

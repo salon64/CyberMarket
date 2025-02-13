@@ -1,4 +1,3 @@
-import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import Layout from "./components/Layout";
 import Login from "./components/Login/login";
@@ -7,11 +6,15 @@ import Inventory from "./components/Inventory/Inventory";
 import NoPage from "./components/NoPage";
 import Profile from "./components/Profile/Profile";
 import Register from "./components/Register/Register";
+import Cart from "./components/Cart/cart";
 //import reactLogo from './assets/react.svg'
 //import viteLogo from '/vite.svg'
 import "./App.css";
-
+import { useState } from "react";
+type AuthUser = { id: string; name: string};
 const App = () => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  
   return (
     <div>
       <BrowserRouter>
@@ -20,7 +23,8 @@ const App = () => {
             <Route path="Marketplace" element={<Marketplace />} />
             <Route path="Inventory" element={<Inventory />} />
             <Route path="Profile" element={<Profile/>} />
-            
+            <Route path="Cart" element={<Cart/>} />
+
             <Route path="*" element={<NoPage />} />
           </Route>
 

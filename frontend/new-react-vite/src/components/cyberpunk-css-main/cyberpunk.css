@@ -307,7 +307,7 @@ body
 .cyber-button-small:hover,
 .cyber-button-big:hover
 {
-    filter: brightness(90%);
+    filter: brightness(100%);
 }
 
 .cyber-button:after,

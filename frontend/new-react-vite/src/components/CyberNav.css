@@ -9,7 +9,15 @@
     align-items: center; /* center vertically */
     justify-content: space-between; 
 }
+a {
+    color: crimson;
+}
+a:hover{
+    color: transparent;
+    text-shadow: 1px 1px rgb(220, 0, 150);
+}
 .top-navbar {
+    font-family: oxanium;
     margin: 0;
     padding: 0;
     list-style-type: none;
