@@ -6,25 +6,26 @@ import Inventory from "./components/Inventory/Inventory";
 import NoPage from "./components/NoPage";
 import Profile from "./components/Profile/Profile";
 import Register from "./components/Register/Register";
-import Cart from "./components/Cart/cart";
+import ProtectedRoute from "./components/Protection/ProtectedRoute"
 //import reactLogo from './assets/react.svg'
 //import viteLogo from '/vite.svg'
 import "./App.css";
 import { useState } from "react";
-type AuthUser = { id: string; name: string};
+type AuthUser = {id: string; name: string};
+
 const App = () => {
   const [user, setUser] = useState<AuthUser | null>(null);
-  
   return (
     <div>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route path="Marketplace" element={<Marketplace />} />
+            <Route element={<ProtectedRoute user={user} />}>   {/* ignore error :) */}
+             <Route path="Marketplace" element={<Marketplace />} />
+            </Route>
             <Route path="Inventory" element={<Inventory />} />
             <Route path="Profile" element={<Profile/>} />
-            <Route path="Cart" element={<Cart/>} />
-
+            
             <Route path="*" element={<NoPage />} />
           </Route>
 
