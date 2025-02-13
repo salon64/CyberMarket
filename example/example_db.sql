@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `main_db`.`ItemTypes` (
   `ItemDescription` VARCHAR(45) NULL,
   `ImgURL` VARCHAR(45) NULL,
 
+  FULLTEXT (ItemName)
   PRIMARY KEY (`TypeID`)
 );
 
