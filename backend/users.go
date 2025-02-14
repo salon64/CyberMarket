@@ -70,6 +70,11 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	fmt.Fprint(*w, string(json))
 }
 
+// when passed a SimpleUserInfo in json format in the body,
+// and it matches a username and password pair in the
+// database a Token and user id is returned in json format.
+// if the body is nill nothing is returned
+// Errors are returned as a simple string and might not update the status code
 func userLogin(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var userInfo SimpleUserInfo
 

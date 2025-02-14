@@ -40,17 +40,18 @@ This section goes trough the REST api that is used to communicate to the backend
 
 Note many paths require you to set the authorization header, when missing the server would respond with 404 to avoid leakage of data
 
-### Authentication users TODO
+### User Login
 
-This would return a token that could be used for authenticating the user.
-*NOT IMPLEMENTED*
+This creates a token that the user would use to authenticate its actions across other api calls.
+The POST request takes the field ``username`` and ``pswd``, this returns the token as well as the associated user id.
+This function might return a simple string indicating a error if one happened
 
 ```curl
-> POST /auth HTTP/1.1
+> POST /login HTTP/1.1
 > Host: example.org
 > User-Agent: curl/7.81.0
 > Accept: */*
-> Content-Length: 23
+> Content-Length: 55
 > Content-Type: application/json
 >
 {
@@ -65,9 +66,8 @@ This would return a token that could be used for authenticating the user.
 < Content-Type: text/plain; charset=utf-8
 <
 {
-    "token": "00112233445566778899aabbccddeeff",
-    "username" : "john_doe",
-    "userid" : 6
+    "Token": "00112233445566778899aabbccddeeff",
+    "Userid" : 6
 }
 ```
 
@@ -133,8 +133,9 @@ Note that the max length of both pswd and name is 45 bytes.
 
 ## Update user info
 
-to update the user send a PATCH request to ``/users/{id}``. Possible return values are 404 if the user is not found. 400 is returned if the token is not valid
-*Note auth is not implemented, token is ignored and assumed to be correct, return vales are also currently omitted*
+to update the user send a PATCH request to ``/users/{id}``.
+This requires the fields token, where the fields new_name or new_pswd are optional.
+This will then return the new username as well as the old one
 
 ```curl
 > PATCH /users/6 HTTP/1.1
