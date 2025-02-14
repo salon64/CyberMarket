@@ -104,7 +104,7 @@ Note this query might be slow
 
 To add an user use the ``POST http://example.org/user``.
 The body of this request, should contain ``name`` and ``pswd``.
-Note that the max length of both pswd and name is 45 bytes
+Note that the max length of both pswd and name is 45 bytes.
 
 ```curl
 > POST /user HTTP/1.1
@@ -125,7 +125,10 @@ Note that the max length of both pswd and name is 45 bytes
 < Content-Length: 1
 < Content-Type: text/plain; charset=utf-8
 <
-6
+{
+    "UserID": 7,
+    "Token": "c6e88ef3-533a-40c1-b08c-ee2074a3a5dc"
+}
 ```
 
 ## Update user info

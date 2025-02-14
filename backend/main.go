@@ -103,6 +103,11 @@ func main() {
 		addUser(&w, r, db)
 	})
 
+	http.HandleFunc("POST /login", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		userLogin(&w, r, db)
+	})
+
 	http.HandleFunc("POST /users/{id}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		updateUserInfo(&w, r, db)
@@ -132,5 +137,8 @@ func main() {
 		}
 	})
 
-	http.ListenAndServe(":80", nil)
+	err = http.ListenAndServe(":80", nil)
+	if err != nil {
+		log.Print(err.Error())
+	}
 }

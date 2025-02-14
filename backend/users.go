@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // struct used for adding a user or updating their info
-type AddUser struct {
+type SimpleUserInfo struct {
 	Name string `json:"name,omitempty"`
 	Pswd string `json:"pswd,omitempty"`
 }
@@ -69,9 +70,8 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	fmt.Fprint(*w, string(json))
 }
 
-func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-
-	var useradd AddUser
+func userLogin(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var userInfo SimpleUserInfo
 
 	if r.Body == nil {
 		log.Print("body was nil")
@@ -80,7 +80,7 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&useradd)
+	err := decoder.Decode(&userInfo)
 
 	if err != nil {
 		(*w).WriteHeader(http.StatusBadRequest)
@@ -90,7 +90,56 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	// test if values aer empty strings
-	if useradd.Name == "" || useradd.Pswd == "" {
+	if userInfo.Name == "" || userInfo.Pswd == "" {
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(*w, "Either Name or Pswd is an empty string")
+		log.Print("Either Name or Pswd is an empty string")
+		return
+	}
+
+	auth, err := CreateToken(userInfo.Name, userInfo.Pswd, db)
+
+	if err != nil {
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(*w, err.Error())
+		return
+	}
+
+	json, err := json.MarshalIndent(auth, "", "    ")
+
+	// write error and exit if json fails
+	if err != nil {
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(*w, err.Error())
+		return
+	}
+
+	// send json
+	fmt.Fprint(*w, string(json))
+}
+
+func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+
+	var userInfo SimpleUserInfo
+
+	if r.Body == nil {
+		log.Print("body was nil")
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&userInfo)
+
+	if err != nil {
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(*w, "Error parsing json: %s", err.Error())
+		log.Printf("Error parsing json: %s", err.Error())
+		return
+	}
+
+	// test if values aer empty strings
+	if userInfo.Name == "" || userInfo.Pswd == "" {
 		(*w).WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(*w, "Either Name or Pswd is an empty string")
 		log.Print("Either Name or Pswd is an empty string")
@@ -98,7 +147,7 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	// add the user to Users
-	res, err := db.Exec("insert into Users(Username,`Password(Hash)`,Wallet, role) values (?, ?, 0, 0);", useradd.Name, useradd.Pswd)
+	_, err = db.Exec("insert into Users(Username,`Password(Hash)`,Wallet, role) values (?, ?, 0, 0);", userInfo.Name, userInfo.Pswd)
 	// if error write error and exit
 	if err != nil {
 		(*w).WriteHeader(http.StatusInternalServerError)
@@ -106,17 +155,22 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		fmt.Fprintln(*w, err.Error())
 		return
 	}
-	// get the id if the row
-	id, err := res.LastInsertId()
-	// if error write error and exit
+
+	// return the id
+	// no need for error handling, we just created the necessary data
+	loginRet, _ := CreateToken(userInfo.Name, userInfo.Pswd, db)
+
+	json, err := json.MarshalIndent(loginRet, "", "    ")
+
+	// write error and exit if json fails
 	if err != nil {
 		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(*w, err.Error())
+		fmt.Fprint(*w, err.Error())
 		return
 	}
 
-	// return the id
-	fmt.Fprintf(*w, "%d", id)
+	// send json
+	fmt.Fprint(*w, string(json))
 }
 
 func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -134,9 +188,11 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 	log.Printf("with data %v", data)
 
-	// TODO do token check
 	token := data["token"]
-	if token == "" {
+	userID, _ := strconv.Atoi(r.PathValue("id"))
+	var auth bool
+	auth, _ = AuthByToken(token, userID, db)
+	if auth {
 		log.Print("failed to authenticate token")
 		(*w).WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(*w, "failed to authenticate token")
@@ -147,10 +203,10 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	new_pswd, pswd_ok := data["new_pswd"]
 
 	if name_ok {
-		db.Exec("UPDATE Users SET Username=? WHERE UserID = ?", new_name, r.PathValue("id"))
+		db.Exec("UPDATE Users SET Username=? WHERE UserID = ?", new_name, userID)
 	}
 	if pswd_ok {
-		db.Exec("UPDATE Users SET `Password(Hash)`=? WHERE UserID = ?", new_pswd, r.PathValue("id"))
+		db.Exec("UPDATE Users SET `Password(Hash)`=? WHERE UserID = ?", new_pswd, userID)
 	}
 
 	// TODO return old name and pswd
