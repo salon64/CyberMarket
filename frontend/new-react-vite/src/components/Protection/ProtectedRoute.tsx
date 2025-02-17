@@ -5,10 +5,10 @@ type ProtectedRouteProps = {
   children: React.ReactNode;
 }
 const ProtectedRoute = ({ children, redirectPath = "/" }: ProtectedRouteProps) => {
-    fetch("http://ronstad.se/login", { method: "POST", body: JSON.stringify(localStorage.getItem("token"))})
+    fetch("http://ronstad.se/auth", { method: "POST", body: JSON.stringify(localStorage.getItem("token"))})
     .then(response => response.json())
     .then(data => {console.log(data);
-    if ("data" === localStorage.getItem("token")) {
+    if (data !== localStorage.getItem("token")) {
       return <Navigate to={redirectPath} replace />;
     }})
     
