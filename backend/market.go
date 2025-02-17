@@ -32,6 +32,10 @@ type MarketplaceItemsInformation struct{
 	Username: string;
 }
 
+type displayConstraints struct{
+	sortBy: string;
+	search: string;
+}
 
 
 
@@ -114,9 +118,8 @@ func removeListingFromMarketplace(w *http.ResponseWriter, r *http.Request, db *s
 	fmt.Fprintln(w,"removed listing")
 }
 
-
 func listMarketplaceItems(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
-	var data MarketplaceItemsInformation{}
+	var data displayConstraints{}
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&data)
 
@@ -129,11 +132,10 @@ func listMarketplaceItems(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	log.Printf("with data %v", data)
 
 	var orderBY 
-	if data
-
-	
-
-	var SQLstatement := "
+	var SQLstatement
+	if data.sortBy == "Newest" {
+		orderBY = "mp.OfferID"
+		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
 		u.Username,
 		it.ItemName, it.ItemDescription, it.ImgURL, 
@@ -142,8 +144,88 @@ func listMarketplaceItems(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
 		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
 		INNER JOIN Users u ON u.UserID = inv.UserID
-		order by  ?;
-	"
+		order by mp.OfferID;
+		`
+	} if else data.sortBy == "Oldest" {
+		orderBY = "mp.OfferID"
+		SQLstatement = `
+		SELECT inv.ItemID, inv.TypeID, inv.UserID,
+		u.Username,
+		it.ItemName, it.ItemDescription, it.ImgURL, 
+		mp.OfferID, mp.Price, mp.CreationDate
+		FROM Marketplace mp
+		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
+		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
+		INNER JOIN Users u ON u.UserID = inv.UserID
+		order by mp.OfferID DESC;
+		`
+	} if else data.sortBy == "Price_Ascending" {
+		orderBY = "mp.Price"
+		SQLstatement = `
+		SELECT inv.ItemID, inv.TypeID, inv.UserID,
+		u.Username,
+		it.ItemName, it.ItemDescription, it.ImgURL, 
+		mp.OfferID, mp.Price, mp.CreationDate
+		FROM Marketplace mp
+		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
+		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
+		INNER JOIN Users u ON u.UserID = inv.UserID
+		order by mp:Price;
+		`
+	} if else data.sortBy == "Price_Descending" {
+		orderBY = "mp.Price DESC"
+		SQLstatement = `
+		SELECT inv.ItemID, inv.TypeID, inv.UserID,
+		u.Username,
+		it.ItemName, it.ItemDescription, it.ImgURL, 
+		mp.OfferID, mp.Price, mp.CreationDate
+		FROM Marketplace mp
+		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
+		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
+		INNER JOIN Users u ON u.UserID = inv.UserID
+		order by mp.Price DESC;
+		`
+	} if else data.sortBy == "Alphabetically_Ascending" {
+		orderBY = "it.ItemName"
+		SQLstatement = `
+		SELECT inv.ItemID, inv.TypeID, inv.UserID,
+		u.Username,
+		it.ItemName, it.ItemDescription, it.ImgURL, 
+		mp.OfferID, mp.Price, mp.CreationDate
+		FROM Marketplace mp
+		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
+		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
+		INNER JOIN Users u ON u.UserID = inv.UserID
+		order by it.ItemName;
+		`
+	} if else data.sortBy == "Alphabetically_Descending" {
+		orderBY = "it.ItemName DESC"
+		SQLstatement = `
+		SELECT inv.ItemID, inv.TypeID, inv.UserID,
+		u.Username,
+		it.ItemName, it.ItemDescription, it.ImgURL, 
+		mp.OfferID, mp.Price, mp.CreationDate
+		FROM Marketplace mp
+		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
+		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
+		INNER JOIN Users u ON u.UserID = inv.UserID
+		order by it.ItemName DESC;
+		`
+	}
+
+	// var SQLstatement := `
+	// 	SELECT inv.ItemID, inv.TypeID, inv.UserID,
+	// 	u.Username,
+	// 	it.ItemName, it.ItemDescription, it.ImgURL, 
+	// 	mp.OfferID, mp.Price, mp.CreationDate
+	// 	FROM Marketplace mp
+	// 	INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
+	// 	INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
+	// 	INNER JOIN Users u ON u.UserID = inv.UserID
+	// 	order by  ?;
+	// `
+
+
 
 	
 	row, err := db.Query(SQLstatement)
@@ -193,6 +275,9 @@ func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 	log.Printf("with data %v", data)
 
+	//TODO: check stuff
+
+	
 
 
 
