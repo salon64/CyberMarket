@@ -1,7 +1,10 @@
 import { Link } from "react-router";
 import "./login.css";
 import CRTScreen from "../CRTScreen";
-
+interface uLogin {
+  uID: string;
+  tok: string;
+}
 function handleSubmit(e) {
   // Prevent the browser from reloading the page
   e.preventDefault();
@@ -15,10 +18,14 @@ function handleSubmit(e) {
   fetch("http://ronstad.se/login", { method: "POST", body: JSON.stringify(formJson)})
   .then(response => response.json())
   .then(data => {
-    console.log(data)
-    localStorage.setItem("token", JSON.stringify(data))
-    alert("Token is: "+ localStorage.getItem("token"))});
-    
+    const obj = JSON.parse(JSON.stringify(data))
+    //let obj: uLogin = JSON.parse(JSON.stringify(data))
+    console.log(JSON.stringify(data))
+    console.log(obj)
+    localStorage.setItem("token", obj.Token)
+    localStorage.setItem("uid", obj.UserID)
+    alert("Token is: "+ localStorage.getItem("token"));
+    alert("uid is: "+ localStorage.getItem("uid"))});
 
   // Or you can work with it as a plain object:
 

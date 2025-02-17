@@ -38,6 +38,7 @@ const Inventory = () => {
               <th>Item</th>
               <th>Description</th>
               <th>Header 3</th>
+              <th>Sell</th>
             </tr>
           </thead>
           <tbody>
