@@ -12,7 +12,7 @@ function handleSubmit(e) {
   const formJson = Object.fromEntries(formData.entries());
   
   // You can pass formData as a fetch body directly:
-  fetch("http://ronstad.se/auth", { method: "POST", body: JSON.stringify(formJson)})
+  fetch("http://ronstad.se/login", { method: "POST", body: JSON.stringify(formJson)})
   .then(response => response.json())
   .then(data => {
     console.log(data)
@@ -31,15 +31,15 @@ const Login = () => {
       <h1 className="cyberpunk-font-og">Cybermarket</h1>
       <form method="post" onSubmit={handleSubmit}>
         <label>
-          Username: <input name="userName" type="text" />
+          Username: <input name="name" type="text" />
         </label>
         <br></br>
         <label>
-          Password: <input name="password" type="password" />
+          Password: <input name="pswd" type="password" />
         </label>
         <hr />
         <button type="submit">
-        <Link to="/Marketplace">Log In</Link>
+        
         </button>
         <br>
         </br>

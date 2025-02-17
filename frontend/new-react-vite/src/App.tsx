@@ -20,7 +20,7 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route element={<ProtectedRoute user={user} />}>   {/* ignore error :) */}
+            <Route element={<ProtectedRoute children/>}>   {/* ignore error :) */}
              <Route path="Marketplace" element={<Marketplace />} />
             </Route>
             <Route path="Inventory" element={<Inventory />} />
