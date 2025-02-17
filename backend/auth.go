@@ -4,12 +4,30 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 // import "database/sql"
+
+func AuthByHeader(r *http.Request, resourceOwner int, db *sql.DB) (bool, error) {
+	auth_row := r.Header.Get("Authorization")
+	log.Println(auth_row)
+
+	token, found := strings.CutPrefix(auth_row, "Bearer ")
+	if !found {
+		return false, errors.New("auth is not of type Bearer")
+	}
+
+	if token == "" {
+		return false, errors.New("token was empty")
+	}
+
+	return AuthByToken(token, resourceOwner, db)
+}
 
 // This returns true if the token passes is valid and the token owner matches the resourceOwner
 // Note currently that if the suer is an admin, access is always given

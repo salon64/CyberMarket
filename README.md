@@ -154,7 +154,7 @@ This will then return the new username as well as the old one
 < HTTP/1.1 200 OK
 < Access-Control-Allow-Origin: *
 < Date: Tue, 28 Jan 2025 14:31:20 GMT
-< Content-Length: 1
+< Content-Length: 64
 < Content-Type: text/plain; charset=utf-8
 <
 {

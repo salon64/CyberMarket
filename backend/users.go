@@ -107,6 +107,7 @@ func userLogin(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	if err != nil {
 		(*w).WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(*w, err.Error())
+		log.Printf("Error creating token: %s", err.Error())
 		return
 	}
 
@@ -197,7 +198,7 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	userID, _ := strconv.Atoi(r.PathValue("id"))
 	var auth bool
 	auth, _ = AuthByToken(token, userID, db)
-	if auth {
+	if !auth {
 		log.Print("failed to authenticate token")
 		(*w).WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(*w, "failed to authenticate token")
