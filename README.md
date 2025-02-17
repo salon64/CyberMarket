@@ -158,3 +158,47 @@ to update the user send a PATCH request to ``/users/{id}``. Possible return valu
     "new_name": "svenne_bannan",
 }
 ```
+
+## List user Items
+
+NOTE this will later change to a POST request which would require the token to be passed along for verification
+
+The way to list a users items, GET a post request to ``/inventory/{id}`` where the id is the users id.
+Possible return values are 404 if the user is not found. 400 is returned if the token is not valid
+
+```curl
+GET /inventory/1 HTTP/1.1
+Host: ronstad.se
+User-Agent: curl/7.81.0
+Accept: */*
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Tue, 11 Feb 2025 13:53:28 GMT
+Content-Length: 426
+Content-Type: text/plain; charset=utf-8
+
+[
+    {
+        "ItemID": 1,
+        "TypeID": 1,
+        "ItemName": "MRE",
+        "ItemDescription": null,
+        "ImgURL":null
+    },
+    {
+        "ItemID": 2,
+        "TypeID": 2,
+        "ItemName": "Cyberarm",
+        "ItemDescription": null,
+        "ImgURL": null
+    },
+    {
+        "ItemID": 3,
+        "TypeID": 3,
+        "ItemName": "Techtool",
+        "ItemDescription": null,
+        "ImgURL": null
+    }
+]
+```
