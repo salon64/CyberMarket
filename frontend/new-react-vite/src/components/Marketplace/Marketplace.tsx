@@ -1,8 +1,51 @@
 import "./Marketplace.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 import CyberpunkWindow from "../cyberpunkWindow";
+import { useEffect, useState } from "react";
 // I am really cool
+interface MarketplaceState {
+  sortBy: string;
+  search: string;
+}
+
+interface MarketplaceItems {
+  ItemID: number;
+  TypeID: number;
+  UserID: number;
+
+  ItemName: string;
+  ItemDescription: string;
+  ImgURL: string;
+  
+  OfferID: number;
+  Price: number;
+  CreationDate: string;
+
+  Username: string;
+}
+
+
+
+
 function Marketplace() {
+  const [sortState, setSortState] = useState<MarketplaceState>({sortBy: "Newest", search: ""})
+  const [marketplaceItems, setMarketplaceItems] = useState<MarketplaceItems[]>([]);
+  onchange = s => {
+    console.log(sortState.sortBy)
+  }
+
+  useEffect(() => {
+    var fetchString = `http://ronstad.se/Marketplace/${sortState.sortBy}/${sortState.search}`
+    fetch(fetchString, { method: "GET" }) // Replace with your actual API URL
+            .then((response) => response.json())
+            .then((marketplaceItems) => setMarketplaceItems(marketplaceItems))
+            .catch((error) => console.error("Error: ", error));
+  }, [sortState])
+
+  const buyItem = (id: number) => {
+    console.log("?", id);
+  };
+
   return (
     
   <body>
@@ -12,14 +55,17 @@ function Marketplace() {
     <div className="left">
       <CyberpunkWindow>
       <div className="left-elements">
-        <div className="sorting">
+        <div className="sorting oxanium-font">
           Sort by:
           <div className="cyber-input">
-            <div className="cyber-select ac-purple">
-              <select>
-                  <option style={{color:"black"}}value="Price">Price</option>
-                  <option style={{color:"black"}}value="Newest">Newest</option>
-                  <option style={{color:"black"}}value="Oldest">Oldest</option>
+            <div className="cyber-select ac-purple ">
+              <select className="oxanium-font"  onChange={(s) => setSortState({sortBy: s.target.value, search: sortState.search})}>
+                  <option style={{color:"black"}}className="oxanium-font" value="Newest"           >Newest</option>
+                  <option style={{color:"black"}}className="oxanium-font" value="Oldest"           >Oldest</option>
+                  <option style={{color:"black"}}className="oxanium-font" value="Price_Ascending"  >Price Ascending</option>
+                  <option style={{color:"black"}}className="oxanium-font" value="Price_Descending" >Price Descending</option>
+                  <option style={{color:"black"}}className="oxanium-font" value="Alphabetically_Ascending" >Alphabetically A-Ö</option>
+                  <option style={{color:"black"}}className="oxanium-font" value="Alphabetically_Descending" >Alphabetically Ö-A</option>
               </select>
             </div>
           </div>
@@ -49,128 +95,34 @@ function Marketplace() {
       <table className="cyber-table store-table ac-custom">
         <thead>
           <tr className="thead">
-            <th>Header 1</th>
-            <th>Header 2</th>
-            <th>Header 3</th>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Seller</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Row 1, Col 1</td>
-            <td>Row 1, Col 2</td>
-            <td>Row 1, Col 3</td>
+              <td className="">itemname</td>
+              <td className="">Price</td>
+              <td className="">a really cool item</td>
+              <td className="">Seller</td>
+              <td>
+                <input onClick={() => buyItem(1)} className='buy-button' type='button' value='Buy' />
+              </td>
           </tr>
-          <tr>
-            <td>Row 2, Col 1</td>
-            <td>Row 2, Col 2</td>
-            <td>Row 2, Col 3</td>
-          </tr>
-          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>
-          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>          <tr>
-            <td>Row 3, Col 1</td>
-            <td>Row 3, Col 2</td>
-            <td>Row 3, Col 3</td>
-          </tr>
+          {marketplaceItems.map((item) => (
+            <tr key={item.ItemID} className="">
+                <td className="">{item.ItemName}</td>
+                <td className="">{item.Price}</td>
+                <td className="">{item.ItemDescription}</td>
+                <td className="">{item.Username}</td>
+                <td>
+                  <input onClick={() => buyItem(item)} className='buy-button' type='button' value='Buy' />
+                </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

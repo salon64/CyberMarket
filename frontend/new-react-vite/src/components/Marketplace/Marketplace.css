@@ -17,6 +17,7 @@ body {
 }
 .tagtext {
     flex: flex;
+    padding-left: 2%;
 
 }
 .left {
@@ -32,7 +33,7 @@ body {
     );
     background-size: 100% 4px;
   
-    animation: flicker 0.1s infinite alternate;
+    animation: flicker 0.001s infinite alternate;
     background-color: #792222; 
     background-color: #4b0a0a15; /* Optional: Background color for the left */
     display: flex;
@@ -108,7 +109,7 @@ body {
     text-shadow: 1px 1px rgb(94, 0, 0);
     tr:hover {
         color: aqua;
-        text-shadow: 1px 1px rgb(255, 0, 111);
+        text-shadow: 2px 2px rgb(94, 0, 0);
     }
 }
     /* tr:hover {
@@ -120,19 +121,26 @@ tr:nth-child(even){
     background-color: rgb(31, 31, 31);
 }
 th:nth-child(1) {
-    width: 5%; /* First column (Header 1) takes 10% */
+    width: 10%; /* item */
 }
-
 th:nth-child(2) {
-    width: 30%; /* Second column (Header 2) takes 30% */
+    width: 5%; /* price */
 }
-
+th:nth-child(4) {
+    width: 15%; /* seller */
+}
+th:nth-child(5) {
+    width: 10%; /* button */
+}
 th:nth-child(3) {
-    width: 50%; /* Remaining space (Header 3) takes the rest */
+    width: fit-content; /* description */
 }
 
-
-
+.buy-button{
+    display:inline-block;
+    width: 80px;
+    height: 40px;
+}
 
 
 
