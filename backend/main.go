@@ -108,10 +108,28 @@ func main() {
 		updateUserInfo(&w, r, db)
 	})
 
+	
+
 	http.HandleFunc("GET /inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		listUserItems(&w, r, db)
 	})
+
+	
+	http.HandleFunc("POST /Marketplace/displayMarket" ) func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		displayMarket(&w, r, db)
+	}
+
+	http.HandleFunc("POST /Marketplace/buy/{OfferId}") func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		buyItem(&w, r, db)
+	}
+
+
+
+
+
 
 	http.HandleFunc("GET /test", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
