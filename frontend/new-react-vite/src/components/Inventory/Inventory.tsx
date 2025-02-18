@@ -79,19 +79,12 @@ const Inventory = () => {
 
     <h1>Create Item</h1>
       <form method="post" onSubmit={handleSubmit}>
-        <label>
-          ItemName: <input name="itemName" type="text" />
+      <label>
+          UserID: <input name="userID" type="text" />
         </label>
         <br></br>
         <label>
           ItemType: <input name="itemType" type="text" />
-        </label>
-        <br></br>
-        <label>
-          ItemDescription: <input name="itemDesc" type="text" />
-        </label>
-        <label>
-          UserID: <input name="userID" type="text" />
         </label>
         <br></br>
         <hr />
