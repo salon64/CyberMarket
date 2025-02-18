@@ -63,7 +63,8 @@ CREATE TABLE IF NOT EXISTS `main_db`.`Marketplace` (
   PRIMARY KEY (`OfferID`),
   CONSTRAINT `MarketItemID`
     FOREIGN KEY (`ItemID`)
-    REFERENCES `main_db`.`Inventory` (`ItemID`)
+    REFERENCES `main_db`.`Inventory` (`ItemID`),
+  FULLTEXT(ItemName
 );
 
 
@@ -91,4 +92,19 @@ CREATE TABLE IF NOT EXISTS `main_db`.`TransactionLog` (
   CONSTRAINT `TransactionItemID`
     FOREIGN KEY (`ItemID`)
     REFERENCES `main_db`.`Inventory` (`ItemID`)
+);
+
+-- -----------------------------------------------------
+-- Table `main_db`.`TokenTable`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `main_db`.`TokenTable` (
+  `Token` BINARY(16) NOT NULL,
+  `UserID` INT NOT NULL,
+  `CreatedOn` DATETIME NOT NULL,
+  
+  PRIMARY KEY (`Token`),
+
+  CONSTRAINT `TokenUser`
+    FOREIGN key (`UserID`)
+    REFERENCES `main_db`.`Users` (`UserID`)
 );
