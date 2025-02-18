@@ -267,7 +267,7 @@ func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// TODO: token check?
 
-	db.Exec(`
+	res, err := db.Exec(`
 		START TRANSACTION;
 
 		SELECT Wallet INTO @buyer_wallet FROM Users WHERE UserID = ? FOR UPDATE;
@@ -303,6 +303,20 @@ func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	data.Price, data.UserID,
 	data.Price, data.UserID)
 
+	if err != nil {
+		(*w).WriteHeader(http.StatusInternalServerError)
+		log.Printf("add user error: %s", err)
+		fmt.Fprintln(*w, err.Error())
+		return
+	}
 
+	TransID, err := res.LastInsertId()
+	if err != nil {
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintln(*w, err.Error())
+		return
+	}
 
+	// return the price, idk
+	fmt.Fprintf(*w, "%d", TransID)
 }
