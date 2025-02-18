@@ -2,15 +2,6 @@ import "./Inventory.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 import ItemTableComponent from "../ItemTable";
 
-interface UserItemInterface {
-  ItemID: number;
-  TypeID: number;
-  ItemName: string;
-  ItemDescription: string;
-  ImgURL: string;
-  IsListed: boolean
-}
-
 const Inventory = () => {
   function handleSubmit(e) {
     // Prevent the browser from reloading the page
