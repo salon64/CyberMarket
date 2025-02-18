@@ -274,6 +274,54 @@ func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 	log.Printf("with data %v", data)
 
-	//TODO: check stuff
+	//TODO: check stuff, money, ownership
+	//TODO: add transaction
+	// sql_2 := "DELETE FROM Marketplace WHERE ItemID = ?;", data.ItemID
+	// sql_1 := "UPDATE Inventory SET UserID=? WHERE ItemID=?", 1, data.ItemID
+	// sql_3 := "INSERT INTO TransactionLog(Price, trans_time, ItemID, Buyer, Seller) VALUES(?, now(), ?, ?, ?);", data.Price, data.ItemID, 1, data.UserID
+	// // buyer
+	// sql_4 := "UPDATE Users SET Wallet=Wallet-? Where UserID=?;", data.Price, 1
+	// //seller
+	// sql_5 := "UPDATE Users SET Wallet=Wallet+? Where UserID=?;", data.Price, data.UserID
+
+	// TODO: token check?
+
+	db.Exec(`
+		START TRANSACTION;
+
+		SELECT Wallet INTO @buyer_wallet FROM Users WHERE UserID = ? FOR UPDATE;
+
+		-- if not enough money
+		IF @buyer_wallet < ? THEN 
+			ROLLBACK;
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'you require more vespian gas';
+		END IF;
+
+		-- remove item from marketplace
+		DELETE FROM Marketplace WHERE ItemID = ?;
+
+		-- transfer item owner
+		UPDATE Inventory SET UserID = ? WHERE ItemID = ?;
+
+		-- log transaction
+		INSERT INTO TransactionLog (Price, trans_time, ItemID, Buyer, Seller) 
+		VALUES (?, NOW(), ?, ?, ?);
+
+		-- remove money from buyer
+		UPDATE Users SET Wallet = Wallet - ? WHERE UserID = ?;
+
+		-- add money to seller
+		UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?;
+
+		COMMIT;
+	`, data.UserID,
+	data.Price, 
+	data.ItemID,
+	1, data.ItemID,
+	data.Price, data.ItemID, 1, data.UserID,
+	data.Price, data.UserID,
+	data.Price, data.UserID)
+
+
 
 }
