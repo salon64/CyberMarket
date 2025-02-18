@@ -12,7 +12,6 @@ const ProtectedRoute = ({ children, redirectPath = "/" }: ProtectedRouteProps) =
       alert("invalid token")
       return <Navigate to={redirectPath} replace />
     }})
-    
-    return children ? children : <Outlet />;
+    return <Outlet />;
     }
 export default ProtectedRoute;
