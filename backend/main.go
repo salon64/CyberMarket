@@ -118,7 +118,7 @@ func main() {
 		listMarketplaceItems(&w, r, db)
 	})
 
-	http.HandleFunc("POST /Marketplace/buy", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("POST /Marketplace/buy/{BuyerID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		buyItem(&w, r, db)
 	})

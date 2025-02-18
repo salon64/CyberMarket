@@ -298,8 +298,8 @@ func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	`, data.UserID,
 	data.Price, 
 	data.ItemID,
-	1, data.ItemID,
-	data.Price, data.ItemID, 1, data.UserID,
+	r.PathValue("BuyerID"), data.ItemID,
+	data.Price, data.ItemID, r.PathValue("BuyerID"), data.UserID,
 	data.Price, data.UserID,
 	data.Price, data.UserID)
 
