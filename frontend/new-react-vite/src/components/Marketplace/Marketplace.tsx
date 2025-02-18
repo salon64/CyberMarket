@@ -35,15 +35,23 @@ function Marketplace() {
   }
 
   useEffect(() => {
-    var fetchString = `http://ronstad.se/Marketplace/${sortState.sortBy}/${sortState.search}`
-    fetch(fetchString, { method: "GET" }) // Replace with your actual API URL
+    var fetchString = `http://ronstad.se/Marketplace/market`
+    fetch(fetchString, { method: "POST", body:  JSON.stringify(sortState)}) // Replace with your actual API URL
             .then((response) => response.json())
             .then((marketplaceItems) => setMarketplaceItems(marketplaceItems))
             .catch((error) => console.error("Error: ", error));
   }, [sortState])
 
-  const buyItem = (id: number) => {
-    console.log("?", id);
+  const buyItem = (item: MarketplaceItems) => {
+    console.log("OfferID: ?", item.OfferID);
+    const jsonItem = JSON.stringify(item)
+    var fetchString = `http://ronstad.se/Marketplace/buy/` + localStorage.get("userID")
+
+    fetch(fetchString, { method: "POST", body:  jsonItem}) 
+            .then((response) => response.json())
+            .then((marketplaceItems) => setMarketplaceItems(marketplaceItems))
+            .catch((error) => console.error("Error: ", error));
+
   };
 
   return (
@@ -103,7 +111,7 @@ function Marketplace() {
           </tr>
         </thead>
         <tbody>
-          <tr>
+          {/* <tr>
               <td className="">itemname</td>
               <td className="">Price</td>
               <td className="">a really cool item</td>
@@ -111,7 +119,7 @@ function Marketplace() {
               <td>
                 <input onClick={() => buyItem(1)} className='buy-button' type='button' value='Buy' />
               </td>
-          </tr>
+          </tr> */}
           {marketplaceItems.map((item) => (
             <tr key={item.ItemID} className="">
                 <td className="">{item.ItemName}</td>
