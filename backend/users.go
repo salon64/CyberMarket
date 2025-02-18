@@ -194,10 +194,9 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 	log.Printf("with data %v", data)
 
-	token := data["token"]
 	userID, _ := strconv.Atoi(r.PathValue("id"))
 	var auth bool
-	auth, _ = AuthByToken(token, userID, db)
+	auth, _ = AuthByHeader(r, userID, db)
 	if !auth {
 		log.Print("failed to authenticate token")
 		(*w).WriteHeader(http.StatusBadRequest)
@@ -209,10 +208,16 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	new_pswd, pswd_ok := data["new_pswd"]
 
 	if name_ok {
-		db.Exec("UPDATE Users SET Username=? WHERE UserID = ?", new_name, userID)
+		_, err = db.Exec("UPDATE Users SET Username=? WHERE UserID = ?", new_name, userID)
+		if err != nil {
+			log.Print(err.Error())
+		}
 	}
 	if pswd_ok {
-		db.Exec("UPDATE Users SET `Password(Hash)`=? WHERE UserID = ?", new_pswd, userID)
+		_, err = db.Exec("UPDATE Users SET `Password(Hash)`=? WHERE UserID = ?", new_pswd, userID)
+		if err != nil {
+			log.Print(err.Error())
+		}
 	}
 
 	// TODO return old name and pswd

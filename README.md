@@ -55,7 +55,7 @@ This function might return a simple string indicating a error if one happened
 > Content-Type: application/json
 >
 {
-    "username" : "john_doe"
+    "name" : "john_doe"
     "pswd" : "dog1234!"
 }
 
@@ -141,12 +141,12 @@ This will then return the new username as well as the old one
 > PATCH /users/6 HTTP/1.1
 > Host: example.org
 > User-Agent: curl/7.81.0
+> Authorization: Bearer c6e88ef3-533a-40c1-b08c-ee2074a3a5dc
 > Accept: */*
 > Content-Length: 23
 > Content-Type: application/json
 >
 {
-    "token": "00112233445566778899AABBCCDDEEFF",
     "new_name": "svenne_bannan",
     "new_pswd": "cat4321?"
 }
