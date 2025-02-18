@@ -11,7 +11,10 @@ const ProtectedRoute = ({ children, redirectPath = "/" }: ProtectedRouteProps) =
     if (data !== localStorage.getItem("token")) {
       alert("invalid token")
       return <Navigate to={redirectPath} replace />
+    } else {
+      return <Outlet />;
     }})
+    .catch(error => {return <Navigate to={redirectPath} replace />})
     return <Outlet />;
     }
 export default ProtectedRoute;

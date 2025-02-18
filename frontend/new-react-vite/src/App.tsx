@@ -14,7 +14,6 @@ import { useState } from "react";
 type AuthUser = {id: string; name: string};
 
 const App = () => {
-  const [user, setUser] = useState<AuthUser | null>(null);
   return (
     <div>
       <BrowserRouter>
