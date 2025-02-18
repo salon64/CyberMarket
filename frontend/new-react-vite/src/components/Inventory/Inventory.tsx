@@ -99,6 +99,9 @@ const Inventory = () => {
         <label>
           ItemDescription: <input name="itemDesc" type="text" />
         </label>
+        <label>
+          UserID: <input name="userID" type="text" />
+        </label>
         <br></br>
         <hr />
         <button type="submit">
