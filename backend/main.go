@@ -118,6 +118,11 @@ func main() {
 		listUserItems(&w, r, db)
 	})
 
+	http.HandleFunc("POST /Marketplace/CreateItem", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		createItem(&w, r, db)
+	})
+
 	http.HandleFunc("GET /test", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		row, err := db.Query("SHOW TABLES;")
