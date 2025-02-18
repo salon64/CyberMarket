@@ -23,8 +23,8 @@ type MarketplaceItemsInformation struct {
 	UserID int
 
 	ItemName        string
-	ItemDescription string
-	ImgURL          string
+	ItemDescription *string
+	ImgURL          *string
 
 	OfferID      int
 	Price        int
@@ -34,8 +34,8 @@ type MarketplaceItemsInformation struct {
 }
 
 type displayConstraints struct {
-	sortBy string
-	search string
+	SortBy string
+	Search string
 }
 
 func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -119,7 +119,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var data displayConstraints
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&data)
-
+	log.Printf("%+v", data)
 	if err != nil {
 		log.Printf("error decoding: %s", err.Error())
 		(*w).WriteHeader(http.StatusBadRequest)
@@ -131,7 +131,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var orderBY string
 	var SQLstatement string
 	//mabe do some sprintf here to avoid this huge if else
-	if data.sortBy == "Newest" {
+	if data.SortBy == "Newest" {
 		orderBY = "mp.OfferID"
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
@@ -144,7 +144,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		INNER JOIN Users u ON u.UserID = inv.UserID
 		order by mp.OfferID;
 		`
-	} else if data.sortBy == "Oldest" {
+	} else if data.SortBy == "Oldest" {
 		orderBY = "mp.OfferID"
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
@@ -157,7 +157,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		INNER JOIN Users u ON u.UserID = inv.UserID
 		order by mp.OfferID DESC;
 		`
-	} else if data.sortBy == "Price_Ascending" {
+	} else if data.SortBy == "Price_Ascending" {
 		orderBY = "mp.Price"
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
@@ -168,9 +168,9 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
 		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
 		INNER JOIN Users u ON u.UserID = inv.UserID
-		order by mp:Price;
+		order by mp.Price;
 		`
-	} else if data.sortBy == "Price_Descending" {
+	} else if data.SortBy == "Price_Descending" {
 		orderBY = "mp.Price DESC"
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
@@ -183,7 +183,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		INNER JOIN Users u ON u.UserID = inv.UserID
 		order by mp.Price DESC;
 		`
-	} else if data.sortBy == "Alphabetically_Ascending" {
+	} else if data.SortBy == "Alphabetically_Ascending" {
 		orderBY = "it.ItemName"
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
@@ -196,7 +196,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		INNER JOIN Users u ON u.UserID = inv.UserID
 		order by it.ItemName;
 		`
-	} else if data.sortBy == "Alphabetically_Descending" {
+	} else if data.SortBy == "Alphabetically_Descending" {
 		orderBY = "it.ItemName DESC"
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
@@ -238,8 +238,8 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var listings []MarketplaceItemsInformation
 	for row.Next() {
 		var listing MarketplaceItemsInformation
-
-		err := row.Scan(&listing.ItemID, &listing.TypeID, &listing.ItemName, &listing.ItemDescription, &listing.ImgURL, &listing.OfferID, &listing.Price, &listing.CreationDate)
+		// SELECT inv.ItemID, inv.TypeID, inv.UserID, u.Username, it.ItemName, it.ItemDescription, it.ImgURL, mp.OfferID, mp.Price, mp.CreationDate
+		err := row.Scan(&listing.ItemID, &listing.TypeID, &listing.UserID, &listing.Username, &listing.ItemName, &listing.ItemDescription, &listing.ImgURL, &listing.OfferID, &listing.Price, &listing.CreationDate)
 		if err != nil {
 			(*w).WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(*w, err.Error())
