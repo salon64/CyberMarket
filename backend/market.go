@@ -12,9 +12,7 @@ import (
 
 type MarketplaceItems struct {
 	ItemID int
-	// OfferID: int;
 	Price        int
-	CreationDate string
 }
 
 type MarketplaceItemsInformation struct {
@@ -39,7 +37,7 @@ type displayConstraints struct {
 }
 
 func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var marketplaceItem MarketplaceItems
+	var data MarketplaceItems
 
 	if r.Body == nil {
 		log.Print("body was nil")
@@ -47,19 +45,21 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&marketplaceItem)
+	err := decoder.Decode(&data)
 
 	if err != nil {
+		log.Printf("error decoding: %s", err.Error())
 		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "Error parsing json: %s", err.Error())
-		log.Printf("Error parsing json: %s", err.Error())
+		fmt.Fprintf(*w, "error decoding: %s", err.Error())
 		return
 	}
+	log.Printf("with data %v", data)
+
+
 	// TODO check if i own the item
 	// TODO ERROR handling
 	t, _ := db.Begin()
-	res, err := t.Exec("insert into Marketplace(ItemID, Price, CreationDate) values (?, ?, ?);", marketplaceItem.ItemID, marketplaceItem.Price, marketplaceItem.CreationDate)
+	res, err := t.Exec("insert into Marketplace(ItemID, Price, CreationDate) values (?, ?, now());", data.ItemID, data.Price)
 
 	// if error write error and exit
 	if err != nil {
@@ -69,7 +69,7 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 		fmt.Fprintf(*w, "add listing error: %s", err.Error())
 		return
 	}
-	// TODO WE NEED A TRANSACTION HERE
+	// TODO: WE NEED A TRANSACTION HERE
 	OfferID, err := res.LastInsertId()
 	// if error write error and exit
 	if err != nil {
@@ -103,7 +103,7 @@ func removeListingFromMarketplace(w *http.ResponseWriter, r *http.Request, db *s
 		return
 	}
 
-	_, err = db.Exec("DELETE FROM Marketplace WHERE OfferID = ?;", 1)
+	_, err = db.Exec("DELETE FROM Marketplace WHERE ItemID = ?;", r.PathValue("ItemID"))
 
 	// if error write error and exit
 	if err != nil {
@@ -275,9 +275,5 @@ func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	log.Printf("with data %v", data)
 
 	//TODO: check stuff
-
-}
-
-func sellItem() {
 
 }

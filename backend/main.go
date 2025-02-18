@@ -118,9 +118,19 @@ func main() {
 		listMarketplaceItems(&w, r, db)
 	})
 
-	http.HandleFunc("POST /Marketplace/buy/{OfferId}", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("POST /Marketplace/buy", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		buyItem(&w, r, db)
+	})
+
+	http.HandleFunc("POST /Marketplace/addListing", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		addListingToMarketplace(&w, r, db)
+	})
+
+	http.HandleFunc("GET /Marketplace/removeListing/{ItemID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		removeListingFromMarketplace(&w, r, db)
 	})
 
 	http.HandleFunc("GET /test", func(w http.ResponseWriter, r *http.Request) {
