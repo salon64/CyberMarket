@@ -21,14 +21,14 @@ type Item struct {
 }
 
 type SimpleItem struct {
-	
+	UserID int
+	ItemType int
 }
 
 // this functions writes out a json of all the items belonging to the users which is given in the url
 // the data returned is described by the item struct
 func createItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var newItem Item
-
+	var newItem SimpleItem
 	if r.Body == nil {
 		log.Print("body was nil")
 		return
@@ -45,14 +45,23 @@ func createItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
+	json, err := json.MarshalIndent(newItem, "", "    ")
 
-	// write error and exit if json fails
+	// if conversion to json failed
 	if err != nil {
 		(*w).WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(*w, err.Error())
 		return
 	}
-
+	_, err = db.Exec("insert into Inventory(UserID, TypeID) values (?, ?);", newItem.UserID, newItem.ItemType)
+	
+	if err != nil {
+		(*w).WriteHeader(http.StatusInternalServerError)
+		log.Printf("add user error: %s", err)
+		fmt.Fprintln(*w, err.Error())
+		return
+	}
+	
 	// send json
 	fmt.Fprint(*w, string(json))
 }
