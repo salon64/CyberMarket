@@ -14,22 +14,20 @@ import { useState } from "react";
 type AuthUser = {id: string; name: string};
 
 const App = () => {
-  const [user, setUser] = useState<AuthUser | null>(null);
   return (
     <div>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route element={<ProtectedRoute children/>}>   {/* ignore error :) */}
-             <Route path="Marketplace" element={<Marketplace />} />
+            <Route element={<ProtectedRoute children/>}>
+              <Route path="Marketplace" element={<Marketplace />} />
+              <Route path="Inventory" element={<Inventory />} />
+              <Route path="Profile" element={<Profile/>} />
             </Route>
-            <Route path="Inventory" element={<Inventory />} />
-            <Route path="Profile" element={<Profile/>} />
-            
             <Route path="*" element={<NoPage />} />
-          </Route>
-
           
+
+            </Route>
           <Route index element={<Login />} />
           <Route path="Register" element={<Register />} />
 

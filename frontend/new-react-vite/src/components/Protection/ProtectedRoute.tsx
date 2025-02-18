@@ -7,11 +7,14 @@ type ProtectedRouteProps = {
 const ProtectedRoute = ({ children, redirectPath = "/" }: ProtectedRouteProps) => {
     fetch("http://ronstad.se/auth", { method: "POST", body: JSON.stringify(localStorage.getItem("token"))})
     .then(response => response.json())
-    .then(data => {console.log(data);
+    .then(data => {console.log(data)
     if (data !== localStorage.getItem("token")) {
-      return <Navigate to={redirectPath} replace />;
+      alert("invalid token")
+      return <Navigate to={redirectPath} replace />
+    } else {
+      return <Outlet />;
     }})
-    
-    return children ? children : <Outlet />;
+    .catch(error => {return <Navigate to={redirectPath} replace />})
+    return <Outlet />;
     }
 export default ProtectedRoute;

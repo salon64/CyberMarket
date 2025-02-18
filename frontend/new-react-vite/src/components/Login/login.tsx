@@ -1,31 +1,42 @@
 import { Link } from "react-router";
 import "./login.css";
 import CRTScreen from "../CRTScreen";
+import { useNavigate } from "react-router";
 
-function handleSubmit(e) {
-  // Prevent the browser from reloading the page
-  e.preventDefault();
-
-  // Read the form data
-  const form = e.target;
-  const formData = new FormData(form);
-  const formJson = Object.fromEntries(formData.entries());
+function Login() {
+  const navigate = useNavigate()
+  function handleSubmit(e) {
+    // Prevent the browser from reloading the page
+    e.preventDefault();
   
-  // You can pass formData as a fetch body directly:
-  fetch("http://ronstad.se/login", { method: "POST", body: JSON.stringify(formJson)})
-  .then(response => response.json())
-  .then(data => {
-    console.log(data)
-    localStorage.setItem("token", JSON.stringify(data))
-    alert("Token is: "+ localStorage.getItem("token"))});
+    // Read the form data
+   
+    const form = e.target;
+    const formData = new FormData(form);
+    const formJson = Object.fromEntries(formData.entries());
     
-
-  // Or you can work with it as a plain object:
-
-  console.log(formJson);
-}
-
-const Login = () => {
+    // You can pass formData as a fetch body directly:
+    fetch("http://ronstad.se/login", { method: "POST", body: JSON.stringify(formJson)})
+    .then(response => response.json())
+    .then(data => {
+      if (data?.Token) {  // if token exists
+        const obj = JSON.parse(JSON.stringify(data))
+        console.log(JSON.stringify(data))
+        console.log(obj)
+        localStorage.setItem("token", obj.Token)
+        localStorage.setItem("uid", obj.UserID)
+        navigate("/Marketplace")
+      } else{
+        alert("nuh uh")
+      }
+    })
+    .catch(error => {alert("nuh uh")});
+      
+  
+    // Or you can work with it as a plain object:
+  
+    console.log(formJson);
+  }
   return (
     <CRTScreen>
       <h1 className="cyberpunk-font-og">Cybermarket</h1>
