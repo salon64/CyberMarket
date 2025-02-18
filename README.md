@@ -202,3 +202,113 @@ Content-Type: text/plain; charset=utf-8
     }
 ]
 ```
+
+## List Market
+
+NOTE, This will be rewrite as a GET request when i force Malcolm to follow the REST standard.
+
+NOTE 2, currently search is not implemented
+
+NOTE 3, if ``SortBy`` is not one of the valid strings an unrelated error is returned, will be fixed
+
+This ``POST /Marketplace/displayMarket`` method takes the arguments ``SortBy`` and ``Search`` in json format and returns the market place items, the valid strings for OrderBy are
+
+- Newest
+- Oldest
+- Price_Ascending
+- Price_Descending
+- Alphabetically_Ascending
+- Alphabetically_Descending
+
+Example
+
+```curl
+POST /Marketplace/displayMarket HTTP/1.1
+Host: example.org
+User-Agent: curl/7.81.0
+Accept: */*
+Content-Length: 32
+Content-Type: application/x-www-form-urlencoded
+
+{"SortBy":"Newest", "Search":""}
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Tue, 18 Feb 2025 14:25:54 GMT
+Content-Length: 561
+Content-Type: text/plain; charset=utf-8
+
+[    
+    {
+        "ItemID": 2,
+        "TypeID": 2,
+        "UserID": 1,
+        "ItemName": "Cyberarm",
+        "ItemDescription": null,
+        "ImgURL": null,
+        "OfferID": 2,
+        "Price": 20,
+        "CreationDate": "2025-02-12T00:00:00Z",
+        "Username": "sha"
+    },
+    {
+        "ItemID": 1,
+        "TypeID": 1,
+        "UserID": 1,
+        "ItemName": "MRE",
+        "ItemDescription": null,
+        "ImgURL": null,
+        "OfferID": 6,
+        "Price": 10,
+        "CreationDate": "2025-02-12T00:00:00Z",
+        "Username": "sha"
+    }
+]
+```
+
+## Adding a listing
+
+Note, this will later be changed to follow REST
+
+By sending a POST to ``/Marketplace/addListing`` with the fields ItemID and Price in json format, a listing is created
+
+```curl
+POST /Marketplace/addListing HTTP/1.1
+Host: ronstad.se
+User-Agent: curl/7.88.1
+Accept: */*
+Content-Length: 26
+Content-Type: application/x-www-form-urlencoded
+
+{"ItemID":4, "Price":2000}
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Tue, 18 Feb 2025 14:48:07 GMT
+Content-Length: 1
+Content-Type: text/plain; charset=utf-8
+
+8
+```
+
+## Removing a listing
+
+Note, this will be rewritten as a DELETE
+
+To remove an listing Send the following get request ``GET /Marketplace/removeListing/{ItemID}``
+where itemID is the intended itemid of the listing to be removed
+
+```curl
+GET /Marketplace/removeListing/1 HTTP/1.1
+Host: example.org
+User-Agent: curl/7.81.0
+Accept: */*
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Tue, 18 Feb 2025 14:42:33 GMT
+Content-Length: 16
+Content-Type: text/plain; charset=utf-8
+
+removed listing
+```

@@ -12,7 +12,7 @@ import (
 
 type MarketplaceItems struct {
 	ItemID int
-	Price        int
+	Price  int
 }
 
 type MarketplaceItemsInformation struct {
@@ -55,7 +55,6 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 	}
 	log.Printf("with data %v", data)
 
-
 	// TODO check if i own the item
 	// TODO ERROR handling
 	t, _ := db.Begin()
@@ -85,25 +84,7 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 }
 
 func removeListingFromMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var marketplaceItem MarketplaceItems
-
-	if r.Body == nil {
-		log.Print("body was nil")
-		return
-	}
-
-	decoder := json.NewDecoder(r.Body)
-	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&marketplaceItem)
-
-	if err != nil {
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "Error parsing json: %s", err.Error())
-		log.Printf("Error parsing json: %s", err.Error())
-		return
-	}
-
-	_, err = db.Exec("DELETE FROM Marketplace WHERE ItemID = ?;", r.PathValue("ItemID"))
+	_, err := db.Exec("DELETE FROM Marketplace WHERE ItemID = ?;", r.PathValue("ItemID"))
 
 	// if error write error and exit
 	if err != nil {
