@@ -1,38 +1,42 @@
 import { Link } from "react-router";
 import "./login.css";
 import CRTScreen from "../CRTScreen";
-interface uLogin {
-  uID: string;
-  tok: string;
-}
-function handleSubmit(e) {
-  // Prevent the browser from reloading the page
-  e.preventDefault();
+import { useNavigate } from "react-router";
 
-  // Read the form data
-  const form = e.target;
-  const formData = new FormData(form);
-  const formJson = Object.fromEntries(formData.entries());
+function Login() {
+  const navigate = useNavigate()
+  function handleSubmit(e) {
+    // Prevent the browser from reloading the page
+    e.preventDefault();
   
-  // You can pass formData as a fetch body directly:
-  fetch("http://ronstad.se/login", { method: "POST", body: JSON.stringify(formJson)})
-  .then(response => response.json())
-  .then(data => {
-    const obj = JSON.parse(JSON.stringify(data))
-    //let obj: uLogin = JSON.parse(JSON.stringify(data))
-    console.log(JSON.stringify(data))
-    console.log(obj)
-    localStorage.setItem("token", obj.Token)
-    localStorage.setItem("uid", obj.UserID)
-    alert("Token is: "+ localStorage.getItem("token"));
-    alert("uid is: "+ localStorage.getItem("uid"))});
-
-  // Or you can work with it as a plain object:
-
-  console.log(formJson);
-}
-
-const Login = () => {
+    // Read the form data
+   
+    const form = e.target;
+    const formData = new FormData(form);
+    const formJson = Object.fromEntries(formData.entries());
+    
+    // You can pass formData as a fetch body directly:
+    fetch("http://ronstad.se/login", { method: "POST", body: JSON.stringify(formJson)})
+    .then(response => response.json())
+    .then(data => {
+      if (data?.Token) {  // if token exists
+        const obj = JSON.parse(JSON.stringify(data))
+        console.log(JSON.stringify(data))
+        console.log(obj)
+        localStorage.setItem("token", obj.Token)
+        localStorage.setItem("uid", obj.UserID)
+        navigate("/Marketplace")
+      } else{
+        alert("nuh uh")
+      }
+    })
+    .catch(error => {alert("nuh uh")});
+      
+  
+    // Or you can work with it as a plain object:
+  
+    console.log(formJson);
+  }
   return (
     <CRTScreen>
       <h1 className="cyberpunk-font-og">Cybermarket</h1>

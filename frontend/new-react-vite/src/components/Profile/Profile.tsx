@@ -1,9 +1,14 @@
-import React, { useState, useEffect, Component, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+
+import Marketplace from "../Marketplace/Marketplace";
 import MyImage from "./aswedishtiger.png";
 import "../cyberpunk-css-main/cyberpunk.css";
 const getToken = () => {
   alert("token is: " + localStorage.getItem("token"))
 }
+
+
 async function handleSubmit(e) {
   // Prevent the browser from reloading the page
   e.preventDefault();
@@ -42,7 +47,7 @@ async function handleSubmit(e) {
 function Profile() {
   const nameForm = useRef(null);
   const [data, setData] = useState(null);
-
+  let navigate = useNavigate()
   useEffect(() => {
     fetch("http://ronstad.se/users", { method: "GET" })
       .then((response) => response.json())
@@ -109,7 +114,10 @@ function Profile() {
             <button>Save changes</button> <br>
             </br>
             <button onClick={getToken}>Check token</button>
-            <button>Log Out</button>
+            <button onClick={() => {
+              localStorage.setItem("token", "")
+                navigate('/')
+              }}>Log Out</button>
           </form>
         </div>
       </div>
