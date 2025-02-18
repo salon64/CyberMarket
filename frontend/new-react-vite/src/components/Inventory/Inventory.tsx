@@ -2,8 +2,31 @@ import "./Inventory.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 import ItemTableComponent from "../ItemTable";
 
+interface UserItemInterface {
+  ItemID: number;
+  TypeID: number;
+  ItemName: string;
+  ItemDescription: string;
+  ImgURL: string;
+  IsListed: boolean
+}
 
 const Inventory = () => {
+  function handleSubmit(e) {
+    // Prevent the browser from reloading the page
+    e.preventDefault();
+  
+    // Read the form data
+   
+    const form = e.target;
+    const formData = new FormData(form);
+    const formJson = Object.fromEntries(formData.entries());
+    
+    // You can pass formData as a fetch body directly:
+    fetch("http://ronstad.se/Marketplace/CreateItem", { method: "POST", body: JSON.stringify(formJson)})
+    .then(response =>  {response.ok ? (alert("ok")):(alert("not ok"))})
+    .catch(error => {alert("nuh uh")});
+  }
     return (
       <body>
         <header>My Inventory</header>
@@ -62,6 +85,29 @@ const Inventory = () => {
         </table>
       </div>
     </div>
+
+    <h1>Create Item</h1>
+      <form method="post" onSubmit={handleSubmit}>
+        <label>
+          ItemName: <input name="itemName" type="text" />
+        </label>
+        <br></br>
+        <label>
+          ItemType: <input name="itemType" type="text" />
+        </label>
+        <br></br>
+        <label>
+          ItemDescription: <input name="itemDesc" type="text" />
+        </label>
+        <br></br>
+        <hr />
+        <button type="submit">
+        Create Item
+        </button>
+        <br>
+        </br>
+      </form>
+
   </body>
     );
   };
