@@ -21,7 +21,7 @@ type PubUser struct {
 }
 
 type UserMoney struct {
-	ID int
+	UserID int
 	Money int
 }
 
@@ -171,7 +171,8 @@ func addMoneyToUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var data UserMoney
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&data)
-
+	log.Println(data.UserID)
+	log.Println(data.Money)
 	if err != nil {
 		log.Printf("error decoding: %s", err.Error())
 		(*w).WriteHeader(http.StatusBadRequest)
@@ -181,8 +182,13 @@ func addMoneyToUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	log.Printf("with data %v", data)
 
 	// TODO token stuff
-	db.Exec("UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?", data.Money, data.ID)
-
+	_, err = db.Exec("UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?", data.Money, data.UserID)
+	if err != nil {
+		log.Printf("error decoding: %s", err.Error())
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		return
+	}
 	(*w).WriteHeader(http.StatusOK)
 }
 
