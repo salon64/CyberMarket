@@ -3,8 +3,8 @@ import "../cyberpunk-css-main/cyberpunk.css";
 import ItemTableComponent from "../ItemTable";
 import { useState } from "react";
 interface addMoney {
-  userID: number;
-  money: number;
+  UserID: number;
+  Money: number;
 
 }
 const Inventory = () => {
@@ -33,7 +33,9 @@ const Inventory = () => {
     let currAmount: number = (
       document.getElementById("cur") as HTMLInputElement
     ).valueAsNumber;
-    let tmp: addMoney = {userID: usID, money: currAmount}
+
+    let tmp: addMoney = {UserID: usID, Money: currAmount}
+    console.log(tmp)
     const form = e.target;
     const formData = new FormData(form);
     const formJson = Object.fromEntries(formData.entries());
@@ -45,7 +47,7 @@ const Inventory = () => {
     .catch(error => {alert("nuh uh")});
   }
   function getMoney() {
-    fetch("http://ronstad.se/users/getMoney/" + localStorage.getItem("uid"), { method: "GET"})
+    fetch("http://ronstad.se/user/getMoney/" + localStorage.getItem("uid"), { method: "GET"})
     .then(response => response.json())
     .then(data => {
       const obj = JSON.parse(JSON.stringify(data))
