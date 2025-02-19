@@ -14,14 +14,13 @@ const Inventory = () => {
     const formJson = Object.fromEntries(formData.entries());
     
     // You can pass formData as a fetch body directly:
-    fetch("http://ronstad.se/users/AddMoney", { method: "POST", body: JSON.stringify(formJson)})
+    fetch("http://ronstad.se/Marketplace/CreateItem", { method: "POST", body: JSON.stringify(formJson)})
     .then(response =>  {response.ok ? (alert("ok")):(alert("not ok"))})
     .catch(error => {alert("nuh uh")});
   }
   function handleSubmit2(e) {
     // Prevent the browser from reloading the page
     e.preventDefault();
-  
     // Read the form data
    
     const form = e.target;
@@ -33,12 +32,22 @@ const Inventory = () => {
     .then(response =>  {response.ok ? (alert("ok")):(alert("not ok"))})
     .catch(error => {alert("nuh uh")});
   }
+  function changeUID() {
+      let userID: string = (
+        document.getElementById("id") as HTMLInputElement
+      ).value;
+      localStorage.setItem("uid", userID)
+      alert(localStorage.getItem("uid"))
+      window.location.reload();
+  }
+
     return (
       <body>
         <header>My Inventory</header>
     <div className="left-right-container">
       <div className="right">
         {/* store */}
+        <input type="text" id="id"></input> <button onClick={() => changeUID()}>Change UID</button>
         <table className="cyber-table store-table">
           <thead style={{backgroundColor: "bisque"}}>
             <tr>
