@@ -34,7 +34,7 @@ const Inventory = () => {
     .catch(error => {alert("nuh uh")});
   }
   function getMoney() {
-    fetch("http://ronstad.se/user/getMoney/" + localStorage.getItem("uid"), { method: "GET"})
+    fetch("http://ronstad.se/users/getMoney/" + localStorage.getItem("uid"), { method: "GET"})
     .then(response => response.json())
     .then(data => {
       const obj = JSON.parse(JSON.stringify(data))
