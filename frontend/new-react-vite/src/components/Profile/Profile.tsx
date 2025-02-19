@@ -72,10 +72,12 @@ function Profile() {
   //   const input = form.elements.namedItem('q') as HTMLInputElement;
   //   console.log(input.value);
   // }
-
+  const [uid] = useState(localStorage.getItem("uid"))
   return (
     <>
       <div>
+        <p className="oxanium-font">UID: {uid} </p>
+        <br></br>
         {data ? (
           JSON.stringify(data)
         ) : (
