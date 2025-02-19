@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-import Marketplace from "../Marketplace/Marketplace";
 import MyImage from "./aswedishtiger.png";
 import "../cyberpunk-css-main/cyberpunk.css";
 const getToken = () => {
