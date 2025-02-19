@@ -35,7 +35,7 @@ function Marketplace() {
   }
 
   useEffect(() => {
-    var fetchString = `http://ronstad.se/Marketplace/market`
+    var fetchString = `http://ronstad.se/Marketplace/displayMarket`
     fetch(fetchString, { method: "POST", body:  JSON.stringify(sortState)}) // Replace with your actual API URL
             .then((response) => response.json())
             .then((marketplaceItems) => setMarketplaceItems(marketplaceItems))
@@ -45,7 +45,7 @@ function Marketplace() {
   const buyItem = (item: MarketplaceItems) => {
     console.log("OfferID: ?", item.OfferID);
     const jsonItem = JSON.stringify(item)
-    var fetchString = `http://ronstad.se/Marketplace/buy/` + localStorage.get("userID")
+    var fetchString = `http://ronstad.se/Marketplace/buy/` + localStorage.getItem("uid")
 
     fetch(fetchString, { method: "POST", body:  jsonItem}) 
             .then((response) => response.json())
