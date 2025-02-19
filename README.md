@@ -1,17 +1,33 @@
 # CyberMarket
 
-A market website made in the course d0018e
+The goal of this website is to provide a marketplace for users to buy and sell items inspired by the tabletop game Cyberpunk RED.
+The site allows for users to enter items to the marketplace and set their price.
+These items on the market would be able to be bought by other users transferring the item to the new users inventory and updating their funds.
 
-## Starting the application
+## Table of Contents
 
-Each part is a self contained container, to launch them we have provided a docker compose file for your convenience.
-To run the docker file type
+- [Changelog](#changelog)
+- [Upcoming work](#upcoming-work)
+- [Technical details](#technical-details)
+  - [Backend](#backend)
+  - [Database](#database)
+    - [Schema](#schema)
+  - [WebServer](#webserver)
+  - [Frontend](#frontend)
+- [Starting the application](#starting-the-application)
+- [Backend API](#backend-api)
 
-```bash
-docker compose up --build
-```
+## Changelog
 
-The structure of the services are as shown below
+changes and added features
+
+### Sprint 1 & 2
+
+- Basic auth functions
+
+### Upcoming work
+
+## Technical details
 
 ```mermaid
 architecture-beta
@@ -30,6 +46,120 @@ architecture-beta
     backend:R --> L:web
     webserver:T --> B:web
 
+```
+
+### Backend
+
+To create this website, a backend application designed in go handles access to the database.
+The task delegated to the backend is handling of request that interact with the data of the system.
+Good examples of this are Login, buying, or viewing a users inventory.
+Some of these required a token be passed along in the header for authorization, so the backend is also the major source of securely of the system.
+In the current architecture the backend also has access to the webserver data, this is for the possibility to add images to the webserver,
+by handling images this way allows for webserver to do handel image request which frees upp recourses from the backend.
+
+Go was chosen as the language as its included standard library has http support as well an standard sql interface (note, driver is installed separately).
+Another benefit of go is familiarity as members of this project have worked with it before
+
+### Database
+
+The chosen database for this project is mysql, the choice was made as its one of the most common open source databases
+
+#### Schema
+
+- TokenTable, this table represents the authorization token given out to each user on login,
+- User, Represents the users, with their money and role
+- Marketplace, each listing is uniquely related to an item for sale with price and the date the listing was created
+- Inventory, represents items and their owner
+- ItemTypes, contain descriptive data of item types, such as image, name and description
+
+```mermaid
+erDiagram
+    Users {
+        int UserID "PK auto_inc"
+        varchar(45) Username "uniq, not null"
+        varchar(45) Password "not null"
+        int role "not null, uniq, default=0"
+    }
+
+    Marketplace {
+        int OfferID "PK, auto_inc"
+        int ItemID "uniq, not null"
+        int Price "not null"
+        datetime CreationDate "not null"
+    }
+
+    Inventory {
+        int ItemID "PK, auto_inc"
+        int UserID "not null"
+        int TypeID "not null"
+    }
+
+    ItemTypes {
+        int TypeID "PK, auto_inc"
+        varchar(45) ItemName "not null"
+        varchar(45) ItemDescription "null"
+        varchar(45) ImgURL "null"
+    }
+
+    TokenTable {
+        binary(16) Token "PK"
+        int UserID  "not null"
+        datetime CreatedOn "not null"
+    }
+
+    TransactionLog {
+        int TransID "PK auto_inc"
+        int Price "not null"
+        datetime Date "not null"
+        int ItemID "null"
+        int Buyer "null"
+        int Seller "null"
+    }
+    TokenTable }|--|| Users: Bearer
+
+    Inventory }|--|| Users: owner
+    Inventory }|--|| ItemTypes: Type
+
+    Marketplace ||--|| Inventory: listing
+
+    TransactionLog }o--o| Inventory: Item
+    TransactionLog }o--o| Users: Buyer
+    TransactionLog }o--o| Users: Seller
+```
+
+### WebServer
+
+The webserver hosting the files are currently not finalized,
+currently to run the frontend the included nodejs from vite is used.
+Possible plans for the future are to use vite for build and using the docker container busybox as an http server
+
+### Frontend
+
+The frontend library chosen was react as its common and great recourses exist to assist development.
+A full frontend library may result in extra work which is not relevant for d0018e (uni course this application is developed in)
+But this applications only goals not for the course ass it will se use even when d0018e has concluded.
+
+To build the react application Vite was offered to us as an viable tool from @voffiedev
+
+## Starting the application
+
+Each part is a self contained container, to launch them we have provided a docker compose file for your convenience.
+To run the docker file type
+
+```bash
+docker compose up --build
+```
+
+To start the go backend application only and connect to known database.
+
+```sh
+docker run --rm -e DBHOST=database.org:3306 -e DBUSER=root -e DBPASS=pswd -p 80:80 $(docker build -q ./backend)
+```
+
+If Go is installed, access to environment variables and privileges to host on a specific ports this command could be run (faster than to build a docker image)
+
+```sh
+"@spookyfirefox needs to write this"
 ```
 
 Note that you ether have run as superuser or be in the docker group
@@ -316,3 +446,19 @@ Content-Type: text/plain; charset=utf-8
 
 removed listing
 ```
+
+### Create Item
+
+TODO THIS NEEDS TO BE DOCUMENTED
+
+### Buy
+
+TODO THIS NEED TO BE DOCUMENTED
+
+### Add funds
+
+TODO THIS NEED TO BE DOCUMENTED
+
+### Show wallet
+
+TODO THIS NEED TO BE DOCUMENTED
