@@ -37,28 +37,6 @@ const Inventory = () => {
       <body>
         <header>My Inventory</header>
     <div className="left-right-container">
-      {/* <div className="left">
-        <div className="left-elements">
-          <div className="sorting">
-            Sort by:
-            <div className="cyber-input">
-              <div className="cyber-select">
-                <select>
-                    <option value="Price">Price</option>
-                    <option value="Newest">Newest</option>
-                    <option value="Oldest">Oldest</option>
-                </select>
-              </div>
-            </div>
-          </div>
-  
-          <div className="tags">
-            Tags
-          </div>
-        </div>
-        
-      </div> */}
-  
       <div className="right">
         {/* store */}
         <table className="cyber-table store-table">
@@ -72,21 +50,6 @@ const Inventory = () => {
           </thead>
           <tbody>
             <ItemTableComponent />
-            {/* <tr>
-              <td>Row 1, Col 1</td>
-              <td>Row 1, Col 2</td>
-              <td>Row 1, Col 3</td>
-            </tr>
-            <tr>
-              <td>Row 2, Col 1</td>
-              <td>Row 2, Col 2</td>
-              <td>Row 2, Col 3</td>
-            </tr>
-            <tr>
-              <td>Row 3, Col 1</td>
-              <td>Row 3, Col 2</td>
-              <td>Row 3, Col 3</td>
-            </tr> */}
           </tbody>
         </table>
       </div>
