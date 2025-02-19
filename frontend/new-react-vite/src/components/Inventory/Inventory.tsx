@@ -2,7 +2,7 @@ import "./Inventory.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 import ItemTableComponent from "../ItemTable";
 import { useState } from "react";
-interface addM {
+interface addMoney {
   userID: number;
   money: number;
 
@@ -27,13 +27,19 @@ const Inventory = () => {
     // Prevent the browser from reloading the page
     e.preventDefault();
     // Read the form data
-    let tmp: addM = {userID: 1, money: 2}
+    let usID: number = (
+      document.getElementById("usId") as HTMLInputElement
+    ).valueAsNumber;
+    let currAmount: number = (
+      document.getElementById("cur") as HTMLInputElement
+    ).valueAsNumber;
+    let tmp: addMoney = {userID: usID, money: currAmount}
     const form = e.target;
     const formData = new FormData(form);
     const formJson = Object.fromEntries(formData.entries());
     
     // You can pass formData as a fetch body directly:
-    fetch("http://ronstad.se/user/AddMoney", { method: "POST", body: JSON.stringify(formJson)})
+    fetch("http://ronstad.se/user/AddMoney", { method: "POST", body: JSON.stringify(tmp)})
     .then(response => response.json())
     .then(data => {console.log(data)})
     .catch(error => {alert("nuh uh")});
@@ -102,11 +108,11 @@ const Inventory = () => {
       <h1>Add money to wallet</h1>
       <form method="post" onSubmit={handleSubmit2}>
       <label>
-          UserID: <input name="userID" type="text" />
+          UserID: <input name="userID" type="number" id="usId" />
         </label>
         <br></br>
         <label>
-          Amount: <input name="money" type="number" />
+          Amount: <input name="money" type="number" id="cur" />
         </label>
         <br></br>
         <hr />
