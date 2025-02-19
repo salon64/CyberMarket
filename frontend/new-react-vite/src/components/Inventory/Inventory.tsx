@@ -1,6 +1,7 @@
 import "./Inventory.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 import ItemTableComponent from "../ItemTable";
+import { useState } from "react";
 
 const Inventory = () => {
   function handleSubmit(e) {
@@ -13,7 +14,7 @@ const Inventory = () => {
     const formData = new FormData(form);
     const formJson = Object.fromEntries(formData.entries());
     
-    // You can pass formData as a fetch body directly:
+    // You can pass formData as a fetch body directly: 
     fetch("http://ronstad.se/Marketplace/CreateItem", { method: "POST", body: JSON.stringify(formJson)})
     .then(response =>  {response.ok ? (alert("ok")):(alert("not ok"))})
     .catch(error => {alert("nuh uh")});
@@ -32,6 +33,18 @@ const Inventory = () => {
     .then(response =>  {response.ok ? (alert("ok")):(alert("not ok"))})
     .catch(error => {alert("nuh uh")});
   }
+  function getMoney() {
+    fetch("http://ronstad.se/user/getMoney/" + localStorage.getItem("uid"), { method: "GET"})
+    .then(response => response.json())
+    .then(data => {
+      const obj = JSON.parse(JSON.stringify(data))
+      console.log(obj)
+      setWallet(data.money)
+      return data.money
+    })
+    .catch(error => {alert("nuh uh")});
+  }
+  
   function changeUID() {
       let userID: string = (
         document.getElementById("id") as HTMLInputElement
@@ -40,10 +53,11 @@ const Inventory = () => {
       alert(localStorage.getItem("uid"))
       window.location.reload();
   }
-
+  const [wallet, setWallet] = useState("0")
+  
     return (
       <body>
-        <header>My Inventory</header>
+        <header>My Inventory</header> Wallet: {wallet}
     <div className="left-right-container">
       <div className="right">
         {/* store */}
