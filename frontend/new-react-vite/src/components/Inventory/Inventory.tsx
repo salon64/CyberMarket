@@ -18,6 +18,21 @@ const Inventory = () => {
     .then(response =>  {response.ok ? (alert("ok")):(alert("not ok"))})
     .catch(error => {alert("nuh uh")});
   }
+  function handleSubmit2(e) {
+    // Prevent the browser from reloading the page
+    e.preventDefault();
+  
+    // Read the form data
+   
+    const form = e.target;
+    const formData = new FormData(form);
+    const formJson = Object.fromEntries(formData.entries());
+    
+    // You can pass formData as a fetch body directly:
+    fetch("http://ronstad.se/Marketplace/AddMoney", { method: "POST", body: JSON.stringify(formJson)})
+    .then(response =>  {response.ok ? (alert("ok")):(alert("not ok"))})
+    .catch(error => {alert("nuh uh")});
+  }
     return (
       <body>
         <header>My Inventory</header>
@@ -94,7 +109,23 @@ const Inventory = () => {
         <br>
         </br>
       </form>
-
+      <h1>Add money to wallet</h1>
+      <form method="post" onSubmit={handleSubmit2}>
+      <label>
+          UserID: <input name="userID" type="text" />
+        </label>
+        <br></br>
+        <label>
+          Amount: <input name="money" type="text" />
+        </label>
+        <br></br>
+        <hr />
+        <button type="submit">
+        Add money
+        </button>
+        <br>
+        </br>
+      </form>
   </body>
     );
   };
