@@ -44,7 +44,7 @@ const Inventory = () => {
     .then(data => {
       const obj = JSON.parse(JSON.stringify(data))
       console.log(obj)
-      setWallet(obj.money)
+      setWallet(obj.money) //im going to krill myself
     })
     //.catch(error => {alert("nuh uh")});
   }
