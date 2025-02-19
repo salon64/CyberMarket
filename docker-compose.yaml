@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: backend/.
+    ports:
+      - "80:80"
+    environment:
+      # Setting upp the connection info for the data base
+      - DBHOST=mysql:3306
+      - DBUSER=root
+      - DBPASS=pswd
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      # this imports the example data tables
+      - ./example/example_db.sql:/docker-entrypoint-initdb.d/example_db.sql
+      # this is where the data is stored
+      - ./db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: pswd
