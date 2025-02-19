@@ -39,12 +39,11 @@ const Inventory = () => {
     .then(data => {
       const obj = JSON.parse(JSON.stringify(data))
       console.log(obj)
-      setWallet(data.money)
-      return data.money
+      setWallet(obj.money)
     })
-    .catch(error => {alert("nuh uh")});
+    //.catch(error => {alert("nuh uh")});
   }
-  
+  getMoney()
   function changeUID() {
       let userID: string = (
         document.getElementById("id") as HTMLInputElement
