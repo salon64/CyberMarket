@@ -2,7 +2,11 @@ import "./Inventory.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 import ItemTableComponent from "../ItemTable";
 import { useState } from "react";
+interface addM {
+  userID: number;
+  money: number;
 
+}
 const Inventory = () => {
   function handleSubmit(e) {
     // Prevent the browser from reloading the page
@@ -23,14 +27,15 @@ const Inventory = () => {
     // Prevent the browser from reloading the page
     e.preventDefault();
     // Read the form data
-   
+    let tmp: addM = {userID: 1, money: 2}
     const form = e.target;
     const formData = new FormData(form);
     const formJson = Object.fromEntries(formData.entries());
     
     // You can pass formData as a fetch body directly:
-    fetch("http://ronstad.se/Marketplace/AddMoney", { method: "POST", body: JSON.stringify(formJson)})
-    .then(response =>  {response.ok ? (alert("ok")):(alert("not ok"))})
+    fetch("http://ronstad.se/user/AddMoney", { method: "POST", body: JSON.stringify(formJson)})
+    .then(response => response.json())
+    .then(data => {console.log(data)})
     .catch(error => {alert("nuh uh")});
   }
   function getMoney() {
@@ -101,7 +106,7 @@ const Inventory = () => {
         </label>
         <br></br>
         <label>
-          Amount: <input name="money" type="text" />
+          Amount: <input name="money" type="number" />
         </label>
         <br></br>
         <hr />
