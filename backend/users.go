@@ -20,6 +20,11 @@ type PubUser struct {
 	Name string
 }
 
+type UserMoney struct {
+	ID int
+	Money int
+}
+
 // list all the users
 func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	// execute sql query to get username id pairs
@@ -154,6 +159,25 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	// TODO return old name and pswd
+
+	(*w).WriteHeader(http.StatusOK)
+}
+
+func addMoneyToUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var data UserMoney
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&data)
+
+	if err != nil {
+		log.Printf("error decoding: %s", err.Error())
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		return
+	}
+	log.Printf("with data %v", data)
+
+	// TODO token stuff
+	db.Exec("UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?", data.Money, data.ID)
 
 	(*w).WriteHeader(http.StatusOK)
 }
