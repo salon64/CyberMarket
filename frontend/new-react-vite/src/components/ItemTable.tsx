@@ -7,8 +7,9 @@ interface UserItemInterface {
     ItemDescription: string;
     ImgURL: string;
     IsListed: boolean
-  }
-  async function handleSell(itemID) {
+}
+
+async function handleSell(itemID: number) {
     // Prevent the browser from reloading the page
     //e.preventDefault();
     
@@ -31,10 +32,12 @@ interface UserItemInterface {
       }
     })
 }
+
 const ItemTableComponent = () => {
     const [userItems, setUserItems] = useState<UserItemInterface[]>([]);
+    let fetchString =  "http://ronstad.se/inventory/" + localStorage.getItem("uid")
     useEffect(() => {
-        fetch("http://ronstad.se/inventory/1", { method: "GET" }) // Replace with your actual API URL
+        fetch(fetchString, { method: "GET" }) // Replace with your actual API URL
             .then((response) => response.json())
             .then((useritems) => setUserItems(useritems))
             .catch((error) => console.error("Error: ", error));
@@ -55,6 +58,13 @@ const ItemTableComponent = () => {
         })
     }
 
+    if (userItems == null){
+      return (
+        <>
+        </>
+      )
+    }
+    
     return (
         <>
             {userItems.map((item) => (
