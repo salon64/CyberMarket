@@ -14,7 +14,7 @@ const Inventory = () => {
     const formJson = Object.fromEntries(formData.entries());
     
     // You can pass formData as a fetch body directly:
-    fetch("http://ronstad.se/Marketplace/CreateItem", { method: "POST", body: JSON.stringify(formJson)})
+    fetch("http://ronstad.se/users/AddMoney", { method: "POST", body: JSON.stringify(formJson)})
     .then(response =>  {response.ok ? (alert("ok")):(alert("not ok"))})
     .catch(error => {alert("nuh uh")});
   }
