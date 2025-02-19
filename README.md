@@ -53,9 +53,9 @@ architecture-beta
 To create this website, a backend application designed in go handles access to the database.
 The task delegated to the backend is handling of request that interact with the data of the system.
 Good examples of this are Login, buying, or viewing a users inventory.
-Some of these required a token be passed along in the header for authorization, so the backend is also the major source of securely of the system.
+Some of these required a token be passed along in the header for authorization, so the backend is also the major source of security for the system.
 In the current architecture the backend also has access to the webserver data, this is for the possibility to add images to the webserver,
-by handling images this way allows for webserver to do handel image request which frees upp recourses from the backend.
+by handling images this way it allows the webserver to  handel image request which frees upp recourses from the backend.
 
 Go was chosen as the language as its included standard library has http support as well an standard sql interface (note, driver is installed separately).
 Another benefit of go is familiarity as members of this project have worked with it before
@@ -137,7 +137,7 @@ Possible plans for the future are to use vite for build and using the docker con
 
 The frontend library chosen was react as its common and great recourses exist to assist development.
 A full frontend library may result in extra work which is not relevant for d0018e (uni course this application is developed in)
-But this applications only goals not for the course ass it will se use even when d0018e has concluded.
+But this applications goals is not only for the course as it will see use after d0018e has concluded.
 
 To build the react application Vite was offered to us as an viable tool from @voffiedev
 
