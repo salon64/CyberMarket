@@ -525,7 +525,7 @@ This was deemed acceptable since its meant that item types are more or less cons
 
 ### Create Item
 
-TODO THIS NEEDS TO BE DOCUMENTED
+Sending the http request ``POST /Marketplace/CreateItem`` allows a user to create an item and place it into any user's inventory with the fields UserID and ItemType.
 
 ### Buy
 
@@ -537,4 +537,4 @@ TODO THIS NEED TO BE DOCUMENTED
 
 ### Show wallet
 
-TODO THIS NEED TO BE DOCUMENTED
+A user can send the request ``GET /user/getMoney/{uid}`` in order to view the amount of currency they hold. As of writing this, anyone can send a request to view anyones wallet. Bearer tokens will be implemented (in most, if not all http requests) in a later sprint to verify which user has access to this information.
