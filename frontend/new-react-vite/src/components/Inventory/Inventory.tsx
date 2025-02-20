@@ -7,21 +7,31 @@ interface addMoney {
   Money: number;
 
 }
+interface createItemInt {
+  UserID: number;
+  ItemType: number;
+
+}
 const Inventory = () => {
   function handleSubmit(e) {
     // Prevent the browser from reloading the page
     e.preventDefault();
   
     // Read the form data
-   
-    const form = e.target;
-    const formData = new FormData(form);
-    const formJson = Object.fromEntries(formData.entries());
-    
+    let usItmID: number = (
+      document.getElementById("usItmId") as HTMLInputElement
+    ).valueAsNumber;
+    let itType: number = (
+      document.getElementById("itmType") as HTMLInputElement
+    ).valueAsNumber;
+    let tmp: createItemInt = {UserID: usItmID, ItemType: itType}
+    console.log(tmp)
     // You can pass formData as a fetch body directly: 
-    fetch("http://ronstad.se/Marketplace/CreateItem", { method: "POST", body: JSON.stringify(formJson)})
-    .then(response =>  {response.ok ? (alert("ok")):(alert("not ok"))})
-    .catch(error => {alert("nuh uh")});
+    fetch("http://ronstad.se/Marketplace/CreateItem", { method: "POST", body: JSON.stringify(tmp)})
+    .then(response =>  {response.ok ? (console.log("Successfully executed request")):(alert("Invalid input"))
+      window.location.reload();
+    })
+    .catch(error => {alert("Error attempting to create an item :"+error)});
   }
   function handleSubmit2(e) {
     // Prevent the browser from reloading the page
@@ -36,15 +46,11 @@ const Inventory = () => {
 
     let tmp: addMoney = {UserID: usID, Money: currAmount}
     console.log(tmp)
-    const form = e.target;
-    const formData = new FormData(form);
-    const formJson = Object.fromEntries(formData.entries());
     
-    // You can pass formData as a fetch body directly:
     fetch("http://ronstad.se/user/AddMoney", { method: "POST", body: JSON.stringify(tmp)})
     .then(response => response.json())
     .then(data => {console.log(data)})
-    .catch(error => {alert("nuh uh")});
+    .catch(error => {alert(error)});
   }
   function getMoney() {
     fetch("http://ronstad.se/user/getMoney/" + localStorage.getItem("uid"), { method: "GET"})
@@ -52,9 +58,9 @@ const Inventory = () => {
     .then(data => {
       const obj = JSON.parse(JSON.stringify(data))
       console.log(obj)
-      setWallet(obj.money) //im going to krill myself
+      setWallet(obj.Amount) //im going to krill myself
     })
-    //.catch(error => {alert("nuh uh")});
+    //.catch(error => {alert(error)});
   }
   getMoney()
   function changeUID() {
@@ -93,11 +99,11 @@ const Inventory = () => {
     <h1>Create Item</h1>
       <form method="post" onSubmit={handleSubmit}>
       <label>
-          UserID: <input name="userID" type="text" />
+          UserID: <input name="userID" type="number" id="usItmId" />
         </label>
         <br></br>
         <label>
-          ItemType: <input name="itemType" type="text" />
+          ItemType: <input name="itemType" type="number" id="itmType"/>
         </label>
         <br></br>
         <hr />
