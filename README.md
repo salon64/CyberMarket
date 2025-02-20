@@ -533,7 +533,7 @@ TODO THIS NEED TO BE DOCUMENTED
 
 ### Add funds
 
-TODO THIS NEED TO BE DOCUMENTED
+The request ``POST /user/AddMoney`` with the additional fields UserID and Amount can any amount of money to an existing user.
 
 ### Show wallet
 
