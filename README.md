@@ -1,5 +1,7 @@
 # CyberMarket
 
+[Github Link](https://github.com/salon64/CyberMarket)
+
 The goal of this website is to provide a marketplace for users to buy and sell items inspired by the tabletop game Cyberpunk RED.
 The site allows for users to enter items to the marketplace and set their price.
 These items on the market would be able to be bought by other users transferring the item to the new users inventory and updating their funds.
@@ -15,17 +17,24 @@ These items on the market would be able to be bought by other users transferring
   - [WebServer](#webserver)
   - [Frontend](#frontend)
 - [Starting the application](#starting-the-application)
+- [Testing and user stories](#testing-and-user-stories)
 - [Backend API](#backend-api)
 
 ## Changelog
 
-changes and added features
+changes and added features, the full view exist on
+[GithuB CyberMarket Project](https://github.com/users/salon64/projects/3/views/1)
 
 ### Sprint 1 & 2
 
-- Basic auth functions
+reflections and result of sprint 1 and 2,
+see [GithuB CyberMarket Project](https://github.com/users/salon64/projects/3/views/1)
 
-### Upcoming work
+## Upcoming work
+
+A Github project is used to track issues and features that are wanted.
+
+[GithuB CyberMarket Project](https://github.com/users/salon64/projects/3/views/1)
 
 ## Technical details
 
@@ -53,9 +62,9 @@ architecture-beta
 To create this website, a backend application designed in go handles access to the database.
 The task delegated to the backend is handling of request that interact with the data of the system.
 Good examples of this are Login, buying, or viewing a users inventory.
-Some of these required a token be passed along in the header for authorization, so the backend is also the major source of securely of the system.
+Some of these required a token be passed along in the header for authorization, so the backend is also the major source of security for the system.
 In the current architecture the backend also has access to the webserver data, this is for the possibility to add images to the webserver,
-by handling images this way allows for webserver to do handel image request which frees upp recourses from the backend.
+by handling images this way it allows the webserver to  handel image request which frees upp recourses from the backend.
 
 Go was chosen as the language as its included standard library has http support as well an standard sql interface (note, driver is installed separately).
 Another benefit of go is familiarity as members of this project have worked with it before
@@ -137,9 +146,34 @@ Possible plans for the future are to use vite for build and using the docker con
 
 The frontend library chosen was react as its common and great recourses exist to assist development.
 A full frontend library may result in extra work which is not relevant for d0018e (uni course this application is developed in)
-But this applications only goals not for the course ass it will se use even when d0018e has concluded.
+But this applications goals is not only for the course as it will see use after d0018e has concluded.
 
 To build the react application Vite was offered to us as an viable tool from @voffiedev
+
+## Testing and User stories
+
+The test are manual and are based on the user stories bellow
+
+When a user browses the market the expected result should be that there are items viable in the market that the user then can interact with.
+
+An User should be able to view their items and funds
+
+An user should be able to put an item they own onto the market for a price of their choosing
+
+When a user buys an item, the items should be transferred to the users inventory,
+and removed from the sellers or created if bought from an admin listing.
+Note that the funds should be updated.
+
+An admin should be able to remove a listing from the market and the item remains in the users inventory.
+
+An admin should be able to remove an item from a users account, removing the item from the users account without adding it to the admin account,
+as well as removing eventual listings. A log should be added that the item was sold to null.
+
+An admin should be able to list a new item to the market with an infinite supply, when they are purchased from this listing a new item shall be created and added to the buyers inventory.
+
+All transactions should be able to be viewed by an admin.
+
+A user should be able to see all transactions they have made.
 
 ## Starting the application
 
