@@ -13,7 +13,8 @@ interface createItemInt {
 
 }
 const Inventory = () => {
-  function handleSubmit(e) {
+  getMoney()
+  function CreateItem(e) {
     // Prevent the browser from reloading the page
     e.preventDefault();
   
@@ -33,7 +34,7 @@ const Inventory = () => {
     })
     .catch(error => {alert("Error attempting to create an item :"+error)});
   }
-  function handleSubmit2(e) {
+  function AddMoney(e) {
     // Prevent the browser from reloading the page
     e.preventDefault();
     // Read the form data
@@ -50,19 +51,22 @@ const Inventory = () => {
     fetch("http://ronstad.se/user/AddMoney", { method: "POST", body: JSON.stringify(tmp)})
     .then(response => response.json())
     .then(data => {console.log(data)})
-    .catch(error => {alert(error)});
+    .catch(error => {}); // kastar error när det funkar?????????????
+    window.location.reload();
   }
+  
   function getMoney() {
     fetch("http://ronstad.se/user/getMoney/" + localStorage.getItem("uid"), { method: "GET"})
     .then(response => response.json())
     .then(data => {
       const obj = JSON.parse(JSON.stringify(data))
-      console.log(obj)
-      setWallet(obj.Amount) //im going to krill myself
+      console.log(obj[0].Amount)
+      setWallet(obj[0].Amount) //im going to krill myself
+      
     })
     //.catch(error => {alert(error)});
   }
-  getMoney()
+  
   function changeUID() {
       let userID: string = (
         document.getElementById("id") as HTMLInputElement
@@ -80,6 +84,7 @@ const Inventory = () => {
       <div className="right">
         {/* store */}
         <input type="text" id="id"></input> <button onClick={() => changeUID()}>Change UID</button>
+        <button onClick={() => getMoney()}>getwallet</button>
         <table className="cyber-table store-table">
           <thead style={{backgroundColor: "bisque"}}>
             <tr>
@@ -97,7 +102,7 @@ const Inventory = () => {
     </div>
 
     <h1>Create Item</h1>
-      <form method="post" onSubmit={handleSubmit}>
+      <form method="post" onSubmit={CreateItem}>
       <label>
           UserID: <input name="userID" type="number" id="usItmId" />
         </label>
@@ -114,7 +119,7 @@ const Inventory = () => {
         </br>
       </form>
       <h1>Add money to wallet</h1>
-      <form method="post" onSubmit={handleSubmit2}>
+      <form method="post" onSubmit={AddMoney}>
       <label>
           UserID: <input name="userID" type="number" id="usId" />
         </label>
