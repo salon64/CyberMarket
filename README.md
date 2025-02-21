@@ -198,32 +198,65 @@ A simple rust terminal interface is implemented as an client that is used for de
 
 Currently not implemented, work is planed after sprint 4
 
-## Testing and User stories
+## User stories and Testing 
 
-TODO *from task description*: Test case specifications (manual testing, related to the roles and user stories) Write step by step how you will execute the demo for TA
+TODO *from task description*: Test case specifications (manual testing, related to the roles and user stories) Write step by step how you will execute the demo for TA. The test are manual and are based on the user stories bellow
 
-The test are manual and are based on the user stories bellow
+### User Stories
+1. As a User I want to be able to register an acount on the website. So that i have acces to the website.
 
-When a user browses the market the expected result should be that there are items viable in the market that the user then can interact with.
+2. As a User I want to be able to log into my account, In order to view my profile/inventory/marketplace.
 
-An User should be able to view their items and funds
+3. As a User I want to be able to view my profile, so that i can see account details about my account.
 
-An user should be able to put an item they own onto the market for a price of their choosing
+4. As a User I want to be able to update my username/password in my profile page, in order to have account the account inforamtion i prefer.
 
-When a user buys an item, the items should be transferred to the users inventory,
-and removed from the sellers or created if bought from an admin listing.
-Note that the funds should be updated.
+5. As a User I want to be able to view my inventory in order to see my wallet and items.
 
-An admin should be able to remove a listing from the market and the item remains in the users inventory.
+6. As a User I want to be able to add money into my account, to have sufficent funds.
 
-An admin should be able to remove an item from a users account, removing the item from the users account without adding it to the admin account,
-as well as removing eventual listings. A log should be added that the item was sold to null.
+7. As a User I want to be able to create items that i can list on the marketplace, to interact with the market.
 
-An admin should be able to list a new item to the market with an infinite supply, when they are purchased from this listing a new item shall be created and added to the buyers inventory.
+8. As a User I want to be able to sell an item from my inventory at a price i set to get rid off items from my inventory.
 
-All transactions should be able to be viewed by an admin.
+9. As a User I want to be able to retract a listing from the marketplace I have made, In order to get that item back soly to my inventory.
 
-A user should be able to see all transactions they have made.
+10. As a User I want to be able to see items lsited in them market with details about it (itemtype, price, description, seller). So that i can see the items currently listed.
+
+11. As a User I want to be able to sort the market by different metrics (time, price, alphabetically). To display the market in the way i prefer.
+
+12. As a Users I want to be able to buy items from the marketplace, In order to get that item to my inventory.
+
+### Testing
+
+1. To register An account The User should press on the "register your account button" that should take the user to a different page. The user should then fill in a user name and password and press the register button. When the button is pressed a http call to the backend to register a new user with the details the user filled in. The backend should take the request and make a new account in the db and return a userID and toeken. 
+TODO add checks and handle non unique usernames
+
+2. To log into an account the user should enter username and password in their input feilds and press the button/ press enter on their keyboard. That should send a http call with the information to the backend that should return a userId and a token if matching and an error if not
+
+3. When logged in a user should be able to press the "profile" button in the navbar, it should take them to the profile page and should display the users ID. 
+
+4. When on the profile website the User should be able to update their user information by entering the new data into the fields and pressing the "save changes" button. That should send a http call to the backend that should check the token to see if the token has permissions for that userID, If it doesnt it should return an error and if it does it should update the information in the DB and return oldname + newname or old psw + new psw.
+
+5. As a user I should be able to press the inventory button in the nacbar. That should diplay the users wallet. It should also display the users items in a table with a distinction if they are in the marketplace or not. If they are not in the marketplace it should display a sell option with a input prompt and a sell button, and if it is in the marketpalce it should display a button to recall the item from the marketplace. 
+
+6. To add money to to their wallet the user should type the users ID and ammount in the input fields under "add money to wallet" and press the "add money" button. That should send a http call to the backend where it should check if the active user can add money to that wallet, if it cant it should return an error. If it can it should add the money (in the DB) to the wallet of the user and return the totla amount of money now in that persons wallet.
+
+7. To add a new item to a users inventory the user should add the users id and the itemType in their respecitive feilds under "create item" and press the button "create item". That should send a http call to the backend, where it should check if the one who sent the request can add items to that inventory. It should also check if the itemtype exists. and return an error if they dont. If it passes the checks it should send to the DB to add that the item to that users inventory and return the ItemID, userId and itemtype.
+
+8. A user should be able to sell an item from their invenotry that is not already on the marketplace by entering the price in items row and press sell. That should send a http call to the backend, that should check if the caller can sell that users items, and return an error if it shouldent. if it should it will add the item to the markeptlace table in the db and return the OfferID. 
+TODO
+
+9. A user should be able to remove a listed item from the marketpalce that they have acces to by pressing the "recall" button. That should send a http call to the backend where it checks if the caller can recall that persons items and return an error if not. If it should it should update the DB by removing the item from the marketpalce table and returning the offerID 
+TODO
+
+10. When a user is on the marketplace it should display all the items on the marketplace in the sorted order, on the left side it should display what they are sorted by. This data should be gathered with an http call from when the user loads the site. that call should return all the items in json format.
+
+11. A user should be able to change the order the items are displayed in by pressing the selction bar and selecting another method. That should send a call to the backend where that calls the db for the marketplace information to be returnet in that order. it should then update the table with all the items to the marketplace sorted in the new order. 
+
+12. A user should be able to buy an item by pressing the "buy" button on the row that item is displayed in. That should send a http call to the backend. The backend will perform chacks to see that you are not buying your own item, you have sufficent funds etc. and return an eror if it fails a check. if not the item should be transfered to the new owner, funds should be updated and and a transaction should be added to the transactionlog in the db. then retrun the OfferID
+TODO
+
 
 ## Reflection
 
