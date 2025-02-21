@@ -561,14 +561,90 @@ This was deemed acceptable since its meant that item types are more or less cons
 
 Sending the http request ``POST /Marketplace/CreateItem`` allows a user to create an item and place it into any user's inventory with the fields UserID and ItemType.
 
+```curl
+POST /Marketplace/CreateItem HTTP/1.1
+Host: example.org
+User-Agent: curl/7.81.0
+Accept: */*
+Content-Length: 26
+Content-Type: application/json
+
+{"UserID":9, "ItemType":3}
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Fri, 21 Feb 2025 09:50:31 GMT
+Content-Length: 38
+Content-Type: text/plain; charset=utf-8
+
+{
+    "UserID": 9,
+    "ItemType": 3
+}
+```
+
 ### Buy
 
 TODO THIS NEED TO BE DOCUMENTED
+
+```curl
+POST /Marketplace/buy/5 HTTP/1.1
+Host: example.org
+User-Agent: curl/7.81.0
+Accept: */*
+Content-Length: 13
+Content-Type: application/json
+
+{"UserID":12}
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Fri, 21 Feb 2025 10:25:31 GMT
+Content-Length: 7
+Content-Type: text/plain; charset=utf-8
+
+Success
+```
 
 ### Add funds
 
 The request ``POST /user/AddMoney`` with the additional fields UserID and Amount can any amount of money to an existing user.
 
+```curl
+POST /user/AddMoney HTTP/1.1
+Host: example.org
+User-Agent: curl/7.81.0
+Accept: */*
+Content-Length: 27
+Content-Type: application/x-www-form-urlencoded
+
+{"UserID":9, "Amount":1000}
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Fri, 21 Feb 2025 10:00:52 GMT
+Content-Length: 0
+```
+
 ### Show wallet
 
 A user can send the request ``GET /user/getMoney/{uid}`` in order to view the amount of currency they hold. As of writing this, anyone can send a request to view anyones wallet. Bearer tokens will be implemented (in most, if not all http requests) in a later sprint to verify which user has access to this information.
+
+```curl
+GET /user/getMoney/12 HTTP/1.1
+Host: example.org
+User-Agent: curl/7.81.0
+Accept: */*
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Fri, 21 Feb 2025 10:28:31 GMT
+Content-Length: 38
+Content-Type: text/plain; charset=utf-8
+
+[
+    {
+        "Amount": 8788
+    }
+]
+```
