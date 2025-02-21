@@ -2,23 +2,54 @@
 
 [Github Link](https://github.com/salon64/CyberMarket)
 
+## Executive summary
+
 The goal of this website is to provide a marketplace for users to buy and sell items inspired by the tabletop game Cyberpunk RED.
 The site allows for users to enter items to the marketplace and set their price.
 These items on the market would be able to be bought by other users transferring the item to the new users inventory and updating their funds.
 
 ## Table of Contents
 
+- [Executive summary](#executive-summary)
+- [Table of Contents](#table-of-contents)
+- [requirements, assumptions, limitations](#requirements-assumptions-limitations)
 - [Changelog](#changelog)
-- [Upcoming work](#upcoming-work)
-- [Technical details](#technical-details)
+  - [Sprint 1 \& 2](#sprint-1--2)
+- [Upcoming work (Prioritized backlog)](#upcoming-work-prioritized-backlog)
+- [System Architecture](#system-architecture)
   - [Backend](#backend)
   - [Database](#database)
     - [Schema](#schema)
+    - [Transaction Log](#transaction-log)
+    - [Comments and grading](#comments-and-grading)
   - [WebServer](#webserver)
   - [Frontend](#frontend)
+  - [Debugging frontend](#debugging-frontend)
+  - [Discord Frontend](#discord-frontend)
+- [Testing and User stories](#testing-and-user-stories)
+- [Reflection](#reflection)
+  - [frontend specific reflection](#frontend-specific-reflection)
+  - [backend specific reflection](#backend-specific-reflection)
 - [Starting the application](#starting-the-application)
-- [Testing and user stories](#testing-and-user-stories)
+- [Website Documentation](#website-documentation)
 - [Backend API](#backend-api)
+  - [User Login](#user-login)
+  - [Listing users](#listing-users)
+  - [Add a user](#add-a-user)
+  - [Update user info](#update-user-info)
+  - [Add funds](#add-funds)
+  - [Show wallet](#show-wallet)
+  - [List user Items](#list-user-items)
+  - [Create Item](#create-item)
+  - [List Market](#list-market)
+  - [Adding a listing](#adding-a-listing)
+  - [Removing a listing](#removing-a-listing)
+  - [Buy](#buy)
+- [References](#references)
+
+## requirements, assumptions, limitations
+
+TODO *from task description*
 
 ## Changelog
 
@@ -30,13 +61,14 @@ changes and added features, the full view exist on
 reflections and result of sprint 1 and 2,
 see [GithuB CyberMarket Project](https://github.com/users/salon64/projects/3/views/1)
 
-## Upcoming work
+## Upcoming work (Prioritized backlog)
 
 A Github project is used to track issues and features that are wanted.
-
 [GithuB CyberMarket Project](https://github.com/users/salon64/projects/3/views/1)
 
-## Technical details
+TODO *from task description*: Prioritized backlog (or reference to it in a tool): Each item should have ID, description, priority(importance), effort(small, medium, large), sprint no (when assigned), status (e.g. when finished).
+
+## System Architecture
 
 ```mermaid
 architecture-beta
@@ -136,6 +168,14 @@ erDiagram
     TransactionLog }o--o| Users: Seller
 ```
 
+#### Transaction Log
+
+TODO write about transaction log
+
+#### Comments and grading
+
+TODO *From task description*: Write about your implementation of grading and comments on particular assets.  
+
 ### WebServer
 
 The webserver hosting the files are currently not finalized,
@@ -150,7 +190,17 @@ But this applications goals is not only for the course as it will see use after 
 
 To build the react application Vite was offered to us as an viable tool from @voffiedev
 
+### Debugging frontend
+
+A simple rust terminal interface is implemented as an client that is used for debugging, see github repo
+
+### Discord Frontend
+
+Currently not implemented, work is planed after sprint 4
+
 ## Testing and User stories
+
+TODO *from task description*: Test case specifications (manual testing, related to the roles and user stories) Write step by step how you will execute the demo for TA
 
 The test are manual and are based on the user stories bellow
 
@@ -175,6 +225,14 @@ All transactions should be able to be viewed by an admin.
 
 A user should be able to see all transactions they have made.
 
+## Reflection
+
+TODO *from task description* A reflection of the system's limitations and the possibilities for improvements.
+
+### frontend specific reflection
+
+### backend specific reflection
+
 ## Starting the application
 
 Each part is a self contained container, to launch them we have provided a docker compose file for your convenience.
@@ -193,10 +251,14 @@ docker run --rm -e DBHOST=database.org:3306 -e DBUSER=root -e DBPASS=pswd -p 80:
 If Go is installed, access to environment variables and privileges to host on a specific ports this command could be run (faster than to build a docker image)
 
 ```sh
-"@spookyfirefox needs to write this"
+TODO "@spookyfirefox needs to write this"
 ```
 
 Note that you ether have run as superuser or be in the docker group
+
+## Website Documentation
+
+TODO *from sprint 2 review*
 
 ## Backend API
 
@@ -295,7 +357,7 @@ Note that the max length of both pswd and name is 45 bytes.
 }
 ```
 
-## Update user info
+### Update user info
 
 to update the user send a PATCH request to ``/users/{id}``.
 This requires the fields token, where the fields new_name or new_pswd are optional.
@@ -327,7 +389,50 @@ This will then return the new username as well as the old one
 }
 ```
 
-## List user Items
+### Add funds
+
+The request ``POST /user/AddMoney`` with the additional fields UserID and Amount can any amount of money to an existing user.
+
+```curl
+POST /user/AddMoney HTTP/1.1
+Host: example.org
+User-Agent: curl/7.81.0
+Accept: */*
+Content-Length: 27
+Content-Type: application/x-www-form-urlencoded
+
+{"UserID":9, "Amount":1000}
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Fri, 21 Feb 2025 10:00:52 GMT
+Content-Length: 0
+```
+
+### Show wallet
+
+A user can send the request ``GET /user/getMoney/{uid}`` in order to view the amount of currency they hold. As of writing this, anyone can send a request to view anyones wallet. Bearer tokens will be implemented (in most, if not all http requests) in a later sprint to verify which user has access to this information.
+
+```curl
+GET /user/getMoney/12 HTTP/1.1
+Host: example.org
+User-Agent: curl/7.81.0
+Accept: */*
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Fri, 21 Feb 2025 10:28:31 GMT
+Content-Length: 38
+Content-Type: text/plain; charset=utf-8
+
+[
+    {
+        "Amount": 8788
+    }
+]
+```
+
+### List user Items
 
 NOTE this will later change to a POST request which would require the token to be passed along for verification
 
@@ -371,7 +476,33 @@ Content-Type: text/plain; charset=utf-8
 ]
 ```
 
-## List Market
+### Create Item
+
+Sending the http request ``POST /Marketplace/CreateItem`` allows a user to create an item and place it into any user's inventory with the fields UserID and ItemType.
+
+```curl
+POST /Marketplace/CreateItem HTTP/1.1
+Host: example.org
+User-Agent: curl/7.81.0
+Accept: */*
+Content-Length: 26
+Content-Type: application/json
+
+{"UserID":9, "ItemType":3}
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Fri, 21 Feb 2025 09:50:31 GMT
+Content-Length: 38
+Content-Type: text/plain; charset=utf-8
+
+{
+    "UserID": 9,
+    "ItemType": 3
+}
+```
+
+### List Market
 
 NOTE, This will be rewrite as a GET request when i force Malcolm to follow the REST standard.
 
@@ -434,7 +565,7 @@ Content-Type: text/plain; charset=utf-8
 ]
 ```
 
-## Adding a listing
+### Adding a listing
 
 Note, this will later be changed to follow REST
 
@@ -459,7 +590,7 @@ Content-Type: text/plain; charset=utf-8
 8
 ```
 
-## Removing a listing
+### Removing a listing
 
 Note, this will be rewritten as a DELETE
 
@@ -481,7 +612,7 @@ Content-Type: text/plain; charset=utf-8
 removed listing
 ```
 
-## Adding a comment on an itemtype
+### Adding a comment on an itemtype
 
 This adds a comment to the specified itemtype use ``POST /ItemType/{TypeID}``.
 The required json fields are as following ``Grade``, ``UserID`` and ``Comment``.
@@ -513,7 +644,7 @@ Content-Type: text/plain; charset=utf-8
 Added the comment
 ```
 
-## Get information and comments on an itemtype
+### Get information and comments on an itemtype
 
 To get information about an itemtype send a get request to ``GET /ItemType/{ItemTypeId}``
 Note that there is no transaction used when getting this information,
@@ -557,35 +688,11 @@ This was deemed acceptable since its meant that item types are more or less cons
 }
 ```
 
-### Create Item
-
-Sending the http request ``POST /Marketplace/CreateItem`` allows a user to create an item and place it into any user's inventory with the fields UserID and ItemType.
-
-```curl
-POST /Marketplace/CreateItem HTTP/1.1
-Host: example.org
-User-Agent: curl/7.81.0
-Accept: */*
-Content-Length: 26
-Content-Type: application/json
-
-{"UserID":9, "ItemType":3}
-
-HTTP/1.1 200 OK
-Access-Control-Allow-Origin: *
-Date: Fri, 21 Feb 2025 09:50:31 GMT
-Content-Length: 38
-Content-Type: text/plain; charset=utf-8
-
-{
-    "UserID": 9,
-    "ItemType": 3
-}
-```
-
 ### Buy
 
 TODO THIS NEED TO BE DOCUMENTED
+
+TODO Discus sql transaction
 
 ```curl
 POST /Marketplace/buy/5 HTTP/1.1
@@ -606,45 +713,6 @@ Content-Type: text/plain; charset=utf-8
 Success
 ```
 
-### Add funds
+## References
 
-The request ``POST /user/AddMoney`` with the additional fields UserID and Amount can any amount of money to an existing user.
-
-```curl
-POST /user/AddMoney HTTP/1.1
-Host: example.org
-User-Agent: curl/7.81.0
-Accept: */*
-Content-Length: 27
-Content-Type: application/x-www-form-urlencoded
-
-{"UserID":9, "Amount":1000}
-
-HTTP/1.1 200 OK
-Access-Control-Allow-Origin: *
-Date: Fri, 21 Feb 2025 10:00:52 GMT
-Content-Length: 0
-```
-
-### Show wallet
-
-A user can send the request ``GET /user/getMoney/{uid}`` in order to view the amount of currency they hold. As of writing this, anyone can send a request to view anyones wallet. Bearer tokens will be implemented (in most, if not all http requests) in a later sprint to verify which user has access to this information.
-
-```curl
-GET /user/getMoney/12 HTTP/1.1
-Host: example.org
-User-Agent: curl/7.81.0
-Accept: */*
-
-HTTP/1.1 200 OK
-Access-Control-Allow-Origin: *
-Date: Fri, 21 Feb 2025 10:28:31 GMT
-Content-Length: 38
-Content-Type: text/plain; charset=utf-8
-
-[
-    {
-        "Amount": 8788
-    }
-]
-```
+TODO move references from google doc to here
