@@ -113,6 +113,16 @@ func main() {
 		updateUserInfo(&w, r, db)
 	})
 
+	http.HandleFunc("GET /user/getMoney/{id}", func(w http.ResponseWriter, r *http.Request){
+		enableCors((&w))
+		getUserMoney(&w, r, db)
+	})
+
+	http.HandleFunc("POST /user/AddMoney", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		addMoneyToUser(&w, r, db)
+	})
+
 	http.HandleFunc("GET /inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		listUserItems(&w, r, db)

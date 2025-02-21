@@ -21,6 +21,15 @@ type PubUser struct {
 	Name string
 }
 
+type UserMoney struct {
+	UserID int
+	Money int
+}
+
+type Money struct {
+	Amount int
+}
+
 // list all the users
 func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	// execute sql query to get username id pairs
@@ -223,4 +232,78 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// TODO return old name and pswd
 
 	(*w).WriteHeader(http.StatusOK)
+}
+
+func addMoneyToUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var data UserMoney
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&data)
+	log.Println(data.UserID)
+	log.Println(data.Money)
+	if err != nil {
+		log.Printf("error decoding: %s", err.Error())
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		return
+	}
+	log.Printf("with data %v", data)
+
+	// TODO token stuff
+	_, err = db.Exec("UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?", data.Money, data.UserID)
+	if err != nil {
+		log.Printf("error decoding: %s", err.Error())
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		return
+	}
+	(*w).WriteHeader(http.StatusOK)
+}
+
+func getUserMoney(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	// execute sql query to get username id pairs
+	row, err := db.Query("SELECT Wallet FROM Users WHERE UserID = ?;", r.PathValue("id"))
+
+	// write error if the query returned error
+	if isErrLog(w, err) {
+		return
+	}
+	// close the row connection when function exits
+	defer row.Close()
+
+	// where to store result
+	// note this was chosen instead of printing each row after read
+	// this allows for retuning error if any row parsing fails.
+	// the con of this that the result is buffered, which leads to an memory overhead
+	var moneyArray []Money
+
+	// prepare for next read
+	for row.Next() {
+		var money Money
+		// read data into user struct
+		err := row.Scan(&money.Amount)
+
+		// write error and exit if scan fails
+		if err != nil {
+			(*w).WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(*w, err.Error())
+			return
+		}
+		// push user to the array
+		moneyArray = append(moneyArray, money)
+	}
+
+	// convert to json
+	// using MarshalIndent to make result pretty for debugging
+	json, err := json.MarshalIndent(moneyArray, "", "    ")
+
+	// write error and exit if json fails
+	if err != nil {
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(*w, err.Error())
+		return
+	}
+	// log.Println(moneyArray[0].Amount)
+	// log.Println(string(json))
+	// send json
+	fmt.Fprint(*w, string(json))
 }
