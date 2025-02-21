@@ -8,32 +8,14 @@ interface UserItemInterface {
     ImgURL: string;
     IsListed: boolean
 }
-
-async function handleSell(itemID: number) {
-    // Prevent the browser from reloading the page
-    //e.preventDefault();
-    
-    let state = {
-        sellP: (document.getElementById("sellPrice") as HTMLInputElement).value,
-        token: localStorage.getItem("token"),
-        itemID: itemID
-    }
-    //alert("test");
-    console.log(JSON.stringify(state));
-    fetch("http://ronstad.se/Marketplace/addListing", { method: "POST", body: JSON.stringify(state) })
-    .then((response) => {
-      if (response.ok === true) {
-        console.log(JSON.stringify(state));
-        alert("Item succesfully put on marketplace");
-      } else {
-        console.log(JSON.stringify(state));
-        console.log("Invalid");
-        alert("nuh uh");
-      }
-    })
+interface sellItem {
+  ItemID: number;
+  Token: string | null;
+  Price: number
 }
 
 const ItemTableComponent = () => {
+    const [sellPrice, setSellPrice] = useState(0)
     const [userItems, setUserItems] = useState<UserItemInterface[]>([]);
     let fetchString =  "http://ronstad.se/inventory/" + localStorage.getItem("uid")
     useEffect(() => {
@@ -57,7 +39,25 @@ const ItemTableComponent = () => {
           }
         })
     }
-
+    function handleSell(itemID: number) {
+  
+      // Prevent the browser from reloading the page
+      //e.preventDefault();
+      let tmp: sellItem = {ItemID: itemID, Token: localStorage.getItem("token"), Price: sellPrice}
+      //alert("test");
+      console.log(JSON.stringify(tmp));
+      fetch("http://ronstad.se/Marketplace/addListing", { method: "POST", body: JSON.stringify(tmp) })
+      .then((response) => {
+        if (response.ok === true) {
+          console.log(JSON.stringify(tmp));
+          alert("Item succesfully put on marketplace");
+        } else {
+          console.log(JSON.stringify(tmp));
+          console.log("Invalid");
+          alert("nuh uh");
+        }
+      })
+  }
     if (userItems == null){
       return (
         <>
@@ -74,7 +74,7 @@ const ItemTableComponent = () => {
                     <td className="">{item.ItemName}</td>
                     {/*map either button or text input if item is already listed */}
                     <td>
-                        {item.IsListed ? (<button onClick={() => rmListing(item)} name="rmListing" id="rm"></button>) : (<><input type={"text"} name="sellPrice" id="sellPrice"/> <button onClick={() => handleSell(item.ItemID)} className={"cyber-button-small bg-blue fg-yellow"}>Sell</button></>)}
+                        {(<><input type={"number"} onChange={(e) => {setSellPrice(e.target.valueAsNumber || 0)}} name="sellPrice" id="sellPrice"/> <button onClick={() => handleSell(item.ItemID)} className={"cyber-button-small bg-blue fg-yellow"}>Sell</button></>)}
                     </td>
                 </tr>
             ))}
