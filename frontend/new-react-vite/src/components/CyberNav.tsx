@@ -13,10 +13,11 @@ function CyberNav() {
               <li><Link to="/Marketplace"><button className="cyber-button-small bg-blue fg-yellow">Marketplace</button></Link></li>
               <li><Link to="/Inventory"><button className="cyber-button-small bg-blue fg-yellow">Inventory</button></Link></li>
               <li><Link to="/Profile"><button className="cyber-button-small bg-blue fg-yellow">Profile</button></Link></li>
+              <li><Link to="/AdminPage"><button className="cyber-button-small bg-blue fg-yellow">Admin</button></Link></li>
             </ul>
           </nav>
           <nav className="top-navbar">
-           <li><Link to="/cart"><button className="cyber-button-small bg-red fg-yellow">Cart</button></Link></li>
+           <li><Link to="/Cart"><button className="cyber-button-small bg-red fg-yellow">Cart</button></Link></li>
           </nav>
         </div>
       </div>

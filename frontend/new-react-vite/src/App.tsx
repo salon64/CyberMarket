@@ -7,10 +7,10 @@ import NoPage from "./components/NoPage";
 import Profile from "./components/Profile/Profile";
 import Register from "./components/Register/Register";
 import ProtectedRoute from "./components/Protection/ProtectedRoute"
-//import reactLogo from './assets/react.svg'
-//import viteLogo from '/vite.svg'
+import AdminPage from "./components/Admin/AdminPage";
+import Cart from "./components/cart/cart";
 import "./App.css";
-import { useState } from "react";
+
 type AuthUser = {id: string; name: string};
 
 const App = () => {
@@ -23,6 +23,8 @@ const App = () => {
               <Route path="Marketplace" element={<Marketplace />} />
               <Route path="Inventory" element={<Inventory />} />
               <Route path="Profile" element={<Profile/>} />
+              <Route path="AdminPage" element={<AdminPage/>} />
+              <Route path="Cart" element={<Cart/>} />
             </Route>
             <Route path="*" element={<NoPage />} />
           

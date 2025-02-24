@@ -1,7 +1,7 @@
 import "../Marketplace/Marketplace.css";
 function Cart(){
     return (
-    <h1>Shopping cart</h1>
+    <header>Shopping cart</header>
 
     );
 }
