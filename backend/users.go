@@ -251,9 +251,9 @@ func addMoneyToUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// TODO token stuff
 	_, err = db.Exec("UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?", data.Money, data.UserID)
 	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
+		log.Printf("Error updating user Wallet: %s", err.Error())
 		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		fmt.Fprintf(*w, "Error updating user Wallet: %s", err.Error())
 		return
 	}
 	(*w).WriteHeader(http.StatusOK)
