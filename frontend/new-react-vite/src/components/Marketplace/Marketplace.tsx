@@ -144,27 +144,6 @@ function Marketplace() {
             </tr>
           </thead>
           <tbody>
-            {/* <tr>
-                <td className="">itemname</td>
-                <td className="">Price</td>
-                <td className="">a really cool item</td>
-                <td className="">Seller</td>
-                <td>
-                  <input onClick={() => buyItem(1)} className='buy-button' type='button' value='Buy' />
-                </td>
-            </tr> */}
-            {/* {marketplaceItems.map((item) => (
-              <tr key={item.ItemID} className="">
-                  <td className="">{item.ItemName}</td>
-                  <td className="">{item.Price}</td>
-                  <td className="">{item.ItemDescription}</td>
-                  <td className="">{item.Username}</td>
-                  <td>
-                    <input onClick={() => buyItem(item)} className='buy-button' type='button' value='Buy' />
-                  </td>
-              </tr>
-            ))}
-            */}
             {market()}
           </tbody>
         </table>
