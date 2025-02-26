@@ -54,74 +54,26 @@ function Marketplace() {
 
   };
 
-  return (
-    
-  <body>
-
-
-  <div className="left-right-container">
-    <div className="left">
-      <CyberpunkWindow>
-      <div className="left-elements">
-        <div className="sorting oxanium-font">
-          Sort by:
-          <div className="cyber-input">
-            <div className="cyber-select ac-purple ">
-              <select className="oxanium-font"  onChange={(s) => setSortState({sortBy: s.target.value, search: sortState.search})}>
-                  <option style={{color:"black"}}className="oxanium-font" value="Newest"           >Newest</option>
-                  <option style={{color:"black"}}className="oxanium-font" value="Oldest"           >Oldest</option>
-                  <option style={{color:"black"}}className="oxanium-font" value="Price_Ascending"  >Price Ascending</option>
-                  <option style={{color:"black"}}className="oxanium-font" value="Price_Descending" >Price Descending</option>
-                  <option style={{color:"black"}}className="oxanium-font" value="Alphabetically_Ascending" >Alphabetically A-Ö</option>
-                  <option style={{color:"black"}}className="oxanium-font" value="Alphabetically_Descending" >Alphabetically Ö-A</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="tags">  
-                   
-          <div className="tagtext">
-          <header>Tags</header> 
-            <ul>
-              <input type="checkbox" className="cyber-check-tags" ></input> Cyberware <br></br>
-              <input type="checkbox" className="cyber-check-tags" ></input> Consumables<br></br>
-              <input type="checkbox" className="cyber-check-tags" ></input> Weapons<br></br>
-              <input type="checkbox" className="cyber-check-tags" ></input> Drugs<br></br>
-              <input type="checkbox" className="cyber-check-tags" ></input> Armor<br></br>
-            </ul>
-          </div>
-        </div>
-      </div>
-      </CyberpunkWindow>
-      
-    </div>
-
-    <div className="right">
-      
-      {/* store */}
-      <table className="cyber-table store-table ac-custom">
-        <thead>
-          <tr className="thead">
-            <th>Item</th>
-            <th>Price</th>
-            <th>Description</th>
-            <th>Seller</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* <tr>
-              <td className="">itemname</td>
-              <td className="">Price</td>
-              <td className="">a really cool item</td>
-              <td className="">Seller</td>
-              <td>
-                <input onClick={() => buyItem(1)} className='buy-button' type='button' value='Buy' />
-              </td>
-          </tr> */}
-          {marketplaceItems.map((item) => (
-            <tr key={item.ItemID} className="">
+  const market = () => {
+    if (marketplaceItems === null) {
+      console.log("empty")
+      return (
+        <tr>
+          <td className="">itemname</td>
+          <td className="">Price</td>
+          <td className="">PlaceHolder, Your marketplace is empty</td>
+          <td className="">Seller</td>
+          <td>
+            <input className='buy-button' type='button' value='Buy' />
+          </td>
+        </tr>
+      )
+    }
+    else {
+      console.log("not empty")
+      return (
+          marketplaceItems.map((item: MarketplaceItems) => (
+              <tr key={item.ItemID}>
                 <td className="">{item.ItemName}</td>
                 <td className="">{item.Price}</td>
                 <td className="">{item.ItemDescription}</td>
@@ -129,13 +81,75 @@ function Marketplace() {
                 <td>
                   <input onClick={() => buyItem(item)} className='buy-button' type='button' value='Buy' />
                 </td>
+              </tr>))
+      )
+
+
+
+    }
+  } 
+
+  return (
+    
+  <body>
+    <div className="left-right-container">
+      <div className="left">
+        <CyberpunkWindow>
+        <div className="left-elements">
+          <div className="sorting oxanium-font">
+            Sort by:
+            <div className="cyber-input">
+              <div className="cyber-select ac-purple ">
+                <select className="oxanium-font"  onChange={(s) => setSortState({sortBy: s.target.value, search: sortState.search})}>
+                    <option style={{color:"black"}}className="oxanium-font" value="Newest"           >Newest</option>
+                    <option style={{color:"black"}}className="oxanium-font" value="Oldest"           >Oldest</option>
+                    <option style={{color:"black"}}className="oxanium-font" value="Price_Ascending"  >Price Ascending</option>
+                    <option style={{color:"black"}}className="oxanium-font" value="Price_Descending" >Price Descending</option>
+                    <option style={{color:"black"}}className="oxanium-font" value="Alphabetically_Ascending" >Alphabetically A-Ö</option>
+                    <option style={{color:"black"}}className="oxanium-font" value="Alphabetically_Descending" >Alphabetically Ö-A</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="tags">  
+                    
+            <div className="tagtext">
+            <header>Tags</header> 
+              <ul>
+                <input type="checkbox" className="cyber-check-tags" ></input> Cyberware <br></br>
+                <input type="checkbox" className="cyber-check-tags" ></input> Consumables<br></br>
+                <input type="checkbox" className="cyber-check-tags" ></input> Weapons<br></br>
+                <input type="checkbox" className="cyber-check-tags" ></input> Drugs<br></br>
+                <input type="checkbox" className="cyber-check-tags" ></input> Armor<br></br>
+              </ul>
+            </div>
+          </div>
+        </div>
+        </CyberpunkWindow>
+        
+      </div>
+
+      <div className="right">
+        
+        {/* store */}
+        <table className="cyber-table store-table ac-custom">
+          <thead>
+            <tr className="thead">
+              <th>Item</th>
+              <th>Price</th>
+              <th>Description</th>
+              <th>Seller</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {market()}
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 
   );
 }
