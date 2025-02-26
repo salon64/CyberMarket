@@ -198,11 +198,12 @@ A simple rust terminal interface is implemented as an client that is used for de
 
 Currently not implemented, work is planed after sprint 4
 
-## User stories and Testing 
+## User stories and Testing
 
 TODO *from task description*: Test case specifications (manual testing, related to the roles and user stories) Write step by step how you will execute the demo for TA. The test are manual and are based on the user stories bellow
 
 ### User Stories
+
 1. As a User I want to be able to register an acount on the website. So that i have acces to the website.
 
 2. As a User I want to be able to log into my account, In order to view my profile/inventory/marketplace.
@@ -229,34 +230,33 @@ TODO *from task description*: Test case specifications (manual testing, related 
 
 ### Testing
 
-1. To register An account The User should press on the "register your account button" that should take the user to a different page. The user should then fill in a user name and password and press the register button. When the button is pressed a http call to the backend to register a new user with the details the user filled in. The backend should take the request and make a new account in the db and return a userID and toeken. 
+1. To register An account The User should press on the "register your account button" that should take the user to a different page. The user should then fill in a user name and password and press the register button. When the button is pressed a http call to the backend to register a new user with the details the user filled in. The backend should take the request and make a new account in the db and return a userID and toeken.
 TODO add checks and handle non unique usernames
 
 2. To log into an account the user should enter username and password in their input feilds and press the button/ press enter on their keyboard. That should send a http call with the information to the backend that should return a userId and a token if matching and an error if not
 
-3. When logged in a user should be able to press the "profile" button in the navbar, it should take them to the profile page and should display the users ID. 
+3. When logged in a user should be able to press the "profile" button in the navbar, it should take them to the profile page and should display the users ID.
 
 4. When on the profile website the User should be able to update their user information by entering the new data into the fields and pressing the "save changes" button. That should send a http call to the backend that should check the token to see if the token has permissions for that userID, If it doesnt it should return an error and if it does it should update the information in the DB and return oldname + newname or old psw + new psw.
 
-5. As a user I should be able to press the inventory button in the nacbar. That should diplay the users wallet. It should also display the users items in a table with a distinction if they are in the marketplace or not. If they are not in the marketplace it should display a sell option with a input prompt and a sell button, and if it is in the marketpalce it should display a button to recall the item from the marketplace. 
+5. As a user I should be able to press the inventory button in the nacbar. That should diplay the users wallet. It should also display the users items in a table with a distinction if they are in the marketplace or not. If they are not in the marketplace it should display a sell option with a input prompt and a sell button, and if it is in the marketpalce it should display a button to recall the item from the marketplace.
 
 6. To add money to to their wallet the user should type the users ID and ammount in the input fields under "add money to wallet" and press the "add money" button. That should send a http call to the backend where it should check if the active user can add money to that wallet, if it cant it should return an error. If it can it should add the money (in the DB) to the wallet of the user and return the totla amount of money now in that persons wallet.
 
 7. To add a new item to a users inventory the user should add the users id and the itemType in their respecitive feilds under "create item" and press the button "create item". That should send a http call to the backend, where it should check if the one who sent the request can add items to that inventory. It should also check if the itemtype exists. and return an error if they dont. If it passes the checks it should send to the DB to add that the item to that users inventory and return the ItemID, userId and itemtype.
 
-8. A user should be able to sell an item from their invenotry that is not already on the marketplace by entering the price in items row and press sell. That should send a http call to the backend, that should check if the caller can sell that users items, and return an error if it shouldent. if it should it will add the item to the markeptlace table in the db and return the OfferID. 
+8. A user should be able to sell an item from their invenotry that is not already on the marketplace by entering the price in items row and press sell. That should send a http call to the backend, that should check if the caller can sell that users items, and return an error if it shouldent. if it should it will add the item to the markeptlace table in the db and return the OfferID.
 TODO
 
-9. A user should be able to remove a listed item from the marketpalce that they have acces to by pressing the "recall" button. That should send a http call to the backend where it checks if the caller can recall that persons items and return an error if not. If it should it should update the DB by removing the item from the marketpalce table and returning the offerID 
+9. A user should be able to remove a listed item from the marketpalce that they have acces to by pressing the "recall" button. That should send a http call to the backend where it checks if the caller can recall that persons items and return an error if not. If it should it should update the DB by removing the item from the marketpalce table and returning the offerID
 TODO
 
 10. When a user is on the marketplace it should display all the items on the marketplace in the sorted order, on the left side it should display what they are sorted by. This data should be gathered with an http call from when the user loads the site. that call should return all the items in json format.
 
-11. A user should be able to change the order the items are displayed in by pressing the selction bar and selecting another method. That should send a call to the backend where that calls the db for the marketplace information to be returnet in that order. it should then update the table with all the items to the marketplace sorted in the new order. 
+11. A user should be able to change the order the items are displayed in by pressing the selction bar and selecting another method. That should send a call to the backend where that calls the db for the marketplace information to be returnet in that order. it should then update the table with all the items to the marketplace sorted in the new order.
 
 12. A user should be able to buy an item by pressing the "buy" button on the row that item is displayed in. That should send a http call to the backend. The backend will perform chacks to see that you are not buying your own item, you have sufficent funds etc. and return an eror if it fails a check. if not the item should be transfered to the new owner, funds should be updated and and a transaction should be added to the transactionlog in the db. then retrun the OfferID
 TODO
-
 
 ## Reflection
 
@@ -723,9 +723,28 @@ This was deemed acceptable since its meant that item types are more or less cons
 
 ### Buy
 
-TODO THIS NEED TO BE DOCUMENTED
+This Call would by the item defined by the path ``/Marketplace/buy/{itemID}``, the passed JSON ``UserID`` would be the new owner of that item.
+The funds from teh listing is transferred from the buyer (passed UserID) ot the owner of the item. The bought objects owner is updated to the buyer.
+If the buyer does not have enough funds the plaintext "not enough funds" is returned with the status code 200 ok.
 
-TODO Discus sql transaction
+Notes on security.
+Currently there is no authentication on this. This means that another user can buy stuff as another user,
+will be fixed when token authentication is implemented in this method.
+To avoid that the user does purchases in quick sequence to trick the found checking by having both checks complete before any of the purchases have happened,
+the whole of checking funds, transferring ownership, updating funds and removing the listing is done in a singe sql transaction
+
+DANGEROUS FLAW, CURRENTLY BEING FIXED.\
+imagine the following scenario
+
+1. User **A** adds a listing för item **1** on the marketplace with the price **100 EUR**
+2. User **B** loads the website with the listing of item **1** with price **100 EUR**
+3. **A** removes the listing
+4. **A** add the same item **1** on the market place for **250 EUR**
+5. **B** haven't reloaded the website still **sees price **100**
+6. **B** buys item **1** thinking it buys it for **100 EUR**
+7. **B** actually buys the item for **250 EUR**
+
+This can happen since we use itemID as the identifier, by changing to marketID this is prevented, since marketplace ids are unique
 
 ```curl
 POST /Marketplace/buy/5 HTTP/1.1
