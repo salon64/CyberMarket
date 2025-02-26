@@ -10,9 +10,10 @@ const Inventory = () => {
     fetch("http://ronstad.se/user/getMoney/" + localStorage.getItem("uid"), { method: "GET"})
     .then(response => response.json())
     .then(data => {
+      console.count(data)
       const obj = JSON.parse(JSON.stringify(data))
-      console.log(obj[0].Amount)
-      setWallet(obj[0].Amount) //im going to krill myself
+      console.log(obj.Amount)
+      setWallet(obj.Amount) //im going to krill myself
       
     })
     //.catch(error => {alert(error)});

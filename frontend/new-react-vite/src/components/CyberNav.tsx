@@ -7,7 +7,6 @@ function CyberNav() {
         <div className="top">
         <div className="top-elements">
           <h1 className="cyberpunk-font-og">CyberMarket</h1>
-          
           <nav>
             <ul className="top-navbar">
               <li><Link to="/Marketplace"><button className="cyber-button-small bg-blue fg-yellow">Marketplace</button></Link></li>
