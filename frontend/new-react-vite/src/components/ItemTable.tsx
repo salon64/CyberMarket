@@ -4,9 +4,9 @@ interface UserItemInterface {
     ItemID: number;
     TypeID: number;
     ItemName: string;
+    IsListed: number;
     ItemDescription: string;
     ImgURL: string;
-    IsListed: boolean
 }
 interface sellItem {
   ItemID: number;
@@ -21,14 +21,17 @@ const ItemTableComponent = () => {
     useEffect(() => {
         fetch(fetchString, { method: "GET" }) // Replace with your actual API URL
             .then((response) => response.json())
-            .then((useritems) => setUserItems(useritems))
+            .then((useritems) => {setUserItems(useritems)
+              console.log(useritems)
+            })
             .catch((error) => console.error("Error: ", error));
         }, []);
 
       
     function rmListing(it: UserItemInterface): void {
         console.log(it.ItemID);
-        var adr: string = "http://ronstad.se/Marketplace/removeListing" + it.ItemID
+        var adr: string = "http://ronstad.se/Marketplace/removeListing/" + it.ItemID
+        console.log(adr)
         fetch(adr, { method: "GET" })
         .then((response) => {
           if (response.ok === true) {
@@ -38,6 +41,8 @@ const ItemTableComponent = () => {
             alert("nuh uh");
           }
         })
+        .catch(error => console.log(error))
+        window.location.reload();
     }
     function handleSell(itemID: number) {
   
@@ -46,16 +51,21 @@ const ItemTableComponent = () => {
       let tmp: sellItem = {ItemID: itemID, Token: localStorage.getItem("token"), Price: sellPrice}
       //alert("test");
       console.log(JSON.stringify(tmp));
+      console.log("start")
       fetch("http://ronstad.se/Marketplace/addListing", { method: "POST", body: JSON.stringify(tmp) })
       .then((response) => {
         if (response.ok === true) {
           console.log(JSON.stringify(tmp));
+          console.log("Item succesfully put on marketplace")
           alert("Item succesfully put on marketplace");
         } else {
           console.log(JSON.stringify(tmp));
           console.log("Invalid");
           alert("nuh uh");
         }
+      })
+      .catch(error => {console.log(error)
+        console.log("catch")
       })
   }
     if (userItems == null){
@@ -72,9 +82,10 @@ const ItemTableComponent = () => {
                     <td className="">{item.ItemID}</td>
                     <td className="">{item.TypeID}</td>
                     <td className="">{item.ItemName}</td>
+                    <td className="">{item.IsListed}</td>
                     {/*map either button or text input if item is already listed */}
                     <td>
-                        {(<><input type={"number"} onChange={(e) => {setSellPrice(e.target.valueAsNumber || 0)}} name="sellPrice" id="sellPrice"/> <button onClick={() => handleSell(item.ItemID)} className={"cyber-button-small bg-blue fg-yellow"}>Sell</button></>)}
+                        {item.IsListed ? (<button onClick={() => rmListing(item)}>Remove Listing</button>) : (<><input type={"number"} onChange={(e) => {setSellPrice(e.target.valueAsNumber || 0)}} name="sellPrice" id="sellPrice"/> <button onClick={() => handleSell(item.ItemID)} className={"cyber-button-small bg-blue fg-yellow"}>Sell</button></>)}
                     </td>
                 </tr>
             ))}
