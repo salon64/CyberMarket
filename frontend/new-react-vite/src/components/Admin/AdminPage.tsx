@@ -17,7 +17,7 @@ interface ItemTypeInformation {
 
 function AdminPage() {
   
-  function CreateItem(e) {
+  function CreateItem(e: any) {
     // Prevent the browser from reloading the page
     e.preventDefault();
 
@@ -45,7 +45,7 @@ function AdminPage() {
       });
   }
 
-  function AddMoney(e) {
+  function AddMoney(e: any) {
     // Prevent the browser from reloading the page
     e.preventDefault();
     // Read the form data
@@ -66,7 +66,7 @@ function AdminPage() {
       .then((data) => {
         console.log(data);
       })
-      .catch((error) => {}); // kastar error när det funkar?????????????
+      .catch((error) => {console.log(error)}); // kastar error när det funkar?????????????
     window.location.reload();
   }
 
@@ -78,7 +78,7 @@ function AdminPage() {
     window.location.reload();
   }
 
-  function CreateItemType(e) {
+  function CreateItemType(e: any) {
     e.preventDefault();
 
     let ItemName: string = (
@@ -100,7 +100,7 @@ function AdminPage() {
       .then((data) => {
         console.log(data);
       })
-      .catch((error) => {}); // kastar error när det funkar?????????????
+      .catch((error) => {console.log(error)}); // kastar error när det funkar?????????????
     window.location.reload();
   }
 

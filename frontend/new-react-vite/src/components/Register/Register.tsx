@@ -1,8 +1,8 @@
-import { Outlet, Link } from "react-router";
+import { Link } from "react-router";
 import "../Login/login.css";
 import CRTScreen from "../CRTScreen";
 
-async function handleSubmit(e) {
+async function handleSubmit(e:any) {
     // Prevent the browser from reloading the page
     e.preventDefault();
   

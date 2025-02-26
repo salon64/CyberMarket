@@ -30,8 +30,9 @@ interface MarketplaceItems {
 function Marketplace() {
   const [sortState, setSortState] = useState<MarketplaceState>({sortBy: "Newest", search: ""})
   const [marketplaceItems, setMarketplaceItems] = useState<MarketplaceItems[]>([]);
-  onchange = s => {
+  onchange = s => { // <-- wtf is this
     console.log(sortState.sortBy)
+    console.log(s)
   }
 
   useEffect(() => {

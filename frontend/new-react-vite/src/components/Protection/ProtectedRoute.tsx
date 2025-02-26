@@ -4,7 +4,7 @@ type ProtectedRouteProps = {
   redirectPath?: string;
   children: React.ReactNode;
 }
-const ProtectedRoute = ({ children, redirectPath = "/" }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ redirectPath = "/" }: ProtectedRouteProps) => {
     fetch("http://ronstad.se/auth", { method: "POST", body: JSON.stringify(localStorage.getItem("token"))})
     .then(response => response.json())
     .then(data => {console.log(data)
@@ -14,7 +14,8 @@ const ProtectedRoute = ({ children, redirectPath = "/" }: ProtectedRouteProps) =
     } else {
       return <Outlet />;
     }})
-    .catch(error => {return <Navigate to={redirectPath} replace />})
+    .catch(error => {console.log(error)
+      return <Navigate to={redirectPath} replace />})
     return <Outlet />;
     }
 export default ProtectedRoute;
