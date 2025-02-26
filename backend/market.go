@@ -3,8 +3,10 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
+	"strconv"
 
 	// "log"
 	"net/http"
@@ -242,81 +244,107 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Fprint(*w, string(json))
 }
 
-func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var data MarketplaceItemsInformation
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&data)
+type BuyStruct struct {
+	UserID int
+}
 
+func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) error {
+	//TODO auth by token
+	var data BuyStruct
+	itemID, err := strconv.Atoi(r.PathValue("ItemID"))
 	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
 		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
-		return
+		return err
 	}
-	log.Printf("with data %v", data)
 
-	//TODO: check stuff, money, ownership
-	//TODO: add transaction
-	// sql_2 := "DELETE FROM Marketplace WHERE ItemID = ?;", data.ItemID
-	// sql_1 := "UPDATE Inventory SET UserID=? WHERE ItemID=?", 1, data.ItemID
-	// sql_3 := "INSERT INTO TransactionLog(Price, trans_time, ItemID, Buyer, Seller) VALUES(?, now(), ?, ?, ?);", data.Price, data.ItemID, 1, data.UserID
-	// // buyer
-	// sql_4 := "UPDATE Users SET Wallet=Wallet-? Where UserID=?;", data.Price, 1
-	// //seller
-	// sql_5 := "UPDATE Users SET Wallet=Wallet+? Where UserID=?;", data.Price, data.UserID
+	if r.Body == nil {
+		(*w).WriteHeader(http.StatusBadRequest)
+		return errors.New("body was empty")
+	}
 
-	// TODO: token check?
-
-	res, err := db.Exec(`
-		START TRANSACTION;
-
-		SELECT Wallet INTO @buyer_wallet FROM Users WHERE UserID = ? FOR UPDATE;
-
-		-- if not enough money
-		IF @buyer_wallet < ? THEN 
-			ROLLBACK;
-			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'you require more vespian gas';
-		END IF;
-
-		-- remove item from marketplace
-		DELETE FROM Marketplace WHERE ItemID = ?;
-
-		-- transfer item owner
-		UPDATE Inventory SET UserID = ? WHERE ItemID = ?;
-
-		-- log transaction
-		INSERT INTO TransactionLog (Price, trans_time, ItemID, Buyer, Seller) 
-		VALUES (?, NOW(), ?, ?, ?);
-
-		-- remove money from buyer
-		UPDATE Users SET Wallet = Wallet - ? WHERE UserID = ?;
-
-		-- add money to seller
-		UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?;
-
-		COMMIT;
-	`, data.UserID,
-	data.Price, 
-	data.ItemID,
-	r.PathValue("BuyerID"), data.ItemID,
-	data.Price, data.ItemID, r.PathValue("BuyerID"), data.UserID,
-	data.Price, data.UserID,
-	data.Price, data.UserID)
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&data)
 
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		log.Printf("add user error: %s", err)
-		fmt.Fprintln(*w, err.Error())
-		return
+		(*w).WriteHeader(http.StatusBadRequest)
+		return err
 	}
-
-	TransID, err := res.LastInsertId()
+	log.Printf("%+v", data)
+	log.Print(itemID)
+	// begin transaction
+	t, err := db.Begin()
 	if err != nil {
 		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(*w, err.Error())
-		return
+		return err
 	}
 
-	// return the price, idk
-	fmt.Fprintf(*w, "%d", TransID)
+	// get the price and seller
+	row := t.QueryRow(`SELECT Marketplace.Price, Inventory.UserID
+						FROM main_db.Marketplace
+						LEFT JOIN Inventory on  Inventory.ItemID = Marketplace.ItemID
+						Where Marketplace.ItemID = ? ;`, itemID)
+	var price int
+	var seller int
+	err = row.Scan(&price, &seller)
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+
+	row = t.QueryRow("SELECT Wallet FROM main_db.Users WHERE UserID = ?;", data.UserID)
+	var wallet int
+	err = row.Scan(&wallet)
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+	// test if user have enough funds
+	if wallet < price {
+		t.Rollback()
+		return errors.New("not enough funds")
+	}
+	// update users funds and item owner
+	_, err = t.Exec(`UPDATE Users SET Wallet = Wallet - ? WHERE Users.UserID = ? ;`, price, data.UserID)
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+	_, err = t.Exec(`UPDATE Inventory SET UserID = ? WHERE Inventory.ItemID = ? ;`, data.UserID, itemID)
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+	_, err = t.Exec(`UPDATE Users SET Wallet = Wallet + ? WHERE Users.UserID = ? ;`, price, seller)
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+
+	_, err = db.Exec("DELETE FROM Marketplace WHERE ItemID = ?;", itemID)
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+	// create transaction log
+	_, err = t.Exec(`INSERT INTO TransactionLog (Price, Date, ItemID, Buyer, Seller) 
+        VALUES (?, NOW(), ?, ?, ?);`, price, itemID, data.UserID, seller)
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+	err = t.Commit()
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+	fmt.Fprint(*w, "Success")
+	return nil
 }

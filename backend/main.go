@@ -103,6 +103,11 @@ func main() {
 		addUser(&w, r, db)
 	})
 
+	http.HandleFunc("POST /login", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		userLogin(&w, r, db)
+	})
+
 	http.HandleFunc("POST /users/{id}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		updateUserInfo(&w, r, db)
@@ -131,7 +136,11 @@ func main() {
 	//TODO change to OfferID
 	http.HandleFunc("POST /Marketplace/buy/{ItemID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
-		buyItem(&w, r, db)
+		err := buyItem(&w, r, db)
+		if err != nil {
+			log.Print(err.Error())
+			fmt.Fprint(w, err.Error())
+		}
 	})
 
 	http.HandleFunc("POST /Marketplace/addListing", func(w http.ResponseWriter, r *http.Request) {
@@ -147,6 +156,11 @@ func main() {
 	http.HandleFunc("GET /Marketplace/removeListing/{ItemID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		removeListingFromMarketplace(&w, r, db)
+	})
+
+	http.HandleFunc("POST /Marketplace/CreateItem", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		createItem(&w, r, db)
 	})
 
 	http.HandleFunc("GET /test", func(w http.ResponseWriter, r *http.Request) {
@@ -168,5 +182,8 @@ func main() {
 		}
 	})
 
-	http.ListenAndServe(":80", nil)
+	err = http.ListenAndServe(":80", nil)
+	if err != nil {
+		log.Print(err.Error())
+	}
 }

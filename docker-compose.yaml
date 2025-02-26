@@ -11,8 +11,8 @@ services:
 
   mysql:
     image: mysql:8.0
-    # ports:
-      # - "3306:3306"
+    ports:
+      - "3306:3306"
     volumes:
       # this imports the example data tables
       - ./example/example_db.sql:/docker-entrypoint-initdb.d/example_db.sql
