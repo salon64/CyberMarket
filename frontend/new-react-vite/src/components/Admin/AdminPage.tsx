@@ -92,7 +92,7 @@ function AdminPage() {
     console.log(tmp);
 
 
-    fetch("http://localhost:80/Admin/CreateNewItemType", {
+    fetch("http://ronstad.se/Admin/CreateNewItemType", {
       method: "POST",
       body: JSON.stringify(tmp),
     })
