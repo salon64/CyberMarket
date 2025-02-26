@@ -129,7 +129,7 @@ func main() {
 	})
 
 	//TODO change to OfferID
-	http.HandleFunc("POST /Marketplace/buy/{BuyerID}", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("POST /Marketplace/buy/{ItemID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		buyItem(&w, r, db)
 	})
