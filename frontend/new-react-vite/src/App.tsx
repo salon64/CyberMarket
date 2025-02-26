@@ -11,8 +11,6 @@ import AdminPage from "./components/Admin/AdminPage";
 import Cart from "./components/cart/cart";
 import "./App.css";
 
-type AuthUser = {id: string; name: string};
-
 const App = () => {
   return (
     <div>

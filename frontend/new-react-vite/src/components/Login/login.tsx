@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 
 function Login() {
   const navigate = useNavigate()
-  function handleSubmit(e) {
+  function handleSubmit(e: any) {
     // Prevent the browser from reloading the page
     e.preventDefault();
   
@@ -30,7 +30,7 @@ function Login() {
         alert("nuh uh")
       }
     })
-    .catch(error => {alert("nuh uh")});
+    .catch(error => {alert(error)});
       
   
     // Or you can work with it as a plain object:

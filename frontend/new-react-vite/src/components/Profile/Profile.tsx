@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import MyImage from "./aswedishtiger.png";
@@ -8,7 +8,7 @@ const getToken = () => {
 }
 
 
-async function handleSubmit(e) {
+async function handleSubmit(e: any) {
   // Prevent the browser from reloading the page
   e.preventDefault();
 
@@ -44,7 +44,7 @@ async function handleSubmit(e) {
 }
 
 function Profile() {
-  const nameForm = useRef(null);
+
   const [data, setData] = useState(null);
   let navigate = useNavigate()
   useEffect(() => {
