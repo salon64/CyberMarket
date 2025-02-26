@@ -72,8 +72,20 @@ function Marketplace() {
     else {
       console.log("not empty")
       return (
-        <p>not empty</p>
+          marketplaceItems.map((item: MarketplaceItems) => (
+              <tr key={item.ItemID}>
+                <td className="">{item.ItemName}</td>
+                <td className="">{item.Price}</td>
+                <td className="">{item.ItemDescription}</td>
+                <td className="">{item.Username}</td>
+                <td>
+                  <input onClick={() => buyItem(item)} className='buy-button' type='button' value='Buy' />
+                </td>
+              </tr>))
       )
+
+
+
     }
   } 
 
