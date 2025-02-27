@@ -8,33 +8,33 @@ function Login() {
   function handleSubmit(e: any) {
     // Prevent the browser from reloading the page
     e.preventDefault();
-  
+
     // Read the form data
-   
+
     const form = e.target;
     const formData = new FormData(form);
     const formJson = Object.fromEntries(formData.entries());
-    
+
     // You can pass formData as a fetch body directly:
-    fetch("http://ronstad.se/login", { method: "POST", body: JSON.stringify(formJson)})
-    .then(response => response.json())
-    .then(data => {
-      if (data?.Token) {  // if token exists
-        const obj = JSON.parse(JSON.stringify(data))
-        console.log(JSON.stringify(data))
-        console.log(obj)
-        localStorage.setItem("token", obj.Token)
-        localStorage.setItem("uid", obj.UserID)
-        navigate("/Marketplace")
-      } else{
-        alert("nuh uh")
-      }
-    })
-    .catch(error => {alert(error)});
-      
-  
+    fetch("http://ronstad.se:5687/login", { method: "POST", body: JSON.stringify(formJson), mode: "no-cors" })
+      .then(response => response.json())
+      .then(data => {
+        if (data?.Token) {  // if token exists
+          const obj = JSON.parse(JSON.stringify(data))
+          console.log(JSON.stringify(data))
+          console.log(obj)
+          localStorage.setItem("token", obj.Token)
+          localStorage.setItem("uid", obj.UserID)
+          navigate("/Marketplace")
+        } else {
+          alert("nuh uh")
+        }
+      })
+      .catch(error => { alert(error) });
+
+
     // Or you can work with it as a plain object:
-  
+
     console.log(formJson);
   }
   return (
@@ -50,7 +50,7 @@ function Login() {
         </label>
         <hr />
         <button type="submit">
-        
+
         </button>
         <br>
         </br>

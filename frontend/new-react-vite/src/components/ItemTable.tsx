@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
 interface UserItemInterface {
-    ItemID: number;
-    TypeID: number;
-    ItemName: string;
-    IsListed: number;
-    ItemDescription: string;
-    ImgURL: string;
+  ItemID: number;
+  TypeID: number;
+  ItemName: string;
+  IsListed: number;
+  ItemDescription: string;
+  ImgURL: string;
 }
 interface sellItem {
   ItemID: number;
@@ -15,44 +15,45 @@ interface sellItem {
 }
 
 const ItemTableComponent = () => {
-    const [sellPrice, setSellPrice] = useState(0)
-    const [userItems, setUserItems] = useState<UserItemInterface[]>([]);
-    let fetchString =  "http://ronstad.se/inventory/" + localStorage.getItem("uid")
-    useEffect(() => {
-        fetch(fetchString, { method: "GET" }) // Replace with your actual API URL
-            .then((response) => response.json())
-            .then((useritems) => {setUserItems(useritems)
-              console.log(useritems)
-            })
-            .catch((error) => console.error("Error: ", error));
-        }, []);
+  const [sellPrice, setSellPrice] = useState(0)
+  const [userItems, setUserItems] = useState<UserItemInterface[]>([]);
+  let fetchString = "http://ronstad.se:5687/inventory/" + localStorage.getItem("uid")
+  useEffect(() => {
+    fetch(fetchString, { method: "GET" }) // Replace with your actual API URL
+      .then((response) => response.json())
+      .then((useritems) => {
+        setUserItems(useritems)
+        console.log(useritems)
+      })
+      .catch((error) => console.error("Error: ", error));
+  }, []);
 
-      
-    function rmListing(it: UserItemInterface): void {
-        console.log(it.ItemID);
-        var adr: string = "http://ronstad.se/Marketplace/removeListing/" + it.ItemID
-        console.log(adr)
-        fetch(adr, { method: "GET" })
-        .then((response) => {
-          if (response.ok === true) {
-            alert("Item removed from marketplace");
-          } else {
-            console.log("Invalid Request");
-            alert("nuh uh");
-          }
-        })
-        .catch(error => console.log(error))
-        window.location.reload();
-    }
-    function handleSell(itemID: number) {
-  
-      // Prevent the browser from reloading the page
-      //e.preventDefault();
-      let tmp: sellItem = {ItemID: itemID, Token: localStorage.getItem("token"), Price: sellPrice}
-      //alert("test");
-      console.log(JSON.stringify(tmp));
-      console.log("start")
-      fetch("http://ronstad.se/Marketplace/addListing", { method: "POST", body: JSON.stringify(tmp) })
+
+  function rmListing(it: UserItemInterface): void {
+    console.log(it.ItemID);
+    var adr: string = "http://ronstad.se:5687/Marketplace/removeListing/" + it.ItemID
+    console.log(adr)
+    fetch(adr, { method: "GET" })
+      .then((response) => {
+        if (response.ok === true) {
+          alert("Item removed from marketplace");
+        } else {
+          console.log("Invalid Request");
+          alert("nuh uh");
+        }
+      })
+      .catch(error => console.log(error))
+    window.location.reload();
+  }
+  function handleSell(itemID: number) {
+
+    // Prevent the browser from reloading the page
+    //e.preventDefault();
+    let tmp: sellItem = { ItemID: itemID, Token: localStorage.getItem("token"), Price: sellPrice }
+    //alert("test");
+    console.log(JSON.stringify(tmp));
+    console.log("start")
+    fetch("http://ronstad.se:5687/Marketplace/addListing", { method: "POST", body: JSON.stringify(tmp) })
       .then((response) => {
         if (response.ok === true) {
           console.log(JSON.stringify(tmp));
@@ -64,33 +65,34 @@ const ItemTableComponent = () => {
           alert("nuh uh");
         }
       })
-      .catch(error => {console.log(error)
+      .catch(error => {
+        console.log(error)
         console.log("catch")
       })
   }
-    if (userItems == null){
-      return (
-        <>
-        </>
-      )
-    }
-    
+  if (userItems == null) {
     return (
-        <>
-            {userItems.map((item) => (
-                <tr key={item.ItemID} className="">
-                    <td className="">{item.ItemID}</td>
-                    <td className="">{item.TypeID}</td>
-                    <td className="">{item.ItemName}</td>
-                    <td className="">{item.IsListed}</td>
-                    {/*map either button or text input if item is already listed */}
-                    <td>
-                        {item.IsListed ? (<button onClick={() => rmListing(item)}>Remove Listing</button>) : (<><input type={"number"} onChange={(e) => {setSellPrice(e.target.valueAsNumber || 0)}} name="sellPrice" id="sellPrice"/> <button onClick={() => handleSell(item.ItemID)} className={"cyber-button-small bg-blue fg-yellow"}>Sell</button></>)}
-                    </td>
-                </tr>
-            ))}
-        </>
-    );
+      <>
+      </>
+    )
+  }
+
+  return (
+    <>
+      {userItems.map((item) => (
+        <tr key={item.ItemID} className="">
+          <td className="">{item.ItemID}</td>
+          <td className="">{item.TypeID}</td>
+          <td className="">{item.ItemName}</td>
+          <td className="">{item.IsListed}</td>
+          {/*map either button or text input if item is already listed */}
+          <td>
+            {item.IsListed ? (<button onClick={() => rmListing(item)}>Remove Listing</button>) : (<><input type={"number"} onChange={(e) => { setSellPrice(e.target.valueAsNumber || 0) }} name="sellPrice" id="sellPrice" /> <button onClick={() => handleSell(item.ItemID)} className={"cyber-button-small bg-blue fg-yellow"}>Sell</button></>)}
+          </td>
+        </tr>
+      ))}
+    </>
+  );
 }
 
 export default ItemTableComponent
