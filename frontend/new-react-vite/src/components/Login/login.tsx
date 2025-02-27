@@ -16,21 +16,19 @@ function Login() {
     const formJson = Object.fromEntries(formData.entries());
 
     // You can pass formData as a fetch body directly:
-    fetch("http://ronstad.se:5687/login", { method: "POST", body: JSON.stringify(formJson), mode: "no-cors" })
+    fetch("http://ronstad.se:5687/login", { method: "POST", body: JSON.stringify(formJson) })
       .then(response => response.json())
       .then(data => {
         if (data?.Token) {  // if token exists
-          const obj = JSON.parse(JSON.stringify(data))
-          console.log(JSON.stringify(data))
-          console.log(obj)
-          localStorage.setItem("token", obj.Token)
-          localStorage.setItem("uid", obj.UserID)
+          console.log(data)
+          localStorage.setItem("token", data.Token)
+          localStorage.setItem("uid", data.UserID)
           navigate("/Marketplace")
         } else {
           alert("nuh uh")
         }
       })
-      .catch(error => { alert(error) });
+      .catch(error => { alert("testing " + error) });
 
 
     // Or you can work with it as a plain object:
