@@ -56,7 +56,9 @@ function Marketplace() {
     
     fetch(fetchString, { method: "POST", body:  jsonItem}) 
             .then((response) => response.json())
-            .then((marketplaceItems) => setMarketplaceItems(marketplaceItems))
+            .then((marketplaceItems) => {setMarketplaceItems(marketplaceItems)
+              window.location.reload();
+            })
             .catch((error) => console.error("Error: ", error));
 
   };
