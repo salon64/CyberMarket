@@ -26,7 +26,9 @@ These items on the market would be able to be bought by other users transferring
   - [Frontend](#frontend)
   - [Debugging frontend](#debugging-frontend)
   - [Discord Frontend](#discord-frontend)
-- [Testing and User stories](#testing-and-user-stories)
+- [User stories and Testing](#user-stories-and-testing)
+  - [User Stories](#user-stories)
+  - [Testing](#testing)
 - [Reflection](#reflection)
   - [frontend specific reflection](#frontend-specific-reflection)
   - [backend specific reflection](#backend-specific-reflection)
@@ -170,7 +172,8 @@ erDiagram
 
 #### Transaction Log
 
-TODO write about transaction log
+The transaction log is used to keep track of all transaction, souch as when a user buys an item from the marketplace.
+The log also allows for tracking when an item is created, buy setting the seller to null and the price to 0, in the same manner
 
 #### Comments and grading
 
