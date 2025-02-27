@@ -7,6 +7,9 @@ interface MarketplaceState {
   sortBy: string;
   search: string;
 }
+interface userIDInt {
+  UserID: number
+}
 
 interface MarketplaceItems {
   ItemID: number;
@@ -45,9 +48,12 @@ function Marketplace() {
 
   const buyItem = (item: MarketplaceItems) => {
     console.log("OfferID: ?", item.OfferID);
-    const jsonItem = JSON.stringify(item)
-    var fetchString = `http://ronstad.se/Marketplace/buy/` + localStorage.getItem("uid")
-
+    var tmpInt: userIDInt = {UserID: Number(localStorage.getItem("uid"))}
+    const jsonItem = JSON.stringify(tmpInt)
+    console.log(tmpInt)
+    console.log(jsonItem)
+    var fetchString = `http://ronstad.se/Marketplace/buy/` + item.ItemID
+    
     fetch(fetchString, { method: "POST", body:  jsonItem}) 
             .then((response) => response.json())
             .then((marketplaceItems) => setMarketplaceItems(marketplaceItems))
