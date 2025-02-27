@@ -1,8 +1,14 @@
 services:
+
+  webserver:
+    build: frontend/new-react-vite/.
+    ports:
+      - "80:80"
+
   backend:
     build: backend/.
     ports:
-      - "80:80"
+      - "5687:5687"
     environment:
       # Setting upp the connection info for the data base
       - DBHOST=mysql:3306

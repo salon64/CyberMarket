@@ -113,7 +113,7 @@ func main() {
 		updateUserInfo(&w, r, db)
 	})
 
-	http.HandleFunc("GET /user/getMoney/{id}", func(w http.ResponseWriter, r *http.Request){
+	http.HandleFunc("GET /user/getMoney/{id}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors((&w))
 		getUserMoney(&w, r, db)
 	})
@@ -182,7 +182,7 @@ func main() {
 		}
 	})
 
-	err = http.ListenAndServe(":80", nil)
+	err = http.ListenAndServe(":5687", nil)
 	if err != nil {
 		log.Print(err.Error())
 	}
