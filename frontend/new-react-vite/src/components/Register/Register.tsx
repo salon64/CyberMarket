@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import "../Login/login.css";
 import CRTScreen from "../CRTScreen";
+import { globalAddr } from "../../header";
 
 async function handleSubmit(e: any) {
   // Prevent the browser from reloading the page
@@ -16,7 +17,7 @@ async function handleSubmit(e: any) {
   // Or you can work with it as a plain object:
   const formJson = Object.fromEntries(formData.entries());
   //console.log(JSON.stringify(formJson));
-  fetch("http://ronstad.se:5687/user", { method: "POST", body: JSON.stringify(formJson) })
+  fetch("http://"+globalAddr+"/user", { method: "POST", body: JSON.stringify(formJson) })
     .then(response => {
       if (response.ok === true) {
         console.log("Valid")

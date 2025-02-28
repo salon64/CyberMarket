@@ -1,11 +1,12 @@
 import { Navigate, Outlet } from "react-router"
+import { globalAddr } from "../../header";
 type ProtectedRouteProps = {
   //user: AuthUser | null;
   redirectPath?: string;
   children: React.ReactNode;
 }
 const ProtectedRoute = ({ redirectPath = "/" }: ProtectedRouteProps) => {
-  fetch("http://ronstad.se:5687/auth", { method: "POST", body: JSON.stringify(localStorage.getItem("token")) })
+  fetch("http://"+globalAddr+"/auth", { method: "POST", body: JSON.stringify(localStorage.getItem("token")) })
     .then(response => response.json())
     .then(data => {
       console.log(data)

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { globalAddr } from "../header";
 
 interface UserItemInterface {
   ItemID: number;
@@ -17,7 +18,7 @@ interface sellItem {
 const ItemTableComponent = () => {
   const [sellPrice, setSellPrice] = useState(0)
   const [userItems, setUserItems] = useState<UserItemInterface[]>([]);
-  let fetchString = "http://ronstad.se:5687/inventory/" + localStorage.getItem("uid")
+  let fetchString = "http://"+globalAddr+"/inventory/" + localStorage.getItem("uid")
   useEffect(() => {
     fetch(fetchString, { method: "GET" }) // Replace with your actual API URL
       .then((response) => response.json())
@@ -31,7 +32,7 @@ const ItemTableComponent = () => {
 
   function rmListing(it: UserItemInterface): void {
     console.log(it.ItemID);
-    var adr: string = "http://ronstad.se:5687/Marketplace/removeListing/" + it.ItemID
+    var adr: string = "http://"+globalAddr+"/Marketplace/removeListing/" + it.ItemID
     console.log(adr)
     fetch(adr, { method: "GET" })
       .then((response) => {
@@ -53,7 +54,7 @@ const ItemTableComponent = () => {
     //alert("test");
     console.log(JSON.stringify(tmp));
     console.log("start")
-    fetch("http://ronstad.se:5687/Marketplace/addListing", { method: "POST", body: JSON.stringify(tmp) })
+    fetch("http://"+globalAddr+"/Marketplace/addListing", { method: "POST", body: JSON.stringify(tmp) })
       .then((response) => {
         if (response.ok === true) {
           console.log(JSON.stringify(tmp));
