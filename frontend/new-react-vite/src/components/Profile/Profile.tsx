@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import MyImage from "./aswedishtiger.png";
 import "../cyberpunk-css-main/cyberpunk.css";
+import { globAddr } from "../../header";
 const getToken = () => {
   alert("token is: " + localStorage.getItem("token"))
 }
@@ -21,7 +22,7 @@ async function handleSubmit(e: any) {
   let userID: string = (
     document.getElementById("nameChangeFormID") as HTMLInputElement
   ).value;
-  userID = "http://ronstad.se/users/" + userID;
+  userID = "http://"+globAddr+"/users/" + userID;
   console.log(userID);
 
   // Or you can work with it as a plain object:
@@ -38,7 +39,7 @@ async function handleSubmit(e: any) {
       }
     })
     .then((data) => console.log(data));
-  fetch("http://ronstad.se/users", { method: "GET" })
+  fetch("http://"+globAddr+"/users", { method: "GET" })
     .then((response) => response.json())
     .then((res) => console.log(res));
 }
@@ -48,7 +49,7 @@ function Profile() {
   const [data, setData] = useState(null);
   let navigate = useNavigate()
   useEffect(() => {
-    fetch("http://ronstad.se/users", { method: "GET" })
+    fetch("http://"+globAddr+"/users", { method: "GET" })
       .then((response) => response.json())
       .then((data) => setData(data))
       // .then((data) => console.log(data))

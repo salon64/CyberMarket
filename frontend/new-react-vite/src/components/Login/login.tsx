@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import "./login.css";
 import CRTScreen from "../CRTScreen";
 import { useNavigate } from "react-router";
+import { globAddr } from "../../header";
 
 function Login() {
   const navigate = useNavigate()
@@ -16,7 +17,7 @@ function Login() {
     const formJson = Object.fromEntries(formData.entries());
     
     // You can pass formData as a fetch body directly:
-    fetch("http://ronstad.se/login", { method: "POST", body: JSON.stringify(formJson)})
+    fetch("http://"+globAddr+"/login", { method: "POST", body: JSON.stringify(formJson)})
     .then(response => response.json())
     .then(data => {
       if (data?.Token) {  // if token exists

@@ -1,4 +1,5 @@
 import "../cyberpunk-css-main/cyberpunk.css";
+import {globAddr} "../../header"
 interface addMoney {
   UserID: number;
   Money: number;
@@ -30,7 +31,7 @@ function AdminPage() {
     let tmp: createItemInt = { UserID: usItmID, ItemType: itType };
     console.log(tmp);
     // You can pass formData as a fetch body directly:
-    fetch("http://ronstad.se/Marketplace/CreateItem", {
+    fetch("http://"+globAddr+"/Marketplace/CreateItem", {
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -58,7 +59,7 @@ function AdminPage() {
     let tmp: addMoney = { UserID: usID, Money: currAmount };
     console.log(tmp);
 
-    fetch("http://ronstad.se/user/AddMoney", {
+    fetch("http://"+globAddr+"/user/AddMoney", {
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -92,7 +93,7 @@ function AdminPage() {
     console.log(tmp);
 
 
-    fetch("http://ronstad.se/Admin/CreateNewItemType", {
+    fetch("http://"+globAddr+"/Admin/CreateNewItemType", {
       method: "POST",
       body: JSON.stringify(tmp),
     })

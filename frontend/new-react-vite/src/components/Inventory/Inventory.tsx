@@ -2,12 +2,13 @@ import "./Inventory.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 import ItemTableComponent from "../ItemTable";
 import { useState } from "react";
+import { globAddr } from "../../header";
 
 const Inventory = () => {
   getMoney()
   
   function getMoney() {
-    fetch("http://ronstad.se/user/getMoney/" + localStorage.getItem("uid"), { method: "GET"})
+    fetch("http://"+globAddr+"/user/getMoney/" + localStorage.getItem("uid"), { method: "GET"})
     .then(response => response.json())
     .then(data => {
       console.count(data)
