@@ -40,7 +40,7 @@ function Marketplace() {
   }
 
   useEffect(() => {
-    var fetchString = `http://`+globalAddr+`/displayMarket`
+    var fetchString = `http://`+globalAddr+`/Marketplace/displayMarket`
     fetch(fetchString, { method: "POST", body:  JSON.stringify(sortState)}) // Replace with your actual API URL
             .then((response) => response.json())
             .then((marketplaceItems) => setMarketplaceItems(marketplaceItems))
