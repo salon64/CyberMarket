@@ -1,3 +1,4 @@
+import { globalAddr } from "../../header";
 import "../cyberpunk-css-main/cyberpunk.css";
 interface addMoney {
   UserID: number;
@@ -10,13 +11,13 @@ interface createItemInt {
 interface ItemTypeInformation {
   ItemName: string;
   ItemDescription: string | null;
-  ImgURL: string |null;
+  ImgURL: string | null;
   ShortDescription: string | null;
 }
 
 
 function AdminPage() {
-  
+
   function CreateItem(e: any) {
     // Prevent the browser from reloading the page
     e.preventDefault();
@@ -30,7 +31,7 @@ function AdminPage() {
     let tmp: createItemInt = { UserID: usItmID, ItemType: itType };
     console.log(tmp);
     // You can pass formData as a fetch body directly:
-    fetch("http://ronstad.se/Marketplace/CreateItem", {
+    fetch("http://"+globalAddr+"/Marketplace/CreateItem", {
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -58,7 +59,7 @@ function AdminPage() {
     let tmp: addMoney = { UserID: usID, Money: currAmount };
     console.log(tmp);
 
-    fetch("http://ronstad.se/user/AddMoney", {
+    fetch("http://"+globalAddr+"/user/AddMoney", {
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -66,7 +67,7 @@ function AdminPage() {
       .then((data) => {
         console.log(data);
       })
-      .catch((error) => {console.log(error)}); // kastar error när det funkar?????????????
+      .catch((error) => { console.log(error) }); // kastar error när det funkar?????????????
     window.location.reload();
   }
 
@@ -88,11 +89,11 @@ function AdminPage() {
       document.getElementById("ShortDescription") as HTMLInputElement
     ).value;
 
-    let tmp: ItemTypeInformation = {ItemName:ItemName, ItemDescription:null, ImgURL:null, ShortDescription:ShortDescription};
+    let tmp: ItemTypeInformation = { ItemName: ItemName, ItemDescription: null, ImgURL: null, ShortDescription: ShortDescription };
     console.log(tmp);
 
 
-    fetch("http://ronstad.se/Admin/CreateNewItemType", {
+    fetch("http://"+globalAddr+"/Admin/CreateNewItemType", {
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -100,7 +101,7 @@ function AdminPage() {
       .then((data) => {
         console.log(data);
       })
-      .catch((error) => {console.log(error)}); // kastar error när det funkar?????????????
+      .catch((error) => { console.log(error) }); // kastar error när det funkar?????????????
     window.location.reload();
   }
 
