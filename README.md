@@ -171,8 +171,9 @@ erDiagram
     TransactionLog }o--o| Users: Buyer
     TransactionLog }o--o| Users: Seller
 
-    %% TODO UPDATE SCHEMA WITH COMMENTS
 ```
+<!-- TODO UPDATE SCHEMA WITH COMMENTS -->
+<!-- TODO UPDATE SCHEMA WITH BASKET -->
 
 #### Transaction Log
 
@@ -185,9 +186,12 @@ TODO *From task description*: Write about your implementation of grading and com
 
 ### WebServer
 
-The webserver hosting the files are currently not finalized,
-currently to run the frontend the included nodejs from vite is used.
-Possible plans for the future are to use vite for build and using the docker container busybox as an http server
+As react and vite was chosen to create the fronted, we need a way to host the static files vite generates,
+An option would be to host them on the same application as the backend, this would have been the easier option
+but would have some cons. One of with would have been the close link between the website which would have made
+the system harder to link to other application, in this case Discord.
+So the decision was made to host the website separate from the backend.
+The final solution was set up a docker build system that builds the vite application and then sets up a busybox container as the webserver.
 
 ### Frontend
 
