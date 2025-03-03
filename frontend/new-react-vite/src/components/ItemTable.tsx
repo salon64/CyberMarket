@@ -60,6 +60,7 @@ const ItemTableComponent = () => {
           console.log(JSON.stringify(tmp));
           console.log("Item succesfully put on marketplace")
           alert("Item succesfully put on marketplace");
+          window.location.reload();
         } else {
           console.log(JSON.stringify(tmp));
           console.log("Invalid");
