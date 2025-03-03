@@ -46,6 +46,8 @@ These items on the market would be able to be bought by other users transferring
   - [List Market](#list-market)
   - [Adding a listing](#adding-a-listing)
   - [Removing a listing](#removing-a-listing)
+  - [Adding a comment on an itemtype](#adding-a-comment-on-an-itemtype)
+  - [Get information and comments on an itemtype](#get-information-and-comments-on-an-itemtype)
   - [Buy](#buy)
 - [References](#references)
 
@@ -168,12 +170,14 @@ erDiagram
     TransactionLog }o--o| Inventory: Item
     TransactionLog }o--o| Users: Buyer
     TransactionLog }o--o| Users: Seller
+
+    %% TODO UPDATE SCHEMA WITH COMMENTS
 ```
 
 #### Transaction Log
 
-The transaction log is used to keep track of all transaction, souch as when a user buys an item from the marketplace.
-The log also allows for tracking when an item is created, buy setting the seller to null and the price to 0, in the same manner
+The transaction log is used to keep track of all transaction, such as when a user buys an item from the marketplace.
+The log also allows for tracking when an item is created, buy setting the seller and price to null.
 
 #### Comments and grading
 
@@ -207,25 +211,25 @@ TODO *from task description*: Test case specifications (manual testing, related 
 
 ### User Stories
 
-1. As a User I want to be able to register an acount on the website. So that i have acces to the website.
+1. As a User I want to be able to register an account on the website. So that i have access to the website.
 
 2. As a User I want to be able to log into my account, In order to view my profile/inventory/marketplace.
 
 3. As a User I want to be able to view my profile, so that i can see account details about my account.
 
-4. As a User I want to be able to update my username/password in my profile page, in order to have account the account inforamtion i prefer.
+4. As a User I want to be able to update my username/password in my profile page, in order to have account the account information i prefer.
 
 5. As a User I want to be able to view my inventory in order to see my wallet and items.
 
-6. As a User I want to be able to add money into my account, to have sufficent funds.
+6. As a User I want to be able to add money into my account, to have sufficient funds.
 
 7. As a User I want to be able to create items that i can list on the marketplace, to interact with the market.
 
 8. As a User I want to be able to sell an item from my inventory at a price i set to get rid off items from my inventory.
 
-9. As a User I want to be able to retract a listing from the marketplace I have made, In order to get that item back soly to my inventory.
+9. As a User I want to be able to retract a listing from the marketplace I have made, In order to get that item back solely to my inventory.
 
-10. As a User I want to be able to see items lsited in them market with details about it (itemtype, price, description, seller). So that i can see the items currently listed.
+10. As a User I want to be able to see items listed in them market with details about it (itemtype, price, description, seller). So that i can see the items currently listed.
 
 11. As a User I want to be able to sort the market by different metrics (time, price, alphabetically). To display the market in the way i prefer.
 
@@ -233,32 +237,32 @@ TODO *from task description*: Test case specifications (manual testing, related 
 
 ### Testing
 
-1. To register An account The User should press on the "register your account button" that should take the user to a different page. The user should then fill in a user name and password and press the register button. When the button is pressed a http call to the backend to register a new user with the details the user filled in. The backend should take the request and make a new account in the db and return a userID and toeken.
+1. To register An account The User should press on the "register your account button" that should take the user to a different page.The user should then fill in a user name and password and press the register button. When the button is pressed a http call to the backend to register a new user with the details the user filled in. The backend should take the request and make a new account in the db and return a userID and token.
 TODO add checks and handle non unique usernames
 
-2. To log into an account the user should enter username and password in their input feilds and press the button/ press enter on their keyboard. That should send a http call with the information to the backend that should return a userId and a token if matching and an error if not
+2. To log into an account the user should enter username and password in their input felids and press the button/ press enter on their keyboard. That should send a http call with the information to the backend that should return a userId and a token if matching and an error if not
 
 3. When logged in a user should be able to press the "profile" button in the navbar, it should take them to the profile page and should display the users ID.
 
-4. When on the profile website the User should be able to update their user information by entering the new data into the fields and pressing the "save changes" button. That should send a http call to the backend that should check the token to see if the token has permissions for that userID, If it doesnt it should return an error and if it does it should update the information in the DB and return oldname + newname or old psw + new psw.
+4. When on the profile website the User should be able to update their user information by entering the new data into the fields and pressing the "save changes" button. That should send a http call to the backend that should check the token to see if the token has permissions for that userID, If it doesn't it should return an error and if it does it should update the information in the DB and return oldname + newname or old psw + new psw.
 
-5. As a user I should be able to press the inventory button in the nacbar. That should diplay the users wallet. It should also display the users items in a table with a distinction if they are in the marketplace or not. If they are not in the marketplace it should display a sell option with a input prompt and a sell button, and if it is in the marketpalce it should display a button to recall the item from the marketplace.
+5. As a user I should be able to press the inventory button in the navbar. That should display the users wallet. It should also display the users items in a table with a distinction if they are in the marketplace or not. If they are not in the marketplace it should display a sell option with a input prompt and a sell button, and if it is in the marketplace it should display a button to recall the item from the marketplace.
 
-6. To add money to to their wallet the user should type the users ID and ammount in the input fields under "add money to wallet" and press the "add money" button. That should send a http call to the backend where it should check if the active user can add money to that wallet, if it cant it should return an error. If it can it should add the money (in the DB) to the wallet of the user and return the totla amount of money now in that persons wallet.
+6. To add money to to their wallet the user should type the users ID and amount in the input fields under "add money to wallet" and press the "add money" button. That should send a http call to the backend where it should check if the active user can add money to that wallet, if it cant it should return an error. If it can it should add the money (in the DB) to the wallet of the user and return the total amount of money now in that persons wallet.
 
-7. To add a new item to a users inventory the user should add the users id and the itemType in their respecitive feilds under "create item" and press the button "create item". That should send a http call to the backend, where it should check if the one who sent the request can add items to that inventory. It should also check if the itemtype exists. and return an error if they dont. If it passes the checks it should send to the DB to add that the item to that users inventory and return the ItemID, userId and itemtype.
+7. To add a new item to a users inventory the user should add the users id and the itemType in their respective fields under "create item" and press the button "create item". That should send a http call to the backend, where it should check if the one who sent the request can add items to that inventory. It should also check if the itemtype exists. and return an error if they dont. If it passes the checks it should send to the DB to add that the item to that users inventory and return the ItemID, userId and itemtype.
 
-8. A user should be able to sell an item from their invenotry that is not already on the marketplace by entering the price in items row and press sell. That should send a http call to the backend, that should check if the caller can sell that users items, and return an error if it shouldent. if it should it will add the item to the markeptlace table in the db and return the OfferID.
+8. A user should be able to sell an item from their inventory that is not already on the marketplace by entering the price in items row and press sell. That should send a http call to the backend, that should check if the caller can sell that users items, and return an error if it shouldn't. if it should it will add the item to the marketplace table in the db and return the OfferID.
 TODO
 
-9. A user should be able to remove a listed item from the marketpalce that they have acces to by pressing the "recall" button. That should send a http call to the backend where it checks if the caller can recall that persons items and return an error if not. If it should it should update the DB by removing the item from the marketpalce table and returning the offerID
+9. A user should be able to remove a listed item from the marketplace that they have access to by pressing the "recall" button. That should send a http call to the backend where it checks if the caller can recall that persons items and return an error if not. If it should it should update the DB by removing the item from the marketplace table and returning the offerID
 TODO
 
 10. When a user is on the marketplace it should display all the items on the marketplace in the sorted order, on the left side it should display what they are sorted by. This data should be gathered with an http call from when the user loads the site. that call should return all the items in json format.
 
-11. A user should be able to change the order the items are displayed in by pressing the selction bar and selecting another method. That should send a call to the backend where that calls the db for the marketplace information to be returnet in that order. it should then update the table with all the items to the marketplace sorted in the new order.
+11. A user should be able to change the order the items are displayed in by pressing the section bar and selecting another method. That should send a call to the backend where that calls the db for the marketplace information to be returned in that order. it should then update the table with all the items to the marketplace sorted in the new order.
 
-12. A user should be able to buy an item by pressing the "buy" button on the row that item is displayed in. That should send a http call to the backend. The backend will perform chacks to see that you are not buying your own item, you have sufficent funds etc. and return an eror if it fails a check. if not the item should be transfered to the new owner, funds should be updated and and a transaction should be added to the transactionlog in the db. then retrun the OfferID
+12. A user should be able to buy an item by pressing the "buy" button on the row that item is displayed in. That should send a http call to the backend. The backend will perform checks to see that you are not buying your own item, you have sufficient funds etc. and return an error if it fails a check. if not the item should be transferred to the new owner, funds should be updated and and a transaction should be added to the transaction log in the db. then return the OfferID
 TODO
 
 ## Reflection
@@ -281,7 +285,7 @@ docker compose up --build
 To start the go backend application only and connect to known database.
 
 ```sh
-docker run --rm -e DBHOST=database.org:3306 -e DBUSER=root -e DBPASS=pswd -p 80:80 $(docker build -q ./backend)
+docker run --rm -e DBHOST=database.org:3306 -e DBUSER=root -e DBPASS=pswd -p 5687:5687 $(docker build -q ./backend)
 ```
 
 If Go is installed, access to environment variables and privileges to host on a specific ports this command could be run (faster than to build a docker image)
@@ -447,7 +451,9 @@ Content-Length: 0
 
 ### Show wallet
 
-A user can send the request ``GET /user/getMoney/{uid}`` in order to view the amount of currency they hold. As of writing this, anyone can send a request to view anyones wallet. Bearer tokens will be implemented (in most, if not all http requests) in a later sprint to verify which user has access to this information.
+A user can send the request ``GET /user/getMoney/{uid}`` in order to view the amount of currency they hold.
+As of writing this, anyone can send a request to view anyone's wallet.
+Bearer tokens will be implemented (in most, if not all http requests) in a later sprint to verify which user has access to this information.
 
 ```curl
 GET /user/getMoney/12 HTTP/1.1
@@ -477,7 +483,7 @@ Possible return values are 404 if the user is not found. 400 is returned if the 
 
 ```curl
 GET /inventory/1 HTTP/1.1
-Host: ronstad.se
+Host: example.org
 User-Agent: curl/7.81.0
 Accept: */*
 
@@ -498,14 +504,14 @@ Content-Type: text/plain; charset=utf-8
     {
         "ItemID": 2,
         "TypeID": 2,
-        "ItemName": "Cyberarm",
+        "ItemName": "CyberArm",
         "ItemDescription": null,
         "ImgURL": null
     },
     {
         "ItemID": 3,
         "TypeID": 3,
-        "ItemName": "Techtool",
+        "ItemName": "TechTool",
         "ItemDescription": null,
         "ImgURL": null
     }
@@ -578,7 +584,7 @@ Content-Type: text/plain; charset=utf-8
         "ItemID": 2,
         "TypeID": 2,
         "UserID": 1,
-        "ItemName": "Cyberarm",
+        "ItemName": "CyberArm",
         "ItemDescription": null,
         "ImgURL": null,
         "OfferID": 2,
@@ -609,7 +615,7 @@ By sending a POST to ``/Marketplace/addListing`` with the fields ItemID and Pric
 
 ```curl
 POST /Marketplace/addListing HTTP/1.1
-Host: ronstad.se
+Host: example.org
 User-Agent: curl/7.88.1
 Accept: */*
 Content-Length: 26
@@ -668,7 +674,7 @@ Content-Type: application/x-www-form-urlencoded
 {
     "UserID":12,
     "Grade":0,
-    "Comment":"must discusting"
+    "Comment":"must disgusting"
 }
 
 HTTP/1.1 200 OK
@@ -690,7 +696,7 @@ This was deemed acceptable since its meant that item types are more or less cons
 
 ```curl
 > GET /ItemType/1 HTTP/1.1
-> Host: ronstad.se:5687
+> Host: example.org
 > User-Agent: curl/7.88.1
 > Accept: */*
 
@@ -717,7 +723,7 @@ This was deemed acceptable since its meant that item types are more or less cons
             "UserName": "salonguy",
             "UserID": 12,
             "Grade": 0,
-            "Comment": "must discusting",
+            "Comment": "must disgusting",
             "PostedOn": "2025-03-03T10:19:03Z"
         }
     ]
