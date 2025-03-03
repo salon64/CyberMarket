@@ -316,3 +316,79 @@ Content-Type: text/plain; charset=utf-8
 
 removed listing
 ```
+
+## Adding a comment on an itemtype
+
+This adds a comment to the specified itemtype use ``POST /ItemType/{TypeID}``.
+The required json fields are as following ``Grade``, ``UserID`` and ``Comment``.
+To be allowed to post you need to have bought this itemType before. This is checked by looking in the transaction log.
+Currently only buying from marketplace inserts an entry in this log, but in the future adding an item will be the same as buying from null with price null.
+
+Note that there are currently no security, There are no checks that the userid is you.
+
+```curl
+POST /ItemType/1 HTTP/1.1
+Host: example.org
+User-Agent: curl/7.88.1
+Accept: */*
+Content-Length: 53
+Content-Type: application/x-www-form-urlencoded
+
+{
+    "UserID":12,
+    "Grade":0,
+    "Comment":"must discusting"
+}
+
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Date: Mon, 03 Mar 2025 11:37:11 GMT
+Content-Length: 17
+Content-Type: text/plain; charset=utf-8
+
+Added the comment
+```
+
+## Get information and comments on an itemtype
+
+To get information about an itemtype send a get request to ``GET /ItemType/{ItemTypeId}``
+Note that there is no transaction used when getting this information,
+this means that the first part of the transaction, getting mane and such can complete then, the itemType and its comments are deleted.
+Then the method tries to get the Comments.
+This was deemed acceptable since its meant that item types are more or less constant.
+
+```curl
+> GET /ItemType/1 HTTP/1.1
+> Host: ronstad.se:5687
+> User-Agent: curl/7.88.1
+> Accept: */*
+
+< HTTP/1.1 200 OK
+< Access-Control-Allow-Origin: *
+< Date: Mon, 03 Mar 2025 10:54:08 GMT
+< Content-Length: 498
+< Content-Type: text/plain; charset=utf-8
+< 
+{
+    "Name": "MRE",
+    "ImgURL": null,
+    "ShortDesc": null,
+    "DescURL": null,
+    "Comments": [
+        {
+            "UserName": "pelle",
+            "UserID": 10,
+            "Grade": 5,
+            "Comment": "Tastes good mmm",
+            "PostedOn": "2025-02-27T14:54:26Z"
+        },
+        {
+            "UserName": "salonguy",
+            "UserID": 12,
+            "Grade": 0,
+            "Comment": "must discusting",
+            "PostedOn": "2025-03-03T10:19:03Z"
+        }
+    ]
+}
+```

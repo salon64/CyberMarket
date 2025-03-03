@@ -87,9 +87,6 @@ func main() {
 	}
 
 	// TODO set max life time and other
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "%s ", os.Getenv("DBUSER"))
-	})
 
 	// function that returns an array containing PubUser struct {id,name} in json format
 	http.HandleFunc("GET /users", func(w http.ResponseWriter, r *http.Request) {
@@ -126,6 +123,17 @@ func main() {
 	http.HandleFunc("GET /inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		listUserItems(&w, r, db)
+	})
+
+	// adding a comment to an item type
+	http.HandleFunc("POST /ItemType/{ItemTypeID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		addComment(&w, r, db)
+	})
+
+	http.HandleFunc("GET /ItemType/{ItemTypeID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		getItemTypeInfo(w, r, db)
 	})
 
 	http.HandleFunc("POST /Marketplace/displayMarket", func(w http.ResponseWriter, r *http.Request) {
