@@ -11,7 +11,9 @@ import (
 	// "log"
 	"net/http"
 )
-
+type UserStruc struct{
+	UserID int
+}
 type MarketplaceItems struct {
 	ItemID int
 	Price  int
@@ -32,12 +34,140 @@ type MarketplaceItemsInformation struct {
 
 	Username string
 }
-
+type inCheckout struct {
+	InCheckout int
+}
 type displayConstraints struct {
 	SortBy string
 	Search string
 }
+// --------------------- SHOPPING CART --------------------------------------------
 
+// Recieves UserID and OfferID and adds the offer to the cart table in DB
+func addToCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var data UserStruc
+
+	if r.Body == nil {
+		log.Print("body was nil")
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&data)
+
+	if err != nil {
+		log.Printf("error decoding: %s", err.Error())
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		return
+	}
+	log.Printf("with data %v", data)
+
+	t, _ := db.Begin()
+	_, err = t.Exec("insert into ShoppingCart(UserID, OfferID) values (?, ?);", data.UserID, r.PathValue("OfferID"))
+
+	// if error write error and exit
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		log.Printf("ShoppingCart insertion error: %s", err)
+		fmt.Fprintf(*w, "ShoppingCart insertion error: %s", err.Error())
+		return
+	}
+	t.Commit()
+
+	fmt.Fprintf(*w, "%s", r.PathValue("OfferID"))
+
+}
+func checkCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var data UserStruc
+
+	if r.Body == nil {
+		log.Print("body was nil")
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&data)
+
+	if err != nil {
+		log.Printf("error decoding: %s", err.Error())
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		return
+	}
+	log.Printf("with data %v", data)
+
+	t, _ := db.Begin()
+	var count int
+	err = db.QueryRow("SELECT COUNT(*) FROM ShoppingCart WHERE UserID = ? AND OfferID = ?", data.UserID, r.PathValue("OfferID")).Scan(&count)
+
+	// if error write error and exit
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		log.Printf("ShoppingCart check query error: %s", err)
+		fmt.Fprintf(*w, "ShoppingCart check query error: %s", err.Error())
+		return
+	}
+
+	t.Commit()
+	tmp := inCheckout{InCheckout: count}
+	json, err := json.MarshalIndent(tmp, "", "    ")
+
+	// write error and exit if json fails
+	if err != nil {
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(*w, err.Error())
+		return
+	}
+
+	// send json
+	log.Printf("string test")
+	log.Println(string(json))
+	fmt.Fprint(*w, string(json))
+
+
+	// return tmp value to original html fetch post request
+}
+func removeFromCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var data UserStruc
+
+	if r.Body == nil {
+		log.Print("body was nil")
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&data)
+
+	if err != nil {
+		log.Printf("error decoding: %s", err.Error())
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		return
+	}
+	log.Printf("with data %v", data)
+
+	t, _ := db.Begin()
+	_, err = t.Exec("DELETE FROM ShoppingCart WHERE (UserID, OfferID) = (?, ?);", data.UserID, r.PathValue("OfferID"))
+
+	// if error write error and exit
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		log.Printf("ShoppingCart insertion error: %s", err)
+		fmt.Fprintf(*w, "ShoppingCart insertion error: %s", err.Error())
+		return
+	}
+	t.Commit()
+	
+	fmt.Fprintf(*w, "%s", r.PathValue("OfferID"))
+}
+func cartCheckout(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+
+}
+// --------------------------------------------------------------------------------
 func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var data MarketplaceItems
 
