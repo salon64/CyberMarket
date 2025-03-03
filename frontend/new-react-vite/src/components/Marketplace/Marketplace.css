@@ -125,6 +125,7 @@ th:nth-child(1) {
 }
 th:nth-child(2) {
     width: 5%; /* price */
+<<<<<<< Updated upstream
 }
 th:nth-child(4) {
     width: 20.7%; /* seller */
@@ -132,6 +133,16 @@ th:nth-child(4) {
 th:nth-child(5) {
     width: 10%; /* button */
 }
+=======
+}
+
+th:nth-child(4) {
+    width: 15%; /* seller */
+}
+th:nth-child(5) {
+    width: 10%; /* button */
+}
+>>>>>>> Stashed changes
 th:nth-child(3) {
     width: fit-content; /* description */
 }
