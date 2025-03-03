@@ -2,11 +2,14 @@ import "./Marketplace.css";
 import "../cyberpunk-css-main/cyberpunk.css";
 import CyberpunkWindow from "../cyberpunkWindow";
 import { useEffect, useState } from "react";
-import { globAddr } from "../../header";
+import { globalAddr } from "../../header.tsx"
 // I am really cool
 interface MarketplaceState {
   sortBy: string;
   search: string;
+}
+interface userIDInt {
+  UserID: number
 }
 interface userIDInt {
   UserID: number
@@ -40,7 +43,7 @@ function Marketplace() {
   }
 
   useEffect(() => {
-    var fetchString = "http://"+globAddr+"/Marketplace/displayMarket"
+    var fetchString = `http://`+globalAddr+`/Marketplace/displayMarket`
     fetch(fetchString, { method: "POST", body:  JSON.stringify(sortState)}) // Replace with your actual API URL
             .then((response) => response.json())
             .then((marketplaceItems) => setMarketplaceItems(marketplaceItems))
@@ -53,7 +56,7 @@ function Marketplace() {
     const jsonItem = JSON.stringify(tmpInt)
     console.log(tmpInt)
     console.log(jsonItem)
-    var fetchString = "http://"+globAddr+"/Marketplace/buy/" + item.ItemID
+    var fetchString = `http://`+globalAddr+`/Marketplace/buy/` + item.ItemID
     
     fetch(fetchString, { method: "POST", body:  jsonItem}) 
             .then((response) => response.json())

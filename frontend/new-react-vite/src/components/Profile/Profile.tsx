@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import MyImage from "./aswedishtiger.png";
 import "../cyberpunk-css-main/cyberpunk.css";
-import { globAddr } from "../../header";
+import { globalAddr } from "../../header";
 const getToken = () => {
   alert("token is: " + localStorage.getItem("token"))
 }
@@ -22,7 +22,7 @@ async function handleSubmit(e: any) {
   let userID: string = (
     document.getElementById("nameChangeFormID") as HTMLInputElement
   ).value;
-  userID = "http://"+globAddr+"/users/" + userID;
+  userID = "http://"+globalAddr+"/users/" + userID;
   console.log(userID);
 
   // Or you can work with it as a plain object:
@@ -39,7 +39,7 @@ async function handleSubmit(e: any) {
       }
     })
     .then((data) => console.log(data));
-  fetch("http://"+globAddr+"/users", { method: "GET" })
+  fetch("http://"+globalAddr+"/users", { method: "GET" })
     .then((response) => response.json())
     .then((res) => console.log(res));
 }
@@ -49,7 +49,7 @@ function Profile() {
   const [data, setData] = useState(null);
   let navigate = useNavigate()
   useEffect(() => {
-    fetch("http://"+globAddr+"/users", { method: "GET" })
+    fetch("http://"+globalAddr+"/users", { method: "GET" })
       .then((response) => response.json())
       .then((data) => setData(data))
       // .then((data) => console.log(data))
@@ -61,7 +61,7 @@ function Profile() {
   }, []);
 
 
- 
+
 
   // const handleClickEvent = () => {
 
@@ -85,7 +85,7 @@ function Profile() {
         )}
       </div>
 
-      
+
 
       <div>
         <div className="cyber-input">
@@ -118,8 +118,8 @@ function Profile() {
             <button onClick={getToken}>Check token</button>
             <button onClick={() => {
               localStorage.setItem("token", "")
-                navigate('/')
-              }}>Log Out</button>
+              navigate('/')
+            }}>Log Out</button>
           </form>
         </div>
       </div>

@@ -1,1 +1,1 @@
-export const globAddr = "localhost:80"
+export const globalAddr = "localhost:80"
