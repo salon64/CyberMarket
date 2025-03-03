@@ -3,7 +3,9 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -77,4 +79,98 @@ func addComment(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		commentStruct.UserID, itemTypeID, commentStruct.Grade, commentStruct.Comment)
 
 	fmt.Fprint(*w, "Added the comment")
+}
+
+type itemTypeReturn struct {
+	Name      string
+	ImgURL    *string
+	ShortDesc *string
+	DescURL   *string
+	Comments  []pubComment
+}
+
+type pubComment struct {
+	UserName string
+	UserID   int
+	Grade    int
+	Comment  string
+	PostedOn string
+}
+
+func getItemTypeInfo(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+
+	// convert the passed typeid to int
+	id_str := r.PathValue("ItemTypeID")
+	id, err := strconv.Atoi(id_str)
+	if err != nil {
+		sendAndLogError(&w, http.StatusBadRequest, "Can't convert to a valid type id")
+		return
+	}
+	log.Print("id ", id)
+
+	// Get information about the item type
+	// no transactions since its only reads and item types cant be deleted
+	row := db.QueryRow(`SELECT
+						main_db.ItemTypes.ItemName,
+						main_db.ItemTypes.ImgURL,
+						main_db.ItemTypes.ShortDescription,
+						main_db.ItemTypes.ItemDescription
+						FROM
+						main_db.ItemTypes
+						WHERE main_db.ItemTypes.TypeID = ?;`,
+		id)
+
+	// create the return struct
+	ret := itemTypeReturn{}
+
+	// scan the info into the ret struct
+	err = row.Scan(&ret.Name, &ret.ImgURL, &ret.ShortDesc, &ret.DescURL)
+	// if it cant find rows return that the itemid dont exist
+	if errors.Is(err, sql.ErrNoRows) {
+		sendAndLogError(&w, http.StatusNotFound, "Cant find the specified item")
+		return
+	}
+	// if other error write error and return
+	if err != nil {
+		sendAndLogError(&w, http.StatusInternalServerError, "error getting item info", err.Error())
+		return
+	}
+
+	log.Print(ret)
+
+	rows, err := db.Query(`SELECT
+							main_db.Users.Username,
+							main_db.Users.UserID,
+							main_db.TypeComments.Grade,
+							main_db.TypeComments.Comment,
+							main_db.TypeComments.CreatedOn
+							FROM main_db.TypeComments
+							LEFT JOIN main_db.Users on main_db.TypeComments.UserID = main_db.Users.UserID
+							WHERE main_db.TypeComments.TypeID = ?;`,
+		id)
+	if err != nil {
+		sendAndLogError(&w, http.StatusInternalServerError, "error on getting items comment: ", err.Error())
+		return
+	}
+
+	for rows.Next() {
+		var comment pubComment
+		err := rows.Scan(&comment.UserName, &comment.UserID, &comment.Grade, &comment.Comment, &comment.PostedOn)
+		if err != nil {
+			sendAndLogError(&w, http.StatusInternalServerError, "error while scanning comments: ", err.Error())
+			return
+		}
+
+		ret.Comments = append(ret.Comments, comment)
+	}
+
+	json, err := json.MarshalIndent(ret, "", "    ")
+
+	if err != nil {
+		sendAndLogError(&w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// send json
+	fmt.Fprint(w, string(json))
 }
