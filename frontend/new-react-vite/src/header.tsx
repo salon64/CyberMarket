@@ -1,1 +1,1 @@
-export const globalAddr = "localhost:80"
+export const globalAddr = import.meta.env.VITE_API_ADDRESS

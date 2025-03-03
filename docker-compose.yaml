@@ -1,7 +1,10 @@
 services:
 
   webserver:
-    build: frontend/new-react-vite/.
+    build:
+      context: frontend/new-react-vite/.
+      args:
+        - VITE_API_ADDRESS=ronstad.se:5687
     ports:
       - "80:80"
 
