@@ -392,3 +392,22 @@ This was deemed acceptable since its meant that item types are more or less cons
     ]
 }
 ```
+
+## Delete comment
+
+To delete a comment send ``DELETE /comment/{commentID}``
+
+```curl
+> DELETE /comment/3 HTTP/1.1
+> Host: example.org
+> User-Agent: curl/7.88.1
+> Accept: */*
+ 
+< HTTP/1.1 200 OK
+< Access-Control-Allow-Origin: *
+< Date: Tue, 04 Mar 2025 09:54:05 GMT
+< Content-Length: 15
+< Content-Type: text/plain; charset=utf-8
+ 
+Deleted comment
+```

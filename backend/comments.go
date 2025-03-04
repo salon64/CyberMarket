@@ -90,13 +90,15 @@ type itemTypeReturn struct {
 }
 
 type pubComment struct {
-	UserName string
-	UserID   int
-	Grade    int
-	Comment  string
-	PostedOn string
+	CommentID int
+	UserName  string
+	UserID    int
+	Grade     int
+	Comment   string
+	PostedOn  string
 }
 
+// dont know if its the best idea to have it here, but its comment related ish
 func getItemTypeInfo(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// convert the passed typeid to int
@@ -139,6 +141,7 @@ func getItemTypeInfo(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	log.Print(ret)
 
 	rows, err := db.Query(`SELECT
+							main_db.TypeComments.CommentID,
 							main_db.Users.Username,
 							main_db.Users.UserID,
 							main_db.TypeComments.Grade,
@@ -155,7 +158,7 @@ func getItemTypeInfo(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	for rows.Next() {
 		var comment pubComment
-		err := rows.Scan(&comment.UserName, &comment.UserID, &comment.Grade, &comment.Comment, &comment.PostedOn)
+		err := rows.Scan(&comment.CommentID, &comment.UserName, &comment.UserID, &comment.Grade, &comment.Comment, &comment.PostedOn)
 		if err != nil {
 			sendAndLogError(&w, http.StatusInternalServerError, "error while scanning comments: ", err.Error())
 			return
@@ -173,4 +176,15 @@ func getItemTypeInfo(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// send json
 	fmt.Fprint(w, string(json))
+}
+
+// to delete a comment
+func deleteComment(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	commentID, err := strconv.Atoi(r.PathValue("CommentID"))
+	if err != nil {
+		sendAndLogError(&w, http.StatusBadRequest, "can't convert ", r.PathValue("CommentID"), " to valid int")
+		return
+	}
+	db.Exec(`DELETE FROM main_db.TypeComments WHERE CommentID = ?;`, commentID)
+	fmt.Fprint(w, "Deleted comment")
 }

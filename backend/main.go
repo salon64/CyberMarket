@@ -136,6 +136,11 @@ func main() {
 		getItemTypeInfo(w, r, db)
 	})
 
+	http.HandleFunc("DELETE /comment/{CommentID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		deleteComment(w, r, db)
+	})
+
 	http.HandleFunc("POST /Marketplace/displayMarket", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		listMarketplaceItems(&w, r, db)
