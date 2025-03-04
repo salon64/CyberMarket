@@ -30,6 +30,7 @@ interface MarketplaceItems {
   CreationDate: string;
 
   Username: string;
+  InCheckout: number;
 }
 
 
@@ -43,6 +44,7 @@ function Marketplace() {
   const [fuckTS, setFuckTS] = useState<number | null>(null);
 
   // console.log("showComments state:", showComments);
+  const [cartStatus, setCartStatus] = useState<{ [key: number]: boolean }>({});
   onchange = s => { // <-- wtf is this
     console.log(sortState.sortBy)
     console.log(s)
@@ -50,12 +52,19 @@ function Marketplace() {
   
 
   useEffect(() => {
-    var fetchString = `http://`+globalAddr+`/Marketplace/displayMarket`
-    fetch(fetchString, { method: "POST", body:  JSON.stringify(sortState)}) // Replace with your actual API URL
-            .then((response) => response.json())
-            .then((marketplaceItems) => setMarketplaceItems(marketplaceItems))
-            .catch((error) => console.error("Error: ", error));
-  }, [sortState])
+    var fetchString = `http://${globalAddr}/Marketplace/displayMarket`;
+    fetch(fetchString, { method: "POST", body: JSON.stringify(sortState) })
+      .then((response) => response.json())
+      .then((marketplaceItems) => {
+        setMarketplaceItems(marketplaceItems);
+        
+        // Run checkCart for each item
+        marketplaceItems.forEach((item: MarketplaceItems) => {
+          checkCart(item);
+        });
+      })
+      .catch((error) => console.error("Error: ", error));
+  }, [sortState]);
 
   const buyItem = (item: MarketplaceItems) => {
     console.log("OfferID: ?", item.OfferID);
@@ -74,6 +83,48 @@ function Marketplace() {
 
   };
 
+  const addToCart = (item: MarketplaceItems) => {
+    var tmpInt: userIDInt = {UserID: Number(localStorage.getItem("uid"))}
+    const jsonItem = JSON.stringify(tmpInt)
+    fetch("http://"+globalAddr+"/Marketplace/addToCart/"+ item.OfferID, { method: "POST", body:  jsonItem}) 
+    .then((response) => {response.json()
+      alert("Item successfully added to cart")
+     
+    })
+    .catch((error) => console.error("Error: ", error));
+  }
+  const removeFromCart = (item: MarketplaceItems) => {
+    var tmpInt: userIDInt = {UserID: Number(localStorage.getItem("uid"))}
+    const jsonItem = JSON.stringify(tmpInt)
+    fetch("http://"+globalAddr+"/Marketplace/removeFromCart/"+ item.OfferID, { method: "POST", body:  jsonItem}) 
+    .then((response) => {response.json()
+      alert("Item successfully removed from cart")
+      
+    })
+    .catch((error) => console.error("Error: ", error));
+  }
+
+  const checkCart = async (item: MarketplaceItems) => {
+    const tmpInt: userIDInt = { UserID: Number(localStorage.getItem("uid")) };
+    const jsonItem = JSON.stringify(tmpInt);
+  
+    try {
+      const response = await fetch(`http://${globalAddr}/Marketplace/checkCart/${item.OfferID}`, {
+        method: "POST",
+        body: jsonItem,
+      });
+  
+      const data = await response.json();
+      console.log(data.InCheckout);
+  
+      setCartStatus(prevState => ({
+        ...prevState,
+        [item.ItemID]: data.InCheckout || false
+      }));
+    } catch (error) {
+      console.error("Error checking cart:", error);
+    }
+  };
   const market = () => {
     if (marketplaceItems === null) {
       console.log("empty")
@@ -107,6 +158,12 @@ function Marketplace() {
                 <td className="">{item.Username}</td>
                 <td>
                   <input onClick={() => buyItem(item)} className='buy-button' type='button' value='Buy' />
+                  {cartStatus[item.ItemID] ? 
+                        (<input onClick={() => removeFromCart(item)} className="buy-button" type="button" value="Remove From cart" />
+                      )
+                         : (<input onClick={() => addToCart(item)} className="buy-button" type="button" value="Add To Cart" />
+                        )}
+                      <input onClick={() => checkCart(item)} className="buy-button" type="button" value="Check" />
                 </td>
               </tr>)
         ) 
