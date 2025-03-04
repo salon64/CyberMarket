@@ -130,7 +130,6 @@ func main() {
 
 	http.HandleFunc("POST /Marketplace/displayMarket", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
-		log.Printf("boma2")
 		listMarketplaceItems(&w, r, db)
 	})
 
@@ -147,6 +146,11 @@ func main() {
 		enableCors(&w)
 		addListingToMarketplace(&w, r, db)
 	})
+	http.HandleFunc("GET /Marketplace/displayCart/{UserID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		log.Printf("dc")
+		displayCart(&w, r, db)
+	})
 	http.HandleFunc("POST /Marketplace/checkCart/{OfferID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		checkCart(&w, r, db)
@@ -160,8 +164,9 @@ func main() {
 		enableCors(&w)
 		removeFromCart(&w, r, db)
 	})
-	http.HandleFunc("POST /Marketplace/cartCheckout", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("GET /Marketplace/cartCheckout/{UserID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
+		log.Printf("checkout test")
 		cartCheckout(&w, r, db)
 	})
 	http.HandleFunc("GET /Marketplace/removeListing/{ItemID}", func(w http.ResponseWriter, r *http.Request) {

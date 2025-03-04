@@ -43,6 +43,49 @@ type displayConstraints struct {
 }
 // --------------------- SHOPPING CART --------------------------------------------
 
+func displayCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	row, err := db.Query((`SELECT inv.ItemID, inv.TypeID, inv.UserID,
+		u.Username,
+		it.ItemName, it.ItemDescription, it.ImgURL, 
+		mp.OfferID, mp.Price, mp.CreationDate
+		FROM Marketplace mp
+		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
+		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
+		INNER JOIN Users u ON u.UserID = inv.UserID 
+		WHERE mp.OfferID IN (SELECT OfferID FROM ShoppingCart WHERE UserID = ?);`), r.PathValue("UserID"))
+
+	if isErrLog(w, err) {
+		return
+	}
+
+	defer row.Close()
+
+	var listings []MarketplaceItemsInformation
+	for row.Next() {
+		var listing MarketplaceItemsInformation
+		// SELECT inv.ItemID, inv.TypeID, inv.UserID, u.Username, it.ItemName, it.ItemDescription, it.ImgURL, mp.OfferID, mp.Price, mp.CreationDate
+		err := row.Scan(&listing.ItemID, &listing.TypeID, &listing.UserID, &listing.Username, &listing.ItemName, &listing.ItemDescription, &listing.ImgURL, &listing.OfferID, &listing.Price, &listing.CreationDate)
+		if err != nil {
+			(*w).WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(*w, err.Error())
+			return
+		}
+
+		listings = append(listings, listing)
+	}
+
+	json, err := json.MarshalIndent(listings, "", "    ")
+
+	if err != nil {
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(*w, err.Error())
+		return
+	}
+
+	// send json
+	fmt.Fprint(*w, string(json))
+}
+
 // Recieves UserID and OfferID and adds the offer to the cart table in DB
 func addToCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var data UserStruc
@@ -165,7 +208,176 @@ func removeFromCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Fprintf(*w, "%s", r.PathValue("OfferID"))
 }
 func cartCheckout(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	// Returns illegal rows, if any
+	rows, err := db.Query(`SELECT sc.OfferID FROM ShoppingCart sc 
+	WHERE sc.UserID = ? AND NOT EXISTS 
+	(SELECT 1 FROM Marketplace mp WHERE 
+	mp.OfferID = sc.OfferID);`, r.PathValue("UserID"))
 
+	if rows.Next() { // Item doesn't exist in marketplace anymore, delete item from cart
+		log.Printf("Item doesn't exist anymore")
+		fmt.Fprintf(*w, "Item doesn't exist anymore")
+		_, err := db.Exec(`DELETE FROM ShoppingCart 
+		WHERE UserID = ? 
+		AND NOT EXISTS (
+			SELECT 1 
+			FROM Marketplace mp 
+			WHERE mp.OfferID = ShoppingCart.OfferID
+		);`, r.PathValue("UserID"))
+		if err != nil { // Shouldn't be able to get an error here
+			log.Printf("impossible error (removing cart item): %s", err.Error())
+			(*w).WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(*w, "impossible error (removing cart item): %s", err.Error())
+			return
+		}
+		return
+	}
+	if err != nil {
+		log.Printf("error querying row (cartCheckout): %s", err.Error())
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(*w, "error querying row (cartCheckout): %s", err.Error())
+		return
+	}
+	defer rows.Close()
+	rows, err = db.Query(`SELECT OfferID FROM ShoppingCart WHERE UserID = ?`, r.PathValue("UserID"))
+	if err != nil {
+		log.Printf("error reading offerID rows: %s", err.Error())
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(*w, "error reading offerID rows: %s", err.Error())
+		return
+	}
+	var totCost int
+	var myWallet int
+	// Get totalcost
+	tmp := db.QueryRow(`SELECT SUM(mp.Price) AS TotalCost
+		FROM ShoppingCart sc
+		INNER JOIN Marketplace mp ON sc.OfferID = mp.OfferID
+		WHERE sc.UserID = ?;`, r.PathValue("UserID"))
+	err = tmp.Scan(&totCost)
+
+	if err != nil {
+		log.Printf("error reading totCost: %s", err.Error())
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(*w, "error reading totCost: %s", err.Error())
+		return
+	}
+
+	// Get user wallet
+	tmp = db.QueryRow(`SELECT Wallet FROM Users WHERE UserID = ?`, r.PathValue("UserID"))
+	err = tmp.Scan(&myWallet)
+	if err != nil {
+		log.Printf("error reading buyer wallet: %s", err.Error())
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(*w, "error reading buyer wallet: %s", err.Error())
+		return
+	}
+	if myWallet < totCost {
+		log.Printf("Not enough money in wallet")
+		fmt.Fprintf(*w, "Not enough money in wallet")
+		return
+	}
+
+	t, err := db.Begin()
+	if err != nil {
+		log.Printf("error couldn't begin transaction: %s", err.Error())
+		(*w).WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(*w, "error couldn't begin transaction: %s", err.Error())
+		return
+	}
+	for rows.Next() {
+		var currOfferID int
+		var currPrice int
+		var seller int
+		var currItemID int
+
+		err := rows.Scan(&currOfferID)
+		if err != nil {
+			t.Rollback()
+			log.Printf("error reading current offerID: %s", err.Error())
+			(*w).WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(*w, "error reading current offerID: %s", err.Error())
+			return
+		}
+
+		tmp := t.QueryRow(`SELECT inv.UserID AS SellerID
+			FROM Marketplace mp
+			INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
+			WHERE mp.OfferID = ?;`, currOfferID)
+		err = tmp.Scan(&seller)
+		if err != nil {
+			t.Rollback()
+			log.Printf("error reading seller: %s", err.Error())
+			(*w).WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(*w, "error reading seller: %s", err.Error())
+			return
+		}
+		tmp = t.QueryRow(`SELECT Price FROM Marketplace WHERE OfferID = ?`, currOfferID)
+		err = tmp.Scan(&currPrice)
+		if err != nil {
+			t.Rollback()
+			log.Printf("error reading seller: %s", err.Error())
+			(*w).WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(*w, "error reading seller: %s", err.Error())
+			return
+		}
+
+		tmp = t.QueryRow(`SELECT ItemID FROM Marketplace WHERE OfferID = ?`, currOfferID)
+		err = tmp.Scan(&currItemID)
+		if err != nil {
+			t.Rollback()
+			log.Printf("error reading itemID: %s", err.Error())
+			(*w).WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(*w, "error reading itemID: %s", err.Error())
+			return
+		}
+		// Remove money from buyer wallet
+		_, err = t.Exec("UPDATE Users SET Wallet = Wallet - ? WHERE UserID = ?", currPrice, r.PathValue("UserID"))
+		if err != nil {
+			t.Rollback()
+			log.Printf("error updating buyer wallet: %s", err.Error())
+			(*w).WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(*w, "error updating buyer wallet: %s", err.Error())
+			return
+		}
+		// Add money to seller wallet
+		_, err = t.Exec("UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?", currPrice, seller)
+		if err != nil {
+			t.Rollback()
+			log.Printf("error updating seller wallet: %s", err.Error())
+			(*w).WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(*w, "error updating seller wallet: %s", err.Error())
+			return
+		}
+		_, err = t.Exec(`UPDATE Inventory SET UserID = ? WHERE Inventory.ItemID = ? ;`, r.PathValue("UserID"), currItemID)
+		if err != nil {
+			t.Rollback()
+			(*w).WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		// create transaction log
+		_, err = t.Exec(`INSERT INTO TransactionLog (Price, Date, ItemID, Buyer, Seller) 
+			VALUES (?, NOW(), ?, ?, ?);`, currPrice, currItemID, r.PathValue("UserID"), seller)
+		if err != nil {
+			t.Rollback()
+			(*w).WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		_, err = db.Exec("DELETE FROM Marketplace WHERE ItemID = ?;", currItemID)
+		if err != nil {
+			t.Rollback()
+			(*w).WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+	_, err = db.Exec("DELETE FROM ShoppingCart WHERE UserID = ?;", r.PathValue("UserID"))
+	if err != nil {
+		t.Rollback()
+		(*w).WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	t.Commit()
+	log.Printf("Successfully checked out")
+	fmt.Fprint(*w, "Success")
 }
 // --------------------------------------------------------------------------------
 func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
