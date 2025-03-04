@@ -277,6 +277,99 @@ TODO *from task description* A reflection of the system's limitations and the po
 
 ### backend specific reflection
 
+As mentioned in [Backend](#backend) go was chosen as the language, due to its standard library having http servers and sql interfaces.
+This meant that only two external modules had to be used, the driver code for mysql which is invisible to the programer
+and is dealt with the standard library sql implementation and for our token implementation an UUID module was needed.
+The small mount of modules required did make the backend easier to work with and since the uuid module was written by google there was an unified philosophy.
+
+But Go json implantation caused us some trouble, First of for an field to be decoded or encoded the field needed to be public,
+This was easy to fixed but also easy to miss as an public field starts with an capitalized letter compared to an private which starts with an lowercase.
+Another annoyance is how default values and missing fields are handled, Since decoding to a struct dont return the struct but only updates an existing one.
+When a struct is created to be filed with values decoded from json, all field are initializes to their default values, string are set to empty and ints to zero,
+this causes problem for the decoders does not cause an error if an felid is not found in the json.
+So if for example name is left out we cant determine if the filed was missing or intently left blank (empty string).
+
+#### Error handling
+
+Another annoyance in go was error handling and Nil, Compared to rust which granites that no uninitialize values exist (no nil)
+and uses the enum types result and option to conway the same meaning while allowing for error handling methods on these types.
+Gu uses a more verbose system which forces you to think about error in the same way as rust but eventing is more verbose and laking
+inbuilt operators but still not preventing nil deref errors.
+This puts Go in an awkward position were error can be ignored as in Python and dealt with later in a try catch block.
+Or is forced to be handled as in rust
+
+##### Rust
+
+```rust
+fn i_can_error(arg: i32) -> Result<&i32,dyn Error> {
+    if i < 0 {
+        return Err()
+    } else {
+        return Ok(arg+1)
+    }
+}
+
+fn main() -> Result<(),dyn Error>{
+    println!("{}", i_can_error(-1).unwrap()) // Unwrap panic is the enum is Err
+
+    if let Ok(output) = i_can_error(-1) {
+        // this branch will only be evaluated if i_can_error return the enum ok,
+    }
+
+    println("{}", i_can_error()?) // the ? operator returns the value if its ok, otherwise it exits the function (this case main) and return the error
+}
+```
+
+##### Go
+
+```go
+func iCanError(arg int) (int ,error) {
+    if i<0 {
+        return 0, error
+    } else {
+        return arg + 1, nil
+    }
+}
+
+func main() error{
+    val, _ := iCanError(-1) //ignore the error, our result might be wrong, might also be nil and cause nil deref error later on
+    fmt.PrintLn(val)
+
+    val, err := iCanError(-1) // this is the same as rust unwrap, but incapably verbose and often clutters up your codebase
+    if err != nil {
+        panic("i can error errored")
+    }
+    fmt.PrintLn(val)
+
+    val, err = iCanError(-1) // this is the same as rust if let
+    if err == nil {
+        // do stuff
+    }
+
+    val, err = iCanError(-1) // this is the same as rust ? operator, but incapably verbose and often clutters up your codebase
+    if err != nil {
+        return err
+    }
+    fmt.PrintLn(val)
+}
+```
+
+##### Python
+
+```python
+def iCanError(arg):
+    if arg < 0:
+        raise ValueError
+    else:
+        return arg+1
+
+print(iCanError(-1)) # if it errors the exception is walked along the call stack, same as rust unwarp, but can be caught instead of panic
+
+try
+
+
+```
+
 ## Starting the application
 
 Each part is a self contained container, to launch them we have provided a docker compose file for your convenience.
