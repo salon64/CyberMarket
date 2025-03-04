@@ -11,9 +11,6 @@ interface MarketplaceState {
 interface userIDInt {
   UserID: number
 }
-interface userIDInt {
-  UserID: number
-}
 
 interface MarketplaceItems {
   ItemID: number;
@@ -82,7 +79,7 @@ function Marketplace() {
     fetch("http://"+globalAddr+"/Marketplace/addToCart/"+ item.OfferID, { method: "POST", body:  jsonItem}) 
     .then((response) => {response.json()
       alert("Item successfully added to cart")
-     
+      window.location.reload();
     })
     .catch((error) => console.error("Error: ", error));
   }
@@ -92,7 +89,7 @@ function Marketplace() {
     fetch("http://"+globalAddr+"/Marketplace/removeFromCart/"+ item.OfferID, { method: "POST", body:  jsonItem}) 
     .then((response) => {response.json()
       alert("Item successfully removed from cart")
-      
+      window.location.reload();
     })
     .catch((error) => console.error("Error: ", error));
   }
@@ -149,7 +146,6 @@ function Marketplace() {
                       )
                          : (<input onClick={() => addToCart(item)} className="buy-button" type="button" value="Add To Cart" />
                         )}
-                      <input onClick={() => checkCart(item)} className="buy-button" type="button" value="Check" />
                 </td>
               </tr>))
       )
