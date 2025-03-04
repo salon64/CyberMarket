@@ -224,6 +224,7 @@ func cartCheckout(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 			FROM Marketplace mp 
 			WHERE mp.OfferID = ShoppingCart.OfferID
 		);`, r.PathValue("UserID"))
+		log.Printf("test1")
 		if err != nil { // Shouldn't be able to get an error here
 			log.Printf("impossible error (removing cart item): %s", err.Error())
 			(*w).WriteHeader(http.StatusBadRequest)
