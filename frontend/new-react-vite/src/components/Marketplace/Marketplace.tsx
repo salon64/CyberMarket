@@ -3,6 +3,9 @@ import "../cyberpunk-css-main/cyberpunk.css";
 import CyberpunkWindow from "../cyberpunkWindow";
 import { useEffect, useState } from "react";
 import { globalAddr } from "../../header.tsx"
+import PopUpComments from "../PopUpComments.tsx";
+
+
 // I am really cool
 interface MarketplaceState {
   sortBy: string;
@@ -11,6 +14,7 @@ interface MarketplaceState {
 interface userIDInt {
   UserID: number
 }
+
 
 interface MarketplaceItems {
   ItemID: number;
@@ -35,11 +39,17 @@ interface MarketplaceItems {
 function Marketplace() {
   const [sortState, setSortState] = useState<MarketplaceState>({sortBy: "Newest", search: ""})
   const [marketplaceItems, setMarketplaceItems] = useState<MarketplaceItems[]>([]);
+  
+  const [showComments, setShowComments] = useState(false)
+  const [fuckTS, setFuckTS] = useState<number | null>(null);
+
+  // console.log("showComments state:", showComments);
   const [cartStatus, setCartStatus] = useState<{ [key: number]: boolean }>({});
   onchange = s => { // <-- wtf is this
     console.log(sortState.sortBy)
     console.log(s)
   }
+  
 
   useEffect(() => {
     var fetchString = `http://${globalAddr}/Marketplace/displayMarket`;
@@ -131,11 +141,18 @@ function Marketplace() {
       )
     }
     else {
-      console.log("not empty")
       return (
           marketplaceItems.map((item: MarketplaceItems) => (
               <tr key={item.ItemID}>
-                <td className="">{item.ItemName}</td>
+                {/* <td className="">
+                  <button onClick={() => {
+                    console.log("Opening comments window"); // Debugging
+                    setShowComments(true);
+                  }}>
+                    {item.ItemName}
+                  </button>
+                </td> */}
+                <td style={{ cursor: 'pointer' }} onClick={() => {setFuckTS(item.TypeID); setShowComments(true); } } >{item.ItemName}</td>
                 <td className="">{item.Price}</td>
                 <td className="">{item.ItemDescription}</td>
                 <td className="">{item.Username}</td>
@@ -147,17 +164,22 @@ function Marketplace() {
                          : (<input onClick={() => addToCart(item)} className="buy-button" type="button" value="Add To Cart" />
                         )}
                 </td>
-              </tr>))
+              </tr>)
+        ) 
       )
-
-
-
     }
   } 
 
   return (
-    
-  <body>
+  
+  <div>
+    {/* {showComments && <PopUpComments onClose={() => setShowComments(false)} />} */}
+    {showComments && (
+      <PopUpComments
+        onClose={() => setShowComments(false)}
+        itemId={fuckTS} // Pass item.ItemID as a prop
+      />
+    )}
     <div className="left-right-container">
       <div className="left">
         <CyberpunkWindow>
@@ -215,8 +237,8 @@ function Marketplace() {
         </table>
       </div>
     </div>
-  </body>
-
+  
+  </div>
   );
 }
 
