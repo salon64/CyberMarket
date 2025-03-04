@@ -32,6 +32,13 @@ These items on the market would be able to be bought by other users transferring
 - [Reflection](#reflection)
   - [frontend specific reflection](#frontend-specific-reflection)
   - [backend specific reflection](#backend-specific-reflection)
+    - [HTTP](#http)
+    - [SQL](#sql)
+    - [JSON](#json)
+    - [Error handling](#error-handling)
+      - [Rust](#rust)
+      - [Go](#go)
+      - [Python](#python)
 - [Starting the application](#starting-the-application)
 - [Website Documentation](#website-documentation)
 - [Backend API](#backend-api)
@@ -282,12 +289,35 @@ This meant that only two external modules had to be used, the driver code for my
 and is dealt with the standard library sql implementation and for our token implementation an UUID module was needed.
 The small mount of modules required did make the backend easier to work with and since the uuid module was written by google there was an unified philosophy.
 
+#### HTTP
+
+The HTTP module that is included in go is extensive and provide large about of the functnialty needed for any web application.
+This project encountered some problems regarding *CORS* policy and Complex http methods (**Delete**, **patch** and others),
+the cors problem was solved by simply setting the response header for each request to allow *CORS*.
+While we currently avoid complex http methods such as delete and simply stuck with **post** and **get**.
+In the future it would be wise to implement the pre-flight checks that are required to use these functions.
+
+#### SQL
+
+Go sql implantation provided method that make it easy to use transactions, as instead of calling query or exec on the database object,
+you use the same methods on a transaction object. There exist places where an transaction might benefit but it was decided against,
+one example is ItemTypes Where first common information is retrieved (name, description, ect) then comments are retried.
+There exist the possibility that the itemtype would have been deleted between these two operations.
+This was okay as ItemTypes are not meant to be deleted, and even if they were deleted in the middle of the operation the effect would just be that the user saw no comets on that Itemtype
+and the item type would be gone when the site refreshed.
+For where the result of an race condition would be "fatal" transactions are used, example [Buy](#buy)
+
+For more specific documentation about transactions see the backend api [documentation](#backend-api)
+
+#### JSON
+
 But Go json implantation caused us some trouble, First of for an field to be decoded or encoded the field needed to be public,
 This was easy to fixed but also easy to miss as an public field starts with an capitalized letter compared to an private which starts with an lowercase.
 Another annoyance is how default values and missing fields are handled, Since decoding to a struct dont return the struct but only updates an existing one.
 When a struct is created to be filed with values decoded from json, all field are initializes to their default values, string are set to empty and ints to zero,
 this causes problem for the decoders does not cause an error if an felid is not found in the json.
 So if for example name is left out we cant determine if the filed was missing or intently left blank (empty string).
+A way to avoid this is to use another json library which dont have these problems, but that would require a rewrite of most backed functions
 
 #### Error handling
 
@@ -295,8 +325,12 @@ Another annoyance in go was error handling and Nil, Compared to rust which grani
 and uses the enum types result and option to conway the same meaning while allowing for error handling methods on these types.
 Gu uses a more verbose system which forces you to think about error in the same way as rust but eventing is more verbose and laking
 inbuilt operators but still not preventing nil deref errors.
-This puts Go in an awkward position were error can be ignored as in Python and dealt with later in a try catch block.
-Or is forced to be handled as in rust
+This puts Go in an awkward position were error can be ignored as in Python but not dealt with later in a try catch block.
+
+Personally (@spooky_firefox) i feel like go error handling tries t get you to do the right ting but ends up as verbose mess,
+where each function that can return an error needs three lines to deal with it.
+
+The following code blocks show the verbosely in go error handling.
 
 ##### Rust
 
@@ -310,7 +344,7 @@ fn i_can_error(arg: i32) -> Result<&i32,dyn Error> {
 }
 
 fn main() -> Result<(),dyn Error>{
-    println!("{}", i_can_error(-1).unwrap()) // Unwrap panic is the enum is Err
+    println!("{}", i_can_error(-1).unwrap()) // Unwrap panic if the enum is Err
 
     if let Ok(output) = i_can_error(-1) {
         // this branch will only be evaluated if i_can_error return the enum ok,
@@ -363,11 +397,12 @@ def iCanError(arg):
     else:
         return arg+1
 
-print(iCanError(-1)) # if it errors the exception is walked along the call stack, same as rust unwarp, but can be caught instead of panic
+print(iCanError(-1)) # this is the same as rust ? operator, we dont have to del with error let some else do
 
-try
-
-
+try:
+    print(iCanError(-1)) # this is the same as rust if let which gives us nice control if its an error
+except:
+    # do something
 ```
 
 ## Starting the application
@@ -839,7 +874,7 @@ will be fixed when token authentication is implemented in this method.
 To avoid that the user does purchases in quick sequence to trick the found checking by having both checks complete before any of the purchases have happened,
 the whole of checking funds, transferring ownership, updating funds and removing the listing is done in a singe sql transaction
 
-DANGEROUS FLAW, CURRENTLY BEING FIXED.\
+**DANGEROUS FLAW, CURRENTLY BEING FIXED.**\
 imagine the following scenario
 
 1. User **A** adds a listing för item **1** on the marketplace with the price **100 EUR**
