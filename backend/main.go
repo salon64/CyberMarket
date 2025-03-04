@@ -127,6 +127,7 @@ func main() {
 
 	// adding a comment to an item type
 	http.HandleFunc("POST /ItemType/{ItemTypeID}", func(w http.ResponseWriter, r *http.Request) {
+		
 		enableCors(&w)
 		addComment(&w, r, db)
 	})
@@ -136,7 +137,8 @@ func main() {
 		getItemTypeInfo(w, r, db)
 	})
 
-	http.HandleFunc("DELETE /comment/{CommentID}", func(w http.ResponseWriter, r *http.Request) {
+	//TODO: update to DELETE, and handle option
+	http.HandleFunc("GET /comment/deletecomment/{CommentID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		deleteComment(w, r, db)
 	})
