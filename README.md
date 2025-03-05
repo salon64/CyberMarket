@@ -172,17 +172,21 @@ erDiagram
         int Price "not null"
         datetime CreationDate "not null"
     }
+    Marketplace ||--|| Inventory: listing
 
     Inventory {
         int ItemID "PK, auto_inc"
         int UserID "not null"
         int TypeID "not null"
     }
+    Inventory }|--|| Users: owner
+    Inventory }|--|| ItemTypes: Type
 
     ItemTypes {
         int TypeID "PK, auto_inc"
         varchar(45) ItemName "not null"
-        varchar(45) ItemDescription "null"
+        varchar(255) ShortDescription "null"
+        varchar(45) ItemDescriptionURL "null"
         varchar(45) ImgURL "null"
     }
 
@@ -191,6 +195,7 @@ erDiagram
         int UserID  "not null"
         datetime CreatedOn "not null"
     }
+    TokenTable }|--|| Users: Bearer
 
     TransactionLog {
         int TransID "PK auto_inc"
@@ -200,16 +205,28 @@ erDiagram
         int Buyer "null"
         int Seller "null"
     }
-    TokenTable }|--|| Users: Bearer
-
-    Inventory }|--|| Users: owner
-    Inventory }|--|| ItemTypes: Type
-
-    Marketplace ||--|| Inventory: listing
-
     TransactionLog }o--o| Inventory: Item
     TransactionLog }o--o| Users: Buyer
     TransactionLog }o--o| Users: Seller
+
+    TypeComments {
+        int CommentID "PK auto_inc"
+        int TypeID "not null"
+        int UserID "not null"
+        int Grade "not null"
+        varchar(255) comment "not null"
+        datetime CreatedOn "not null"
+    }
+    TypeComments }|--|| Users: PostedBy
+    TypeComments }|--|| ItemTypes: Comment
+
+    ShoppingBasket {
+        int CartID "PK auto_inc"
+        int UserID "NOT NULL"
+        int OfferID "NOT NULL"
+    }
+    ShoppingBasket }|--|| Users: Basket
+    ShoppingBasket }|--|| Marketplace: Item
 
 ```
 <!-- TODO UPDATE SCHEMA WITH COMMENTS -->
@@ -222,7 +239,14 @@ The log also allows for tracking when an item is created, buy setting the seller
 
 #### Comments and grading
 
-TODO *From task description*: Write about your implementation of grading and comments on particular assets.  
+There exist the ability to comment on itemTypes, This allows user to add comments and a grade to itemtype.
+For a user to be allowed to comment on an itemtype, they need to have been in possession of them item, hover briefly.
+This is accomplished by looking att the transaction log, this allows us to test if that itemtype have ever been sold to the user,
+this includes when an item is created since that is also tracked in the log
+
+#### Shopping basket
+
+THe shopping basket keeps tracks of a users shopping basket, it acts as a many to many between users and marketplace listings. The foreign keys relation to marketplace is set to cascading delete, so that if an item on the marketplace is bought by another user or removed, the shopping cart reference is removed.
 
 ### WebServer
 
