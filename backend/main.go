@@ -127,7 +127,7 @@ func main() {
 
 	// adding a comment to an item type
 	http.HandleFunc("POST /ItemType/{ItemTypeID}", func(w http.ResponseWriter, r *http.Request) {
-		
+
 		enableCors(&w)
 		addComment(&w, r, db)
 	})
@@ -167,7 +167,26 @@ func main() {
 		enableCors(&w)
 		createNewItemType(&w, r, db)
 	})
-
+	http.HandleFunc("GET /Marketplace/displayCart/{UserID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		displayCart(&w, r, db)
+	})
+	http.HandleFunc("POST /Marketplace/checkCart/{OfferID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		checkCart(&w, r, db)
+	})
+	http.HandleFunc("POST /Marketplace/addToCart/{OfferID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		addToCart(&w, r, db)
+	})
+	http.HandleFunc("POST /Marketplace/removeFromCart/{OfferID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		removeFromCart(&w, r, db)
+	})
+	http.HandleFunc("GET /Marketplace/cartCheckout/{UserID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		buyCart(w, r, db)
+	})
 	http.HandleFunc("GET /Marketplace/removeListing/{ItemID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		removeListingFromMarketplace(&w, r, db)

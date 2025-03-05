@@ -12,6 +12,9 @@ import (
 	"net/http"
 )
 
+type UserStruc struct {
+	UserID int
+}
 type MarketplaceItems struct {
 	ItemID int
 	Price  int
@@ -32,7 +35,6 @@ type MarketplaceItemsInformation struct {
 
 	Username string
 }
-
 type displayConstraints struct {
 	SortBy string
 	Search string
@@ -98,6 +100,16 @@ func removeListingFromMarketplace(w *http.ResponseWriter, r *http.Request, db *s
 		fmt.Fprintln(*w, err.Error())
 		return
 	}
+
+	_, err = db.Exec("UPDATE Inventory SET IsListed = 0 WHERE ItemID = ?;", r.PathValue("ItemID"))
+	log.Print(r.PathValue("ItemID"))
+	if err != nil {
+		log.Printf("error updating IsListed to false: %s", err.Error())
+		(*w).WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(*w, "error updating IsListed to false: %s", err.Error())
+		return
+	}
+
 	fmt.Fprintln(*w, "removed listing")
 }
 
