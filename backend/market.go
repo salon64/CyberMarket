@@ -85,13 +85,6 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 	// return the id
 
 	t.Commit()
-	_, err = db.Exec("UPDATE Inventory SET IsListed = 1 WHERE ItemID = ?;", data.ItemID)
-	if err != nil {
-		log.Printf("error updating IsListed to true: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error updating IsListed to true: %s", err.Error())
-		return
-	}
 	fmt.Fprintf(*w, "%d", OfferID)
 }
 

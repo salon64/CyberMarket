@@ -14,15 +14,15 @@ type Item struct {
 	ItemID   int
 	TypeID   int
 	ItemName string
-	IsListed int
-	// these are string pointers since ItemDescription and ImgURL can be null,
-	// when scan is done null is converted to nil pointers
+	// these are pointers since ItemDescription, IsListed and ImgURL can be null,
+	// when using scan null is converted to nil pointers
+	IsListed        *int
 	ItemDescription *string
 	ImgURL          *string
 }
 
 type SimpleItem struct {
-	UserID int
+	UserID   int
 	ItemType int
 }
 
@@ -55,23 +55,24 @@ func createItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 	_, err = db.Exec("insert into Inventory(UserID, TypeID) values (?, ?);", newItem.UserID, newItem.ItemType)
-	
+
 	if err != nil {
 		(*w).WriteHeader(http.StatusInternalServerError)
 		log.Printf("add user error: %s", err)
 		fmt.Fprintln(*w, err.Error())
 		return
 	}
-	
+
 	// send json
 	fmt.Fprint(*w, string(json))
 }
 func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// row, err := db.Query("SELECT ItemID FROM Inventory WHERE UserID = ? ODER BY ItemID", r.PathValue("id"))
 	row, err := db.Query(`
-		SELECT Inventory.ItemID, Inventory.TypeID, ItemTypes.ItemName, Inventory.IsListed, ItemTypes.ItemDescription, ItemTypes.ImgURL
+		SELECT Inventory.ItemID, Inventory.TypeID, ItemTypes.ItemName, ItemTypes.ItemDescription, ItemTypes.ImgURL, Marketplace.OfferID
 		FROM Inventory
 		INNER JOIN ItemTypes on Inventory.TypeID = ItemTypes.TypeID
+        LEFT JOIN Marketplace on Inventory.ItemID = Marketplace.ItemID
 		where Inventory.UserID = ?;`,
 		r.PathValue("id"))
 
@@ -89,7 +90,7 @@ func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		var item Item
 
 		// read the columns from the row
-		err := row.Scan(&item.ItemID, &item.TypeID, &item.ItemName, &item.IsListed, &item.ItemDescription, &item.ImgURL)
+		err := row.Scan(&item.ItemID, &item.TypeID, &item.ItemName, &item.ItemDescription, &item.ImgURL, &item.IsListed)
 
 		// write error and exit if scan fails
 		if err != nil {
