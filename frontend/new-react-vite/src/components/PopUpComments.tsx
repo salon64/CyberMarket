@@ -143,7 +143,7 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
         </label>
         <br></br>
         <br />
-        <button type="submit">Create Item</button>
+        <button type="submit">Submit Comment</button>
         <br></br>
         <br />
         <hr />
