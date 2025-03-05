@@ -68,6 +68,7 @@ func AuthByToken(token string, resourceOwner int, db *sql.DB) (bool, error) {
 // This struct contains the return of CreateToken
 type LoginReturn struct {
 	UserID int
+	Role   int
 	Token  string
 }
 
@@ -77,11 +78,12 @@ func CreateToken(userName string, password string, db *sql.DB) (LoginReturn, err
 	// begin the transaction
 	t, _ := db.Begin()
 	// see if users exist
-	row := t.QueryRow("SELECT userID FROM Users WHERE Username = ? AND `Password(Hash)` = ?;", userName, password)
+	row := t.QueryRow("SELECT userID, Role FROM Users WHERE Username = ? AND `Password(Hash)` = ?;", userName, password)
 
 	// read user id
 	var userID int
-	err := row.Scan(&userID)
+	var role int
+	err := row.Scan(&userID, &role)
 
 	// If the user vas not found abort the transaction and return error
 	if err == sql.ErrNoRows {
@@ -99,6 +101,5 @@ func CreateToken(userName string, password string, db *sql.DB) (LoginReturn, err
 
 	log.Printf("user %s logged in, generated token %s", userName, token)
 	t.Commit()
-	return LoginReturn{UserID: userID, Token: token}, nil
-	// test if user pswd exist
+	return LoginReturn{UserID: userID, Token: token, Role: role}, nil
 }
