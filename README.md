@@ -58,9 +58,27 @@ These items on the market would be able to be bought by other users transferring
   - [Buy](#buy)
 - [References](#references)
 
-## requirements, assumptions, limitations
+## Requirements, Assumptions, Limitations
 
-TODO *from task description*
+### Requirements
+
+#### Functional Requirements
+Some functional requirements would be allowing the user to login, view their inventory, purchase items from the marketplace, sell items they own, add items to a shopping cart and checkout.
+
+#### Non-Functional Requirements
+Non-functional requirements would be; 
+- Usability, the site needs to be easy to use
+- ACID, a marketplace is one of the prime examples of where the principles of Atomicity, Consistency, Isolation and Durability should be followed
+- Security/Data Integrity, user information should be safely stored and encrypted
+- Availability, the site should be consistently available to the user
+
+### Assumptions
+
+The system assumes the user to be sending accurate information and not attempting to break the website in unexpected ways. Internet traffic on the website is also assumed to be low as to not put too much of a load on the backend server.
+
+### Limitations
+
+Many relations slow down the database query's and executions. Items are not grouped by quantity, so if 20 MREs are put up for sale, there exists 20 different listing, one for each MRE.
 
 ## Changelog
 
