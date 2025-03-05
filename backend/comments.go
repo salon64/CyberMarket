@@ -156,6 +156,8 @@ func getItemTypeInfo(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
 		var comment pubComment
 		err := rows.Scan(&comment.CommentID, &comment.UserName, &comment.UserID, &comment.Grade, &comment.Comment, &comment.PostedOn)

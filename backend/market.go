@@ -83,13 +83,6 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 	// return the id
 
 	t.Commit()
-	_, err = db.Exec("UPDATE Inventory SET IsListed = 1 WHERE ItemID = ?;", data.ItemID)
-	if err != nil {
-		log.Printf("error updating IsListed to true: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error updating IsListed to true: %s", err.Error())
-		return
-	}
 	fmt.Fprintf(*w, "%d", OfferID)
 }
 
@@ -105,16 +98,6 @@ func removeListingFromMarketplace(w *http.ResponseWriter, r *http.Request, db *s
 		fmt.Fprintln(*w, err.Error())
 		return
 	}
-
-	_, err = db.Exec("UPDATE Inventory SET IsListed = 0 WHERE ItemID = ?;", r.PathValue("ItemID"))
-	log.Print(r.PathValue("ItemID"))
-	if err != nil {
-		log.Printf("error updating IsListed to false: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error updating IsListed to false: %s", err.Error())
-		return
-	}
-	
 	fmt.Fprintln(*w, "removed listing")
 }
 
