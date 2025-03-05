@@ -12,7 +12,12 @@ These items on the market would be able to be bought by other users transferring
 
 - [Executive summary](#executive-summary)
 - [Table of Contents](#table-of-contents)
-- [requirements, assumptions, limitations](#requirements-assumptions-limitations)
+- [Requirements, Assumptions, Limitations](#requirements-assumptions-limitations)
+  - [Requirements](#requirements)
+    - [Functional Requirements](#functional-requirements)
+    - [Non-Functional Requirements](#non-functional-requirements)
+  - [Assumptions](#assumptions)
+  - [Limitations](#limitations)
 - [Changelog](#changelog)
   - [Sprint 1 \& 2](#sprint-1--2)
 - [Upcoming work (Prioritized backlog)](#upcoming-work-prioritized-backlog)
@@ -41,6 +46,13 @@ These items on the market would be able to be bought by other users transferring
       - [Python](#python)
 - [Starting the application](#starting-the-application)
 - [Website Documentation](#website-documentation)
+  - [Login Page](#login-page)
+  - [Register](#register)
+  - [Marketplace](#marketplace)
+  - [Inventory](#inventory)
+  - [Profile](#profile)
+  - [Admin](#admin)
+  - [Cart](#cart)
 - [Backend API](#backend-api)
   - [User Login](#user-login)
   - [Listing users](#listing-users)
@@ -63,10 +75,13 @@ These items on the market would be able to be bought by other users transferring
 ### Requirements
 
 #### Functional Requirements
+
 Some functional requirements would be allowing the user to login, view their inventory, purchase items from the marketplace, sell items they own, add items to a shopping cart and checkout.
 
 #### Non-Functional Requirements
-Non-functional requirements would be; 
+
+Non-functional requirements would be;
+
 - Usability, the site needs to be easy to use
 - ACID, a marketplace is one of the prime examples of where the principles of Atomicity, Consistency, Isolation and Durability should be followed
 - Security/Data Integrity, user information should be safely stored and encrypted
@@ -456,14 +471,17 @@ Note that you ether have run as superuser or be in the docker group
 ## Website Documentation
 
 ### Login Page
+
 Allows users to enter a username and password to log in,
 also directs Users to a register page
 
 ### Register
+
 Allows users to enter a username and password and register that as a account.
 
 ### Marketplace
-Shows the entire marketplace, with all its listed items with the data: 
+
+Shows the entire marketplace, with all its listed items with the data:
 
 Itemname | Price | ShortDescription | Seller | BuyButton
 
