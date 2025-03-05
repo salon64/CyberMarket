@@ -6,21 +6,15 @@ type ProtectedRouteProps = {
   children: React.ReactNode;
 }
 const ProtectedRoute = ({ redirectPath = "/" }: ProtectedRouteProps) => {
-  fetch("http://"+globalAddr+"/auth", { method: "POST", body: JSON.stringify(localStorage.getItem("token")) })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data)
-      if (data !== localStorage.getItem("token")) {
+
+      if (localStorage.getItem("token") === "" || localStorage.getItem("token") === null) {
         alert("invalid token")
         return <Navigate to={redirectPath} replace />
       } else {
+        //alert("valid")
         return <Outlet />;
       }
-    })
-    .catch(error => {
-      console.log(error)
       return <Navigate to={redirectPath} replace />
-    })
-  return <Outlet />;
+    
 }
 export default ProtectedRoute;

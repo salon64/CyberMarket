@@ -1,1 +1,1 @@
-export const globalAddr = "ronstad.se:5687"
+export const globalAddr = "localhost:80"
