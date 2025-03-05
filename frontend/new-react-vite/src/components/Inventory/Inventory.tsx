@@ -15,9 +15,8 @@ const Inventory = () => {
         const obj = JSON.parse(JSON.stringify(data))
         console.log(obj.Amount)
         setWallet(obj.Amount) //im going to krill myself
-
-      })
-    //.catch(error => {alert(error)});
+      }
+    )
   }
 
   const [wallet, setWallet] = useState("0")
@@ -34,9 +33,9 @@ const Inventory = () => {
             <thead style={{ backgroundColor: "bisque" }}>
               <tr>
                 <th>Item</th>
-                <th>Description</th>
-                <th>Header 3</th>
-                <th>Sell</th>
+                <th>ItemType</th>
+                <th>ItemName</th>
+                <th>Add/Remove from market</th>
               </tr>
             </thead>
             <tbody>

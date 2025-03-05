@@ -86,7 +86,7 @@ const ItemTableComponent = () => {
           <td className="">{item.ItemID}</td>
           <td className="">{item.TypeID}</td>
           <td className="">{item.ItemName}</td>
-          <td className="">{item.IsListed}</td>
+          {/* <td className="">{item.IsListed}</td> */}
           {/*map either button or text input if item is already listed */}
           <td>
             {item.IsListed ? (<button onClick={() => rmListing(item)}>Remove Listing</button>) : (<><input type={"number"} onChange={(e) => { setSellPrice(e.target.valueAsNumber || 0) }} name="sellPrice" id="sellPrice" /> <button onClick={() => handleSell(item.ItemID)} className={"cyber-button-small bg-blue fg-yellow"}>Sell</button></>)}
