@@ -275,6 +275,13 @@ TODO *from task description* A reflection of the system's limitations and the po
 
 ### frontend specific reflection
 
+The frontend framework that was decided on was React
+as it is the most popular framework today. The code was written in TypeScript to get more reliabilty from the typed nature of the language.
+
+This might have been a downside since non uf the developers had worked with neither react ot ts before causing a lot of headaches in development. Most of them stem from not knowing the right way to work with the tools leading to some hacks having to stay in place to hold it together in some places.
+Other then that the langauge offered a lot of tools to do anything you wanted with most of our problems already having documented solutions
+on stackoverflow or other websites.
+
 ### backend specific reflection
 
 As mentioned in [Backend](#backend) go was chosen as the language, due to its standard library having http servers and sql interfaces.
@@ -395,7 +402,50 @@ Note that you ether have run as superuser or be in the docker group
 
 ## Website Documentation
 
-TODO *from sprint 2 review*
+### Login Page
+Allows users to enter a username and password to log in,
+also directs Users to a register page
+
+### Register
+Allows users to enter a username and password and register that as a account.
+
+### Marketplace
+Shows the entire marketplace, with all its listed items with the data: 
+
+Itemname | Price | ShortDescription | Seller | BuyButton
+
+The marketplace is sorted by postdate and can be sorted by
+newest, oldest, price acending, price decending, alphabetically a-ö, alphabetically ö-a. in the top left
+
+There are also tags but they are not yet interactive.
+TODO implement tags
+
+### Inventory
+
+Shows the current balance of the user
+and alsow shows the users items in the same way as on the marketplace.
+But now having a remove/add listing (with a price input feild)
+
+### Profile
+
+Shows the users ID. Allows the user to update username and password
+
+TODO fix profile
+
+### Admin
+
+Allows and admin to chage UserID to check that users view,
+allows them to create an item into a users inventory,
+allows them to add money to a users wallet,
+allows them to create a new itemtype
+
+TODO chage so that only admins have acces to admin page
+
+### Cart
+
+Shows the items in the users cart
+can remove items from cart
+can checkout (buy) all items in cart
 
 ## Backend API
 
