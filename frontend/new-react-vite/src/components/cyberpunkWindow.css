@@ -1,0 +1,13 @@
+.cyberpunk-window {
+    position: relative;
+    flex-grow: 1;
+    background: radial-gradient(circle, #111 10%, #000 100%);
+    overflow: hidden;
+
+    background-color: #000;
+    background-image: repeating-linear-gradient(
+      transparent,
+      transparent 1px,
+      rgba(243, 38, 38, 0.2) 3.5px
+    );
+  }
