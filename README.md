@@ -12,7 +12,12 @@ These items on the market would be able to be bought by other users transferring
 
 - [Executive summary](#executive-summary)
 - [Table of Contents](#table-of-contents)
-- [requirements, assumptions, limitations](#requirements-assumptions-limitations)
+- [Requirements, Assumptions, Limitations](#requirements-assumptions-limitations)
+  - [Requirements](#requirements)
+    - [Functional Requirements](#functional-requirements)
+    - [Non-Functional Requirements](#non-functional-requirements)
+  - [Assumptions](#assumptions)
+  - [Limitations](#limitations)
 - [Changelog](#changelog)
   - [Sprint 1 \& 2](#sprint-1--2)
 - [Upcoming work (Prioritized backlog)](#upcoming-work-prioritized-backlog)
@@ -41,6 +46,13 @@ These items on the market would be able to be bought by other users transferring
       - [Python](#python)
 - [Starting the application](#starting-the-application)
 - [Website Documentation](#website-documentation)
+  - [Login Page](#login-page)
+  - [Register](#register)
+  - [Marketplace](#marketplace)
+  - [Inventory](#inventory)
+  - [Profile](#profile)
+  - [Admin](#admin)
+  - [Cart](#cart)
 - [Backend API](#backend-api)
   - [User Login](#user-login)
   - [Listing users](#listing-users)
@@ -63,10 +75,13 @@ These items on the market would be able to be bought by other users transferring
 ### Requirements
 
 #### Functional Requirements
+
 Some functional requirements would be allowing the user to login, view their inventory, purchase items from the marketplace, sell items they own, add items to a shopping cart and checkout.
 
 #### Non-Functional Requirements
-Non-functional requirements would be; 
+
+Non-functional requirements would be;
+
 - Usability, the site needs to be easy to use
 - ACID, a marketplace is one of the prime examples of where the principles of Atomicity, Consistency, Isolation and Durability should be followed
 - Security/Data Integrity, user information should be safely stored and encrypted
@@ -157,17 +172,21 @@ erDiagram
         int Price "not null"
         datetime CreationDate "not null"
     }
+    Marketplace ||--|| Inventory: listing
 
     Inventory {
         int ItemID "PK, auto_inc"
         int UserID "not null"
         int TypeID "not null"
     }
+    Inventory }|--|| Users: owner
+    Inventory }|--|| ItemTypes: Type
 
     ItemTypes {
         int TypeID "PK, auto_inc"
         varchar(45) ItemName "not null"
-        varchar(45) ItemDescription "null"
+        varchar(255) ShortDescription "null"
+        varchar(45) ItemDescriptionURL "null"
         varchar(45) ImgURL "null"
     }
 
@@ -176,6 +195,7 @@ erDiagram
         int UserID  "not null"
         datetime CreatedOn "not null"
     }
+    TokenTable }|--|| Users: Bearer
 
     TransactionLog {
         int TransID "PK auto_inc"
@@ -185,16 +205,28 @@ erDiagram
         int Buyer "null"
         int Seller "null"
     }
-    TokenTable }|--|| Users: Bearer
-
-    Inventory }|--|| Users: owner
-    Inventory }|--|| ItemTypes: Type
-
-    Marketplace ||--|| Inventory: listing
-
     TransactionLog }o--o| Inventory: Item
     TransactionLog }o--o| Users: Buyer
     TransactionLog }o--o| Users: Seller
+
+    TypeComments {
+        int CommentID "PK auto_inc"
+        int TypeID "not null"
+        int UserID "not null"
+        int Grade "not null"
+        varchar(255) comment "not null"
+        datetime CreatedOn "not null"
+    }
+    TypeComments }|--|| Users: PostedBy
+    TypeComments }|--|| ItemTypes: Comment
+
+    ShoppingBasket {
+        int CartID "PK auto_inc"
+        int UserID "NOT NULL"
+        int OfferID "NOT NULL"
+    }
+    ShoppingBasket }|--|| Users: Basket
+    ShoppingBasket }|--|| Marketplace: Item
 
 ```
 <!-- TODO UPDATE SCHEMA WITH COMMENTS -->
@@ -207,7 +239,14 @@ The log also allows for tracking when an item is created, buy setting the seller
 
 #### Comments and grading
 
-TODO *From task description*: Write about your implementation of grading and comments on particular assets.  
+There exist the ability to comment on itemTypes, This allows user to add comments and a grade to itemtype.
+For a user to be allowed to comment on an itemtype, they need to have been in possession of them item, hover briefly.
+This is accomplished by looking att the transaction log, this allows us to test if that itemtype have ever been sold to the user,
+this includes when an item is created since that is also tracked in the log
+
+#### Shopping basket
+
+THe shopping basket keeps tracks of a users shopping basket, it acts as a many to many between users and marketplace listings. The foreign keys relation to marketplace is set to cascading delete, so that if an item on the marketplace is bought by another user or removed, the shopping cart reference is removed.
 
 ### WebServer
 
@@ -456,14 +495,17 @@ Note that you ether have run as superuser or be in the docker group
 ## Website Documentation
 
 ### Login Page
+
 Allows users to enter a username and password to log in,
 also directs Users to a register page
 
 ### Register
+
 Allows users to enter a username and password and register that as a account.
 
 ### Marketplace
-Shows the entire marketplace, with all its listed items with the data: 
+
+Shows the entire marketplace, with all its listed items with the data:
 
 Itemname | Price | ShortDescription | Seller | BuyButton
 
