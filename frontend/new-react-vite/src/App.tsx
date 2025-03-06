@@ -14,25 +14,29 @@ import "./App.css";
 const App = () => {
   return (
     <HashRouter>  {/* Corrected Router */}
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Login />} /> {/* Fixed placement */}
-          <Route path="Register" element={<Register />} />
-          
-          {/* Protected routes */}
-          <Route element={<ProtectedRoute children/>}>
-            <Route path="Marketplace" element={<Marketplace />} />
-            <Route path="Inventory" element={<Inventory />} />
-            <Route path="Profile" element={<Profile />} />
-            <Route path="AdminPage" element={<AdminPage />} />
-            <Route path="Cart" element={<Cart />} />
-          </Route>
+        <Routes>
+        {/* Public Routes */}
+          <Route path="/" element={<Layout />}>
+          {/* Protected Routes */}
+            <Route element={<ProtectedRoute children roles="0"/>}>
+              <Route path="Marketplace" element={<Marketplace />} />
+              <Route path="Inventory" element={<Inventory />} />
+              <Route path="Profile" element={<Profile/>} />
 
-          {/* Catch-all for unknown routes */}
-          <Route path="*" element={<NoPage />} />
-        </Route>
-      </Routes>
+              <Route path="Cart" element={<Cart/>} />
+            </Route>
+              <Route element={<ProtectedRoute children roles="1"/>}>
+                <Route path="AdminPage" element={<AdminPage/>} />
+              </Route>
+            <Route path="*" element={<NoPage />} />
+          
+
+            </Route>
+          <Route index element={<Login />} />
+          <Route path="Register" element={<Register />} />
+
+          
+        </Routes>
     </HashRouter>
   );
 };

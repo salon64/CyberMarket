@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { X, Trash2, Delete } from 'lucide-react';
+import { X, Trash2 } from 'lucide-react';
 import { globalAddr } from "../header.tsx";
 
 interface PopUpCommentsProps {
