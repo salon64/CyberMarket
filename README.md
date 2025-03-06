@@ -492,13 +492,9 @@ allows them to create an item into a users inventory,
 allows them to add money to a users wallet,
 allows them to create a new itemtype
 
-TODO chage so that only admins have acces to admin page
-
 ### Cart
 
-Shows the items in the users cart
-can remove items from cart
-can checkout (buy) all items in cart
+Shows the items in the users cart. Can remove items from cart. Can checkout (buy) all items in cart
 
 ## Backend API
 
@@ -976,4 +972,53 @@ Success
 
 ## References
 
-TODO move references from google doc to here
+### Olle
+Important
+Informal
+- [go database/sql](https://go.dev/doc/tutorial/database-access)
+- [go database driver](https://github.com/go-sql-driver/mysql/)
+- [golang docker](https://hub.docker.com/_/golang)
+- [mysql docker](https://hub.docker.com/_/mysql/)
+- [CORS managing] (Enabling CORS in Golang)
+- [go sql null](https://medium.com/@dual/ways-to-handle-sql-null-values-in-go-e237f31b82fc)
+
+
+### Shaya:
+- [http connections] https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+- [general react syntax] https://react.dev/reference/react
+- [private routes] https://www.robinwieruch.de/react-router-private-routes/
+- [navigation/redirects] https://api.reactrouter.com/v7/functions/react_router.useNavigate.html
+- [chatgpt] (For implementing hashroutes, due to browserRoutes causing the site to crash on reloads)
+
+### Malcolm:
+#### Important:
+- [cyberpunk css style] https://www.cssscript.com/demo/cyberpunk-2077/
+- [crt screen affects] https://medium.com/@dovid11564/using-css-animations-to-mimic-the-look-of-a-crt-monitor-3919de3318e2 
+- https://codepen.io/lbebber/pen/XJRdrV/ 
+- https://codesandbox.io/p/sandbox/crt-terminal-in-css-js-tlijm?file=%2Findex.html
+- https://stackoverflow.com/questions/70498819/retro-crt-curved-screen-effect-for-website-ccs
+- https://aleclownes.com/2017/02/01/crt-display.html
+- And AI (to assist in putting things together)
+https://www.youtube.com/watch?v=Gy4G68WoHq4 
+
+#### Informal
+- [react tutorial] https://www.youtube.com/watch?v=SqcY0GlETPk
+- [CSS examples] https://getbootstrap.com/
+- [user input] https://stackoverflow.com/questions/53071851/getting-the-value-from-input-element-in-typescript
+- https://stackoverflow.com/questions/57302715/how-to-get-input-field-value-on-button-click-in-react
+- https://www.youtube.com/watch?v=zR5FoKMAJp4
+
+### General
+- https://stackoverflow.com/questions/54300334/react-change-state-based-on-select-option
+- https://www.w3schools.com/react/react_useeffect.asp
+- https://stackoverflow.com/questions/3304014/how-to-interpolate-variables-in-strings-in-javascript-without-concatenation
+- https://stackoverflow.com/questions/29051368/how-do-i-make-a-button-fill-in-a-td-completely
+- https://stackoverflow.com/questions/47270595/how-to-parse-json-string-to-struct
+- https://medium.com/@prashant2018/parse-json-string-to-struct-object-in-golang-59d3cf6bce7
+- https://www.w3schools.com/css/css_text.asp
+- https://dev.to/writech/how-to-handle-the-mouse-hover-event-in-react-h7h
+- https://stackoverflow.com/questions/27827234/how-to-handle-the-onkeypress-event-in-reactjs
+- https://dev.to/silvenleaf/fetch-api-easiest-explanation-part-4-4-delete-by-silvenleaf-4376
+- https://go.dev/blog/routing-enhancements
+- https://git-scm.com/docs/git-merge
+
