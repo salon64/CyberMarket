@@ -1,6 +1,7 @@
 # CyberMarket
 
-[Github Link](https://github.com/salon64/CyberMarket)
+- [Github Link](https://github.com/salon64/CyberMarket)
+- [Github Backlog](https://github.com/users/salon64/projects/3/views/1)
 
 ## Executive summary
 
