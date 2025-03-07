@@ -237,7 +237,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	for row.Next() {
 		var listing MarketplaceItemsInformation
 		// SELECT inv.ItemID, inv.TypeID, inv.UserID, u.Username, it.ItemName, it.ItemDescription, it.ImgURL, mp.OfferID, mp.Price, mp.CreationDate
-		err := row.Scan(&listing.ItemID, &listing.TypeID, &listing.UserID, &listing.Username, &listing.ItemName, &listing.ItemDescription, &listing.ImgURL, &listing.OfferID, &listing.Price, &listing.CreationDate)
+		err := row.Scan(&listing.ItemID, &listing.TypeID, &listing.UserID, &listing.Username, &listing.ItemName, &listing.ShortDescription, &listing.ImgURL, &listing.OfferID, &listing.Price, &listing.CreationDate)
 		if err != nil {
 			(*w).WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(*w, err.Error())
