@@ -96,7 +96,7 @@ function AdminPage() {
 
 
     fetch("http://"+globalAddr+"/Admin/CreateNewItemType", {
-      headers: {'Authorization': 'Bearer ' + localStorage.getItem("token")},
+      
       method: "POST",
       body: JSON.stringify(tmp),
     })
