@@ -290,9 +290,9 @@ TODO *from task description*: Test case specifications (manual testing, related 
 
 5. As a User I want to be able to view my inventory in order to see my wallet and items.
 
-6. As a User I want to be able to add money into my account, to have sufficient funds.
+6. As a Admin I want to be able to add money into a account, to have sufficient funds.
 
-7. As a User I want to be able to create items that i can list on the marketplace, to interact with the market.
+7. As a Admin I want to be able to create items that i can list on the marketplace, to interact with the market.
 
 8. As a User I want to be able to sell an item from my inventory at a price i set to get rid off items from my inventory.
 
@@ -303,6 +303,14 @@ TODO *from task description*: Test case specifications (manual testing, related 
 11. As a User I want to be able to sort the market by different metrics (time, price, alphabetically). To display the market in the way i prefer.
 
 12. As a Users I want to be able to buy items from the marketplace, In order to get that item to my inventory.
+    
+13. As A Admin I want to be able to create a new itemtype that can be added as an item to users inventories.
+14. As A User I want to be able to make comments on itemstypes i have owned.
+15. As A User I want to be able to remove a comment I have made.
+16. As A User I want to be able to view comments made on an itemtype.
+17. As A Admin I want to be able to remove commets made by users.
+18. As A Admin I want to be able to remove marketplace listings made by users.
+19. As a Admin I want to be able to view the transaction log, and filter it based on Users.
 
 ### Testing
 
