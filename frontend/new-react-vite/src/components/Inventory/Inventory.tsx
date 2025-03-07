@@ -28,15 +28,14 @@ const Inventory = () => {
       <div className="left-right-container">
         <div className="right">
           {/* store */}
-
-          <button onClick={() => getMoney()}>getwallet</button>
           <table className="cyber-table store-table">
             <thead style={{ backgroundColor: "bisque" }}>
               <tr>
                 <th>Item</th>
                 <th>Description</th>
                 <th>Header 3</th>
-                <th>Sell</th>
+                <th>Listed?</th>
+                <th>Add/Remove Listing</th>
               </tr>
             </thead>
             <tbody>

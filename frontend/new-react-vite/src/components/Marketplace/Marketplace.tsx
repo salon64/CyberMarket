@@ -3,6 +3,9 @@ import "../cyberpunk-css-main/cyberpunk.css";
 import CyberpunkWindow from "../cyberpunkWindow";
 import { useEffect, useState } from "react";
 import { globalAddr } from "../../header.tsx"
+import PopUpComments from "../PopUpComments.tsx";
+
+
 // I am really cool
 interface MarketplaceState {
   sortBy: string;
@@ -11,6 +14,7 @@ interface MarketplaceState {
 interface userIDInt {
   UserID: number
 }
+
 
 interface MarketplaceItems {
   ItemID: number;
@@ -26,6 +30,7 @@ interface MarketplaceItems {
   CreationDate: string;
 
   Username: string;
+  InCheckout: number;
 }
 
 
@@ -34,18 +39,32 @@ interface MarketplaceItems {
 function Marketplace() {
   const [sortState, setSortState] = useState<MarketplaceState>({sortBy: "Newest", search: ""})
   const [marketplaceItems, setMarketplaceItems] = useState<MarketplaceItems[]>([]);
+  
+  const [showComments, setShowComments] = useState(false)
+  const [fuckTS, setFuckTS] = useState<number | null>(null);
+
+  // console.log("showComments state:", showComments);
+  const [cartStatus, setCartStatus] = useState<{ [key: number]: boolean }>({});
   onchange = s => { // <-- wtf is this
     console.log(sortState.sortBy)
     console.log(s)
   }
+  
 
   useEffect(() => {
-    var fetchString = `http://`+globalAddr+`/Marketplace/displayMarket`
-    fetch(fetchString, { method: "POST", body:  JSON.stringify(sortState)}) // Replace with your actual API URL
-            .then((response) => response.json())
-            .then((marketplaceItems) => setMarketplaceItems(marketplaceItems))
-            .catch((error) => console.error("Error: ", error));
-  }, [sortState])
+    var fetchString = `http://${globalAddr}/Marketplace/displayMarket`;
+    fetch(fetchString, { method: "POST", body: JSON.stringify(sortState) })
+      .then((response) => response.json())
+      .then((marketplaceItems) => {
+        setMarketplaceItems(marketplaceItems);
+        
+        // Run checkCart for each item
+        marketplaceItems.forEach((item: MarketplaceItems) => {
+          checkCart(item);
+        });
+      })
+      .catch((error) => console.error("Error: ", error));
+  }, [sortState]);
 
   const buyItem = (item: MarketplaceItems) => {
     console.log("OfferID: ?", item.OfferID);
@@ -64,6 +83,48 @@ function Marketplace() {
 
   };
 
+  const addToCart = (item: MarketplaceItems) => {
+    var tmpInt: userIDInt = {UserID: Number(localStorage.getItem("uid"))}
+    const jsonItem = JSON.stringify(tmpInt)
+    fetch("http://"+globalAddr+"/Marketplace/addToCart/"+ item.OfferID, { method: "POST", body:  jsonItem}) 
+    .then((response) => {response.json()
+      alert("Item successfully added to cart")
+      window.location.reload();
+    })
+    .catch((error) => console.error("Error: ", error));
+  }
+  const removeFromCart = (item: MarketplaceItems) => {
+    var tmpInt: userIDInt = {UserID: Number(localStorage.getItem("uid"))}
+    const jsonItem = JSON.stringify(tmpInt)
+    fetch("http://"+globalAddr+"/Marketplace/removeFromCart/"+ item.OfferID, { method: "POST", body:  jsonItem}) 
+    .then((response) => {response.json()
+      alert("Item successfully removed from cart")
+      window.location.reload();
+    })
+    .catch((error) => console.error("Error: ", error));
+  }
+
+  const checkCart = async (item: MarketplaceItems) => {
+    const tmpInt: userIDInt = { UserID: Number(localStorage.getItem("uid")) };
+    const jsonItem = JSON.stringify(tmpInt);
+  
+    try {
+      const response = await fetch(`http://${globalAddr}/Marketplace/checkCart/${item.OfferID}`, {
+        method: "POST",
+        body: jsonItem,
+      });
+  
+      const data = await response.json();
+      console.log(data.InCheckout);
+  
+      setCartStatus(prevState => ({
+        ...prevState,
+        [item.ItemID]: data.InCheckout || false
+      }));
+    } catch (error) {
+      console.error("Error checking cart:", error);
+    }
+  };
   const market = () => {
     if (marketplaceItems === null) {
       console.log("empty")
@@ -80,28 +141,45 @@ function Marketplace() {
       )
     }
     else {
-      console.log("not empty")
       return (
           marketplaceItems.map((item: MarketplaceItems) => (
               <tr key={item.ItemID}>
-                <td className="">{item.ItemName}</td>
+                {/* <td className="">
+                  <button onClick={() => {
+                    console.log("Opening comments window"); // Debugging
+                    setShowComments(true);
+                  }}>
+                    {item.ItemName}
+                  </button>
+                </td> */}
+                <td style={{ cursor: 'pointer' }} onClick={() => {setFuckTS(item.TypeID); setShowComments(true); } } >{item.ItemName}</td>
                 <td className="">{item.Price}</td>
                 <td className="">{item.ItemDescription}</td>
                 <td className="">{item.Username}</td>
                 <td>
                   <input onClick={() => buyItem(item)} className='buy-button' type='button' value='Buy' />
+                  {cartStatus[item.ItemID] ? 
+                        (<input onClick={() => removeFromCart(item)} className="buy-button" type="button" value="Remove From cart" />
+                      )
+                         : (<input onClick={() => addToCart(item)} className="buy-button" type="button" value="Add To Cart" />
+                        )}
                 </td>
-              </tr>))
+              </tr>)
+        ) 
       )
-
-
-
     }
   } 
 
   return (
-    
-  <body>
+  
+  <div>
+    {/* {showComments && <PopUpComments onClose={() => setShowComments(false)} />} */}
+    {showComments && (
+      <PopUpComments
+        onClose={() => setShowComments(false)}
+        itemId={fuckTS} // Pass item.ItemID as a prop
+      />
+    )}
     <div className="left-right-container">
       <div className="left">
         <CyberpunkWindow>
@@ -159,8 +237,8 @@ function Marketplace() {
         </table>
       </div>
     </div>
-  </body>
-
+  
+  </div>
   );
 }
 

@@ -43,8 +43,8 @@ const ItemTableComponent = () => {
           alert("nuh uh");
         }
       })
-      .catch(error => console.log(error))
-    window.location.reload();
+      .catch(error => alert(error))
+    
   }
   function handleSell(itemID: number) {
 
@@ -60,6 +60,7 @@ const ItemTableComponent = () => {
           console.log(JSON.stringify(tmp));
           console.log("Item succesfully put on marketplace")
           alert("Item succesfully put on marketplace");
+          window.location.reload();
         } else {
           console.log(JSON.stringify(tmp));
           console.log("Invalid");
