@@ -108,3 +108,26 @@ CREATE TABLE IF NOT EXISTS `main_db`.`TokenTable` (
     FOREIGN key (`UserID`)
     REFERENCES `main_db`.`Users` (`UserID`)
 );
+
+
+-- -----------------------------------------------------
+-- Table `main_db`.`TypeComments`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `main_db`.`TypeComments` (
+  `CommentID` INT NOT NULL AUTO_INCREMENT,
+  `TypeID` INT NOT NULL,
+  `UserID` INT NOT NULL,
+  `Grade` INT NOT NULL,
+  `Comment` VARCHAR(255) NOT NULL,
+  `CreatedOn` DATETIME NOT NULL,
+
+  
+  PRIMARY KEY (`CommentID`),
+
+  CONSTRAINT `CommentUser`
+    FOREIGN key (`UserID`)
+    REFERENCES `main_db`.`Users` (`UserID`),
+  CONSTRAINT `CommentType`
+    FOREIGN key (`TypeID`)
+    REFERENCES `main_db`.`ItemTypes` (`TypeID`)
+);

@@ -87,9 +87,6 @@ func main() {
 	}
 
 	// TODO set max life time and other
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "%s ", os.Getenv("DBUSER"))
-	})
 
 	// function that returns an array containing PubUser struct {id,name} in json format
 	http.HandleFunc("GET /users", func(w http.ResponseWriter, r *http.Request) {
@@ -128,6 +125,24 @@ func main() {
 		listUserItems(&w, r, db)
 	})
 
+	// adding a comment to an item type
+	http.HandleFunc("POST /ItemType/{ItemTypeID}", func(w http.ResponseWriter, r *http.Request) {
+
+		enableCors(&w)
+		addComment(&w, r, db)
+	})
+
+	http.HandleFunc("GET /ItemType/{ItemTypeID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		getItemTypeInfo(w, r, db)
+	})
+
+	//TODO: update to DELETE, and handle option
+	http.HandleFunc("GET /comment/deletecomment/{CommentID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		deleteComment(w, r, db)
+	})
+
 	http.HandleFunc("POST /Marketplace/displayMarket", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		listMarketplaceItems(&w, r, db)
@@ -152,7 +167,26 @@ func main() {
 		enableCors(&w)
 		createNewItemType(&w, r, db)
 	})
-
+	http.HandleFunc("GET /Marketplace/displayCart/{UserID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		displayCart(&w, r, db)
+	})
+	http.HandleFunc("POST /Marketplace/checkCart/{OfferID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		checkCart(&w, r, db)
+	})
+	http.HandleFunc("POST /Marketplace/addToCart/{OfferID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		addToCart(&w, r, db)
+	})
+	http.HandleFunc("POST /Marketplace/removeFromCart/{OfferID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		removeFromCart(&w, r, db)
+	})
+	http.HandleFunc("GET /Marketplace/cartCheckout/{UserID}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		buyCart(w, r, db)
+	})
 	http.HandleFunc("GET /Marketplace/removeListing/{ItemID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		removeListingFromMarketplace(&w, r, db)
