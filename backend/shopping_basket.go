@@ -40,7 +40,7 @@ func displayCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 			&listing.UserID,
 			&listing.Username,
 			&listing.ItemName,
-			&listing.ItemDescription,
+			&listing.ShortDescription,
 			&listing.ImgURL,
 			&listing.OfferID,
 			&listing.Price,

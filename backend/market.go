@@ -26,7 +26,7 @@ type MarketplaceItemsInformation struct {
 	UserID int
 
 	ItemName        string
-	ItemDescription *string
+	ShortDescription *string
 	ImgURL          *string
 
 	OfferID      int
@@ -134,7 +134,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
 		u.Username,
-		it.ItemName, it.ItemDescription, it.ImgURL, 
+		it.ItemName, it.ShortDescription, it.ImgURL, 
 		mp.OfferID, mp.Price, mp.CreationDate
 		FROM Marketplace mp
 		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
@@ -147,7 +147,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
 		u.Username,
-		it.ItemName, it.ItemDescription, it.ImgURL, 
+		it.ItemName, it.ShortDescription, it.ImgURL, 
 		mp.OfferID, mp.Price, mp.CreationDate
 		FROM Marketplace mp
 		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
@@ -160,7 +160,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
 		u.Username,
-		it.ItemName, it.ItemDescription, it.ImgURL, 
+		it.ItemName, it.ShortDescription, it.ImgURL, 
 		mp.OfferID, mp.Price, mp.CreationDate
 		FROM Marketplace mp
 		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
@@ -173,7 +173,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
 		u.Username,
-		it.ItemName, it.ItemDescription, it.ImgURL, 
+		it.ItemName, it.ShortDescription, it.ImgURL, 
 		mp.OfferID, mp.Price, mp.CreationDate
 		FROM Marketplace mp
 		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
@@ -186,7 +186,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
 		u.Username,
-		it.ItemName, it.ItemDescription, it.ImgURL, 
+		it.ItemName, it.ShortDescription, it.ImgURL, 
 		mp.OfferID, mp.Price, mp.CreationDate
 		FROM Marketplace mp
 		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
@@ -199,7 +199,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		SQLstatement = `
 		SELECT inv.ItemID, inv.TypeID, inv.UserID,
 		u.Username,
-		it.ItemName, it.ItemDescription, it.ImgURL, 
+		it.ItemName, it.ShortDescription, it.ImgURL, 
 		mp.OfferID, mp.Price, mp.CreationDate
 		FROM Marketplace mp
 		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
@@ -237,7 +237,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	for row.Next() {
 		var listing MarketplaceItemsInformation
 		// SELECT inv.ItemID, inv.TypeID, inv.UserID, u.Username, it.ItemName, it.ItemDescription, it.ImgURL, mp.OfferID, mp.Price, mp.CreationDate
-		err := row.Scan(&listing.ItemID, &listing.TypeID, &listing.UserID, &listing.Username, &listing.ItemName, &listing.ItemDescription, &listing.ImgURL, &listing.OfferID, &listing.Price, &listing.CreationDate)
+		err := row.Scan(&listing.ItemID, &listing.TypeID, &listing.UserID, &listing.Username, &listing.ItemName, &listing.ShortDescription, &listing.ImgURL, &listing.OfferID, &listing.Price, &listing.CreationDate)
 		if err != nil {
 			(*w).WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(*w, err.Error())
