@@ -148,7 +148,7 @@ func main() {
 		listMarketplaceItems(&w, r, db)
 	})
 
-	http.HandleFunc("POST /Marketplace/displayTransactionslog/{id}", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("POST /displayTransactionslog/{id}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		displayTransactionslog(&w, r, db)
 	})
