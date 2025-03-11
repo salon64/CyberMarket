@@ -102,7 +102,7 @@ func displayTransactionslog(w *http.ResponseWriter, r *http.Request, db *sql.DB)
 	var transactions []TransactionInformation
 	for row.Next() {
 		var transaction TransactionInformation
-		err := row.Scan()
+		err := row.Scan(&transaction.TransID, &transaction.Price, &transaction.Date, &transaction.Buyer, &transaction.Seller)
 		if err != nil {
 			(*w).WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(*w, err.Error())
