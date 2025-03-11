@@ -26,7 +26,7 @@ type MarketplaceItemsInformation struct {
 	UserID int
 
 	ItemName        string
-	ShortDescription string
+	ShortDescription *string
 	ImgURL          *string
 
 	OfferID      int
