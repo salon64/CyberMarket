@@ -148,6 +148,11 @@ func main() {
 		listMarketplaceItems(&w, r, db)
 	})
 
+	http.HandleFunc("POST /Marketplace/displayTransactionslog/{id}", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		displayTransactionslog(&w, r, db)
+	})
+
 	//TODO change to OfferID
 	http.HandleFunc("POST /Marketplace/buy/{ItemID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
