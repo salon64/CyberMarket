@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { globalAddr } from "../../header";
 import "../cyberpunk-css-main/cyberpunk.css";
+import "./AdminPage.css";
 interface addMoney {
   UserID: number;
   Money: number;
@@ -15,8 +17,27 @@ interface ItemTypeInformation {
   ShortDescription: string | null;
 }
 
+interface TransactionLog {
+  TransID: number;
+  Price: number;
+  Date: string;
+  ItemID: number;
+  Buyer: number;
+  Seller: number;
+}
 
 function AdminPage() {
+  const [transactionLog, setTransactionLog] = useState<TransactionLog[]>([]);
+  const [transactionlogID, setTransactionlogID] = useState("all");
+  const handleTransactionLogIDChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTransactionlogID(event.target.value); // Let the user type freely
+  };
+
+  const handleBlur = () => {
+    if (transactionlogID.trim() === "") {
+      setTransactionlogID("all"); // Reset only when input is empty AND user leaves
+    }
+  };
 
   function CreateItem(e: any) {
     // Prevent the browser from reloading the page
@@ -31,7 +52,7 @@ function AdminPage() {
     let tmp: createItemInt = { UserID: usItmID, ItemType: itType };
     console.log(tmp);
     // You can pass formData as a fetch body directly:
-    fetch("http://"+globalAddr+"/Marketplace/CreateItem", {
+    fetch("http://" + globalAddr + "/Marketplace/CreateItem", {
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -59,7 +80,7 @@ function AdminPage() {
     let tmp: addMoney = { UserID: usID, Money: currAmount };
     console.log(tmp);
 
-    fetch("http://"+globalAddr+"/user/AddMoney", {
+    fetch("http://" + globalAddr + "/user/AddMoney", {
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -67,7 +88,9 @@ function AdminPage() {
       .then((data) => {
         console.log(data);
       })
-      .catch((error) => { console.log(error) }); // kastar error när det funkar?????????????
+      .catch((error) => {
+        console.log(error);
+      }); // kastar error när det funkar?????????????
     window.location.reload();
   }
 
@@ -89,11 +112,15 @@ function AdminPage() {
       document.getElementById("ShortDescription") as HTMLInputElement
     ).value;
 
-    let tmp: ItemTypeInformation = { ItemName: ItemName, ItemDescription: null, ImgURL: null, ShortDescription: ShortDescription };
+    let tmp: ItemTypeInformation = {
+      ItemName: ItemName,
+      ItemDescription: null,
+      ImgURL: null,
+      ShortDescription: ShortDescription,
+    };
     console.log(tmp);
 
-
-    fetch("http://"+globalAddr+"/Admin/CreateNewItemType", {
+    fetch("http://" + globalAddr + "/Admin/CreateNewItemType", {
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -101,71 +128,125 @@ function AdminPage() {
       .then((data) => {
         console.log(data);
       })
-      .catch((error) => { console.log(error) }); // kastar error när det funkar?????????????
+      .catch((error) => {
+        console.log(error);
+      }); // kastar error när det funkar?????????????
     window.location.reload();
   }
 
+  useEffect(() => {
+    var fetchString =
+      `http://${globalAddr}/displayTransactionslog/` + transactionlogID;
+    fetch(fetchString, { method: "GET" })
+      .then((response) => response.json())
+      .then((transactionLog) => {
+        setTransactionLog(transactionLog);
+      })
+      .catch((error) => console.log("Error: ", error));
+  }, [transactionlogID]);
+
+  // function
+
   return (
-    <div>
-      <h1>Admin Page</h1>
-      <input type="text" id="id"></input>{" "}
-      <button onClick={() => changeUID()}>Change UID</button>
-      <br />
-      <hr />
-
-
-      <h1>Create Item</h1>
-      <form method="post" onSubmit={CreateItem}>
-        <label>
-          UserID: <input name="userID" type="number" id="usItmId" />
-        </label>
-        <br></br>
-        <label>
-          ItemType: <input name="itemType" type="number" id="itmType" />
-        </label>
-        <br></br>
-        <br />
-        <button type="submit">Create Item</button>
-        <br></br>
+    <div className="left-right-container-admin">
+      <div className="right-admin">
+        <h1>Admin Page</h1>
+        <input type="text" id="id"></input>{" "}
+        <button onClick={() => changeUID()}>Change UID</button>
         <br />
         <hr />
-      </form>
-
-
-      <h1>Add money to wallet</h1>
-      <form method="post" onSubmit={AddMoney}>
-        <label>
-          UserID: <input name="userID" type="number" id="usId" />
-        </label>
-        <br></br>
-        <label>
-          Amount: <input name="money" type="number" id="cur" />
-        </label>
-        <br></br>
-        <br />
-        <button type="submit">Add money</button>
-        <br></br>
-        <br />
-        <hr />
-      </form>
-
-
-      <h1>Create Item Type</h1>
-      <form method="post" onSubmit={CreateItemType}>
-        <label>
-          ItemName: <input name="itemname" type="text" id="ItemName" />
-        </label>
-        <br></br>
-        <label>
-          ShortDescription: <input name="shortdesc" type="text" id="ShortDescription" />
-        </label>
-        <br />
-        <br></br>
-        <button type="submit">create ItemType</button>
-        <br></br>
-        <br />
-        <hr />
-      </form>
+        <h1>Create Item</h1>
+        <form method="post" onSubmit={CreateItem}>
+          <label>
+            UserID: <input name="userID" type="number" id="usItmId" />
+          </label>
+          <br></br>
+          <label>
+            ItemType: <input name="itemType" type="number" id="itmType" />
+          </label>
+          <br></br>
+          <br />
+          <button type="submit">Create Item</button>
+          <br></br>
+          <br />
+          <hr />
+        </form>
+        <h1>Add money to wallet</h1>
+        <form method="post" onSubmit={AddMoney}>
+          <label>
+            UserID: <input name="userID" type="number" id="usId" />
+          </label>
+          <br></br>
+          <label>
+            Amount: <input name="money" type="number" id="cur" />
+          </label>
+          <br></br>
+          <br />
+          <button type="submit">Add money</button>
+          <br></br>
+          <br />
+          <hr />
+        </form>
+        <h1>Create Item Type</h1>
+        <form method="post" onSubmit={CreateItemType}>
+          <label>
+            ItemName: <input name="itemname" type="text" id="ItemName" />
+          </label>
+          <br></br>
+          <label>
+            ShortDescription:{" "}
+            <input name="shortdesc" type="text" id="ShortDescription" />
+          </label>
+          <br />
+          <br></br>
+          <button type="submit">create ItemType</button>
+          <br></br>
+          <br />
+          <hr />
+        </form>
+      </div>
+      <div className="left-admin">
+        <div className="cyber-input">
+          <input
+            type="text"
+            placeholder="Sort by ID, default: all"
+            value={transactionlogID}
+            onChange={handleTransactionLogIDChange}
+            onBlur={handleBlur} // Reset only when focus is lost
+          />
+        </div>
+        
+        <table className="cyber-table store-table ac-custom">
+          <thead>
+            <tr className="thead">
+              <th>TransID</th>
+              <th>Price</th>
+              <th>Date</th>
+              <th>ItemID</th>
+              <th>Buyer</th>
+              <th>Seller</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactionLog && transactionLog.length > 0 ? (
+              transactionLog.map((transaction) => (
+                <tr key={transaction.TransID}>
+                  <td>{transaction.TransID}</td>
+                  <td>{transaction.Price}</td>
+                  <td>{transaction.Date}</td>
+                  <td>{transaction.ItemID}</td>
+                  <td>{transaction.Buyer}</td>
+                  <td>{transaction.Seller}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6}>No transactions available</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
