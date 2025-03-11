@@ -81,7 +81,10 @@ func displayTransactionslog(w *http.ResponseWriter, r *http.Request, db *sql.DB)
 
 
 	if r.PathValue("id") == "all" {
-		SQLStatement = `SELECT * FROM TransactionLog`
+		SQLStatement = `
+		SELECT * FROM TransactionLog
+		ORDER BY TransactionLog.Date DESC;`
+		
 		row, err = db.Query(SQLStatement)
 	} else {
 		SQLStatement = `
