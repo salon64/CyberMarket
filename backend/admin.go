@@ -80,7 +80,7 @@ func displayTransactionslog(w *http.ResponseWriter, r *http.Request, db *sql.DB)
 	var err error
 
 
-	if r.PathValue("id") == "" {
+	if r.PathValue("id") == "all" {
 		SQLStatement = `SELECT * FROM TransactionLog`
 		row, err = db.Query(SQLStatement)
 	} else {
