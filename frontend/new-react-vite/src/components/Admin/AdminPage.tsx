@@ -29,7 +29,9 @@ interface TransactionLog {
 function AdminPage() {
   const [transactionLog, setTransactionLog] = useState<TransactionLog[]>([]);
   const [transactionlogID, setTransactionlogID] = useState("all");
-  const handleTransactionLogIDChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTransactionLogIDChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setTransactionlogID(event.target.value); // Let the user type freely
   };
 
@@ -215,7 +217,7 @@ function AdminPage() {
             onBlur={handleBlur} // Reset only when focus is lost
           />
         </div>
-        
+
         <table className="cyber-table store-table ac-custom">
           <thead>
             <tr className="thead">
