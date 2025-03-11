@@ -76,18 +76,22 @@ func createNewItemType(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func displayTransactionslog(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var SQLStatement string 
+	var row *sql.Rows
+	var err error
 
 
 	if r.PathValue("id") == "" {
 		SQLStatement = `SELECT * FROM TransactionLog`
+		row, err = db.Query(SQLStatement)
 	} else {
 		SQLStatement = `
 		SELECT * FROM TransactionLog
-		WHERE TransactionLog.Buyer =` + r.PathValue("id") + ` OR TransactionLog.Seller = ` +  r.PathValue("id") +
-		`ORDER BY TransactionLog.Date DESC;
+		WHERE TransactionLog.Buyer = ? OR TransactionLog.Seller = ?
+		ORDER BY TransactionLog.Date DESC;
 		`
+		row, err = db.Query(SQLStatement, r.PathValue("id"), r.PathValue("id"))
 	}
-	row, err := db.Query(SQLStatement)
+	// row, err := db.Query(SQLStatement, r.PathValue("id"), r.PathValue("id"))
 
 
 	if isErrLog(w, err) {
