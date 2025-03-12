@@ -27,8 +27,6 @@ const Inventory = () => {
       <div className="left-right-container">
         <div className="right">
           {/* store */}
-
-          <button onClick={() => getMoney()}>getwallet</button>
           <table className="cyber-table store-table">
             <thead style={{ backgroundColor: "bisque" }}>
               <tr>

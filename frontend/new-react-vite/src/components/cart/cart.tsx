@@ -55,9 +55,7 @@ function Cart(){
                   <td className="">Item</td>
                   <td className="">Price</td>
                   <td className="">PlaceHolder, Your cart is empty</td>
-                  <td className="">Seller</td>
-                  <td>
-                  </td>
+                  <td className=""><img className="sellIcon"></img></td>
                 </tr>
               )
             }

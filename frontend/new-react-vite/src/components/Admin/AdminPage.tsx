@@ -54,7 +54,8 @@ function AdminPage() {
     let tmp: createItemInt = { UserID: usItmID, ItemType: itType };
     console.log(tmp);
     // You can pass formData as a fetch body directly:
-    fetch("http://" + globalAddr + "/Marketplace/CreateItem", {
+    fetch("http://"+globalAddr+"/Marketplace/CreateItem", { 
+      
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -82,7 +83,8 @@ function AdminPage() {
     let tmp: addMoney = { UserID: usID, Money: currAmount };
     console.log(tmp);
 
-    fetch("http://" + globalAddr + "/user/AddMoney", {
+    fetch("http://"+globalAddr+"/user/AddMoney", {
+     
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -122,7 +124,9 @@ function AdminPage() {
     };
     console.log(tmp);
 
-    fetch("http://" + globalAddr + "/Admin/CreateNewItemType", {
+
+    fetch("http://"+globalAddr+"/Admin/CreateNewItemType", {
+      
       method: "POST",
       body: JSON.stringify(tmp),
     })

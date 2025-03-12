@@ -43,8 +43,8 @@ const ItemTableComponent = () => {
           alert("nuh uh");
         }
       })
-      .catch(error => console.log(error))
-    window.location.reload();
+      .catch(error => alert(error))
+    
   }
   function handleSell(itemID: number) {
 

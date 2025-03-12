@@ -24,6 +24,7 @@ function Login() {
           console.log(data)
           localStorage.setItem("token", data.Token)
           localStorage.setItem("uid", data.UserID)
+          localStorage.setItem("role", data.Role)
           navigate("/Marketplace")
         } else {
           alert("nuh uh")
@@ -49,7 +50,7 @@ function Login() {
         </label>
         <hr />
         <button type="submit">
-
+            Login
         </button>
         <br>
         </br>
