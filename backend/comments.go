@@ -187,6 +187,10 @@ func deleteComment(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		sendAndLogError(&w, http.StatusBadRequest, "can't convert ", r.PathValue("CommentID"), " to valid int")
 		return
 	}
-	db.Exec(`DELETE FROM main_db.TypeComments WHERE CommentID = ?;`, commentID)
+	_, err = db.Exec(`DELETE FROM main_db.TypeComments WHERE CommentID = ?;`, commentID)
+	if err != nil {
+		sendAndLogError(&w,http.StatusInternalServerError, "error deleting comment: ", err.Error())
+		return
+	}
 	fmt.Fprint(w, "Deleted comment")
 }

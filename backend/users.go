@@ -36,7 +36,8 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	row, err := db.Query("select userid, username from Users")
 
 	// write error if the query returned error
-	if isErrLog(w, err) {
+	if err != nil {
+		sendAndLogError(w, http.StatusInternalServerError, "error listing users")
 		return
 	}
 	// close the row connection when function exits
@@ -56,8 +57,7 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 
 		// write error and exit if scan fails
 		if err != nil {
-			(*w).WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(*w, err.Error())
+			sendAndLogError(w,http.StatusInternalServerError, "error on scanning ", err.Error())
 			return
 		}
 		// push user to the array
@@ -70,8 +70,7 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 
 	// write error and exit if json fails
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(*w, err.Error())
+		sendAndLogError(w,http.StatusInternalServerError, "error encoding return: ", err.Error())
 		return
 	}
 
@@ -88,7 +87,7 @@ func userLogin(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var userInfo SimpleUserInfo
 
 	if r.Body == nil {
-		log.Print("body was nil")
+		sendAndLogError(w, http.StatusBadRequest, "body was nil")
 		return
 	}
 
@@ -97,26 +96,20 @@ func userLogin(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err := decoder.Decode(&userInfo)
 
 	if err != nil {
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "Error parsing json: %s", err.Error())
-		log.Printf("Error parsing json: %s", err.Error())
+		sendAndLogError(w, http.StatusBadRequest, "Error parsing json: ", err.Error())
 		return
 	}
 
 	// test if values aer empty strings
 	if userInfo.Name == "" || userInfo.Pswd == "" {
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(*w, "Either Name or Pswd is an empty string")
-		log.Print("Either Name or Pswd is an empty string")
+		sendAndLogError(w,http.StatusBadRequest,"Either Name or Pswd is an empty string")
 		return
 	}
 
 	auth, err := CreateToken(userInfo.Name, userInfo.Pswd, db)
 
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(*w, err.Error())
-		log.Printf("Error creating token: %s", err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "Error creating token: ", err.Error())
 		return
 	}
 
@@ -124,8 +117,7 @@ func userLogin(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// write error and exit if json fails
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(*w, err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "error encoding return: ", err.Error())
 		return
 	}
 
@@ -138,7 +130,7 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var userInfo SimpleUserInfo
 
 	if r.Body == nil {
-		log.Print("body was nil")
+		sendAndLogError(w, http.StatusBadRequest, "body was nil")
 		return
 	}
 
@@ -147,17 +139,13 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err := decoder.Decode(&userInfo)
 
 	if err != nil {
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "Error parsing json: %s", err.Error())
-		log.Printf("Error parsing json: %s", err.Error())
+		sendAndLogError(w, http.StatusBadRequest, "Error parsing json: ", err.Error())
 		return
 	}
 
 	// test if values aer empty strings
 	if userInfo.Name == "" || userInfo.Pswd == "" {
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(*w, "Either Name or Pswd is an empty string")
-		log.Print("Either Name or Pswd is an empty string")
+		sendAndLogError(w, http.StatusBadRequest, "Either Name or Pswd is an empty string")
 		return
 	}
 
@@ -165,9 +153,7 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	_, err = db.Exec("insert into Users(Username,`Password(Hash)`,Wallet, role) values (?, ?, 0, 0);", userInfo.Name, userInfo.Pswd)
 	// if error write error and exit
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		log.Printf("add user error: %s", err)
-		fmt.Fprintln(*w, err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "add user error: ", err.Error())
 		return
 	}
 
@@ -179,8 +165,7 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// write error and exit if json fails
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(*w, err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "error encoding return: ", err.Error())
 		return
 	}
 
@@ -196,20 +181,20 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err := decoder.Decode(&data)
 
 	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		sendAndLogError(w, http.StatusBadRequest, "Error parsing json: ", err.Error())
 		return
 	}
-	log.Printf("with data %v", data)
+	log.Printf("update user with data %v", data)
 
 	userID, _ := strconv.Atoi(r.PathValue("id"))
 	var auth bool
-	auth, _ = AuthByHeader(r, userID, db)
+	auth, err = AuthByHeader(r, userID, db)
 	if !auth {
-		log.Print("failed to authenticate token")
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(*w, "failed to authenticate token")
+		if err != nil {
+			sendAndLogError(w, http.StatusInternalServerError, "Auth failed: ", err.Error())
+		} else {
+			sendAndLogError(w, http.StatusForbidden, "Auth failed")
+		}
 		return
 	}
 
@@ -219,13 +204,15 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	if name_ok {
 		_, err = db.Exec("UPDATE Users SET Username=? WHERE UserID = ?", new_name, userID)
 		if err != nil {
-			log.Print(err.Error())
+			sendAndLogError(w, http.StatusInternalServerError, "Update Username failed: ", err.Error())
+			return
 		}
 	}
 	if pswd_ok {
 		_, err = db.Exec("UPDATE Users SET `Password(Hash)`=? WHERE UserID = ?", new_pswd, userID)
 		if err != nil {
-			log.Print(err.Error())
+			sendAndLogError(w, http.StatusInternalServerError, "Update password failed: ", err.Error())
+			return
 		}
 	}
 
@@ -238,22 +225,16 @@ func addMoneyToUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var data UserMoney
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&data)
-	log.Println(data.UserID)
-	log.Println(data.Money)
+
 	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		sendAndLogError(w, http.StatusBadRequest, "Error parsing json: ", err.Error())
 		return
 	}
-	log.Printf("with data %v", data)
 
 	// TODO token stuff
 	_, err = db.Exec("UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?", data.Money, data.UserID)
 	if err != nil {
-		log.Printf("Error updating user Wallet: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "Error updating user Wallet: %s", err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "error updating user wallet: ", err.Error())
 		return
 	}
 	(*w).WriteHeader(http.StatusOK)
@@ -270,8 +251,7 @@ func getUserMoney(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// write error and exit if scan fails
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		log.Printf("GetUserMoney sql/scan error: %s", err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "GetUserMoney sql/scan error: ", err.Error())
 		return
 	}
 
@@ -281,8 +261,7 @@ func getUserMoney(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// write error and exit if json fails
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(*w, err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "error encoding return: ", err.Error())
 		return
 	}
 

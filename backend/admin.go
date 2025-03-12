@@ -11,80 +11,58 @@ import (
 )
 
 type ItemTypeInformation struct {
-	ItemName string
-	ItemDescription string 
-	ImgURL string 
-	ShortDescription string
+	ItemName         string
+	ItemDescription  *string
+	ImgURL           *string
+	ShortDescription *string
 }
 
 type TransactionInformation struct {
 	TransID int
-	Price int
-	Date string
-	ItemID int
-	Buyer int
-	Seller int
+	Price   int
+	Date    string
+	ItemID  int
+	Buyer   int
+	Seller  int
 }
 
-// adds a new itemtype to the ItemType table, 
-// TODO implement description and img handling 
+// creates a new item type
 func createNewItemType(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var data ItemTypeInformation
-
-	if r.Body == nil {
-		log.Print("body was nil")
-		return
-	}
 
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&data)
 
 	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		sendAndLogError(w, http.StatusBadRequest, "Error decoding json: ", err.Error())
 		return
 	}
-	log.Printf("with data %v", data)
+	log.Printf("Adding a new item type %v", data)
 
-	// TODO ERROR handling
-	t, _ := db.Begin()
-	res, err := t.Exec("insert into ItemTypes (ItemName, ItemDescription, ImgURL, ShortDescription) values (?, null, null, ?);", data.ItemName, data.ShortDescription)
+	_, err = db.Exec(`INSERT INTO ItemTypes
+						(ItemName, ItemDescription, ImgURL, ShortDescription)
+						values (?, ?, ?, ?);`,
+		data.ItemName, data.ItemDescription, data.ImgURL, data.ShortDescription)
 
 	// if error write error and exit
 	if err != nil {
-		t.Rollback()
-		(*w).WriteHeader(http.StatusInternalServerError)
-		log.Printf("add listing error: %s", err)
-		fmt.Fprintf(*w, "add listing error: %s", err.Error())
-		return
-	}
-	// TODO: WE NEED A TRANSACTION HERE
-	TypeID, err := res.LastInsertId()
-	// if error write error and exit
-	if err != nil {
-		t.Rollback()
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(*w, err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "Error creating ItemType: ", err.Error())
 		return
 	}
 
-	// return the TypeId
-	t.Commit()
-	fmt.Fprintf(*w, "%d", TypeID)
+	fmt.Fprint(*w, "success on creating item type")
 }
 
-func displayTransactionslog(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var SQLStatement string 
+func displayTransactionLogs(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var SQLStatement string
 	var row *sql.Rows
 	var err error
-
 
 	if r.PathValue("id") == "all" {
 		SQLStatement = `
 		SELECT * FROM TransactionLog
 		ORDER BY TransactionLog.Date DESC;`
-		
+
 		row, err = db.Query(SQLStatement)
 	} else {
 		SQLStatement = `
@@ -95,7 +73,6 @@ func displayTransactionslog(w *http.ResponseWriter, r *http.Request, db *sql.DB)
 		row, err = db.Query(SQLStatement, r.PathValue("id"), r.PathValue("id"))
 	}
 	// row, err := db.Query(SQLStatement, r.PathValue("id"), r.PathValue("id"))
-
 
 	if isErrLog(w, err) {
 		return
@@ -115,7 +92,7 @@ func displayTransactionslog(w *http.ResponseWriter, r *http.Request, db *sql.DB)
 	}
 
 	json, err := json.MarshalIndent(transactions, "", "    ")
-	
+
 	if err != nil {
 		(*w).WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(*w, err.Error())

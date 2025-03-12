@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-type UserStruc struct {
+type UserStruct struct {
 	UserID int
 }
 type MarketplaceItems struct {
@@ -52,24 +52,23 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 	err := decoder.Decode(&data)
 
 	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		sendAndLogError(w, http.StatusBadRequest, "Error parsing json: ", err.Error())
 		return
 	}
-	log.Printf("with data %v", data)
 
 	// TODO check if i own the item
 	// TODO ERROR handling
-	t, _ := db.Begin()
+	t, err := db.Begin()
+	if err != nil {
+		sendAndLogError(w, http.StatusInternalServerError, "Error starting transaction: ", err.Error())
+		return
+	}
 	res, err := t.Exec("insert into Marketplace(ItemID, Price, CreationDate) values (?, ?, now());", data.ItemID, data.Price)
 
 	// if error write error and exit
 	if err != nil {
 		t.Rollback()
-		(*w).WriteHeader(http.StatusInternalServerError)
-		log.Printf("add listing error: %s", err)
-		fmt.Fprintf(*w, "add listing error: %s", err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "Error inserting listing: ", err.Error())
 		return
 	}
 	// TODO: WE NEED A TRANSACTION HERE
@@ -77,36 +76,26 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 	// if error write error and exit
 	if err != nil {
 		t.Rollback()
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(*w, err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "Error getting transaction id: ", err.Error())
 		return
 	}
 
 	// return the id
 
-	t.Commit()
+	err = t.Commit()
+	if err != nil {
+		sendAndLogError(w, http.StatusInternalServerError, "Error committing listing: ", err.Error())
+	}
+
 	fmt.Fprintf(*w, "%d", OfferID)
 }
 
 func removeListingFromMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	_, err := db.Exec("DELETE FROM Marketplace WHERE ItemID = ?;", r.PathValue("ItemID"))
-	log.Printf("test")
-	log.Printf("%s", r.PathValue("ItemID"))
-	log.Printf("test")
+
 	// if error write error and exit
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		log.Printf("error deleting marketplace listing: %s", err)
-		fmt.Fprintln(*w, err.Error())
-		return
-	}
-
-	_, err = db.Exec("UPDATE Inventory SET IsListed = 0 WHERE ItemID = ?;", r.PathValue("ItemID"))
-	log.Print(r.PathValue("ItemID"))
-	if err != nil {
-		log.Printf("error updating IsListed to false: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error updating IsListed to false: %s", err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "Error deleting listing: ", err.Error())
 		return
 	}
 
@@ -117,101 +106,50 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var data displayConstraints
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&data)
-	log.Printf("%+v", data)
+
 	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		sendAndLogError(w, http.StatusBadRequest, "Error parsing json: ", err.Error())
 		return
 	}
-	log.Printf("with data %v", data)
 
-	var orderBY string
 	var SQLstatement string
-	//mabe do some sprintf here to avoid this huge if else
+	SQLstatement = `
+		SELECT inv.ItemID, inv.TypeID, inv.UserID,
+		u.Username,
+		it.ItemName, it.ShortDescription, it.ImgURL, 
+		mp.OfferID, mp.Price, mp.CreationDate
+		FROM Marketplace mp
+		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
+		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
+		INNER JOIN Users u ON u.UserID = inv.UserID `
+
+	// maybe do some sprintf here to avoid this huge if else
 	if data.SortBy == "Newest" {
-		orderBY = "mp.OfferID"
-		SQLstatement = `
-		SELECT inv.ItemID, inv.TypeID, inv.UserID,
-		u.Username,
-		it.ItemName, it.ShortDescription, it.ImgURL, 
-		mp.OfferID, mp.Price, mp.CreationDate
-		FROM Marketplace mp
-		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
-		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
-		INNER JOIN Users u ON u.UserID = inv.UserID
-		order by mp.OfferID;
-		`
+		SQLstatement += "order by CreationDate;"
+
 	} else if data.SortBy == "Oldest" {
-		orderBY = "mp.OfferID"
-		SQLstatement = `
-		SELECT inv.ItemID, inv.TypeID, inv.UserID,
-		u.Username,
-		it.ItemName, it.ShortDescription, it.ImgURL, 
-		mp.OfferID, mp.Price, mp.CreationDate
-		FROM Marketplace mp
-		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
-		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
-		INNER JOIN Users u ON u.UserID = inv.UserID
-		order by mp.OfferID DESC;
+		SQLstatement += `
+		order by CreationDate DESC;
 		`
 	} else if data.SortBy == "Price_Ascending" {
-		orderBY = "mp.Price"
-		SQLstatement = `
-		SELECT inv.ItemID, inv.TypeID, inv.UserID,
-		u.Username,
-		it.ItemName, it.ShortDescription, it.ImgURL, 
-		mp.OfferID, mp.Price, mp.CreationDate
-		FROM Marketplace mp
-		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
-		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
-		INNER JOIN Users u ON u.UserID = inv.UserID
+		SQLstatement += `
 		order by mp.Price;
 		`
 	} else if data.SortBy == "Price_Descending" {
-		orderBY = "mp.Price DESC"
-		SQLstatement = `
-		SELECT inv.ItemID, inv.TypeID, inv.UserID,
-		u.Username,
-		it.ItemName, it.ShortDescription, it.ImgURL, 
-		mp.OfferID, mp.Price, mp.CreationDate
-		FROM Marketplace mp
-		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
-		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
-		INNER JOIN Users u ON u.UserID = inv.UserID
+		SQLstatement += `
 		order by mp.Price DESC;
 		`
 	} else if data.SortBy == "Alphabetically_Ascending" {
-		orderBY = "it.ItemName"
-		SQLstatement = `
-		SELECT inv.ItemID, inv.TypeID, inv.UserID,
-		u.Username,
-		it.ItemName, it.ShortDescription, it.ImgURL, 
-		mp.OfferID, mp.Price, mp.CreationDate
-		FROM Marketplace mp
-		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
-		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
-		INNER JOIN Users u ON u.UserID = inv.UserID
+		SQLstatement += `
 		order by it.ItemName;
 		`
 	} else if data.SortBy == "Alphabetically_Descending" {
-		orderBY = "it.ItemName DESC"
-		SQLstatement = `
-		SELECT inv.ItemID, inv.TypeID, inv.UserID,
-		u.Username,
-		it.ItemName, it.ShortDescription, it.ImgURL, 
-		mp.OfferID, mp.Price, mp.CreationDate
-		FROM Marketplace mp
-		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
-		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
-		INNER JOIN Users u ON u.UserID = inv.UserID
+		SQLstatement += `
 		order by it.ItemName DESC;
 		`
 	} else {
-		// TODO ERROR HERE
-		// OR DEFAULT HERE
+		SQLstatement += `;`
 	}
-	log.Print(orderBY) // this is here since orderby needs to be used
 
 	// var SQLstatement := `
 	// 	SELECT inv.ItemID, inv.TypeID, inv.UserID,
@@ -227,7 +165,8 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	row, err := db.Query(SQLstatement)
 
-	if isErrLog(w, err) {
+	if err != nil {
+		sendAndLogError(w, http.StatusInternalServerError, "Error when querying marketplace: ", err.Error())
 		return
 	}
 
@@ -239,8 +178,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		// SELECT inv.ItemID, inv.TypeID, inv.UserID, u.Username, it.ItemName, it.ItemDescription, it.ImgURL, mp.OfferID, mp.Price, mp.CreationDate
 		err := row.Scan(&listing.ItemID, &listing.TypeID, &listing.UserID, &listing.Username, &listing.ItemName, &listing.ShortDescription, &listing.ImgURL, &listing.OfferID, &listing.Price, &listing.CreationDate)
 		if err != nil {
-			(*w).WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(*w, err.Error())
+			sendAndLogError(w, http.StatusInternalServerError, "Error scanning: ", err.Error())
 			return
 		}
 
@@ -250,8 +188,7 @@ func listMarketplaceItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	json, err := json.MarshalIndent(listings, "", "    ")
 
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(*w, err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "error encoding return: ", err.Error())
 		return
 	}
 
@@ -360,6 +297,7 @@ func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		(*w).WriteHeader(http.StatusInternalServerError)
 		return err
 	}
+
 	fmt.Fprint(*w, "Success")
 	return nil
 }

@@ -68,7 +68,7 @@ func displayCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 // Recieves UserID and OfferID and adds the offer to the cart table in DB
 func addToCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var data UserStruc
+	var data UserStruct
 
 	if r.Body == nil {
 		log.Print("body was nil")
@@ -105,7 +105,7 @@ func addToCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 // this function returns if the if the item is in the users cart. zero for false 1 for true
 func checkCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var data UserStruc
+	var data UserStruct
 
 	if r.Body == nil {
 		log.Print("body was nil")
@@ -153,7 +153,7 @@ func checkCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 // Removes an item forom the users cart, pahtvalue is offerid and struct contains userod
 func removeFromCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var data UserStruc
+	var data UserStruct
 
 	if r.Body == nil {
 		log.Print("body was nil")
@@ -164,9 +164,7 @@ func removeFromCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err := decoder.Decode(&data)
 
 	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		sendAndLogError(w, http.StatusBadRequest, "error decoding: ", err.Error())
 		return
 	}
 
@@ -174,9 +172,7 @@ func removeFromCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// if error write error and exit
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		log.Printf("ShoppingCart insertion error: %s", err)
-		fmt.Fprintf(*w, "ShoppingCart insertion error: %s", err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "shopping basket insertion error: ", err.Error())
 		return
 	}
 
