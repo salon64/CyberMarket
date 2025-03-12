@@ -1,0 +1,15 @@
+.left-right-container-profile {
+    display: flex;
+}
+
+.left-profile {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-profile {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}

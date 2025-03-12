@@ -1,138 +1,158 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-
-import MyImage from "./aswedishtiger.png";
+import { useEffect, useState } from "react";
 import "../cyberpunk-css-main/cyberpunk.css";
 import { globalAddr } from "../../header";
-const getToken = () => {
-  alert("token is: " + localStorage.getItem("token"))
+import "./Profile.css";
+
+interface TransactionLog {
+  TransID: number;
+  Price: number;
+  Date: string;
+  ItemID: number;
+  Buyer: number;
+  Seller: number;
 }
 
-
-async function handleSubmit(e: any) {
-  // Prevent the browser from reloading the page
-  e.preventDefault();
-
-  // Read the form data
-  const form = e.target;
-  const formData = new FormData(form);
-  console.log(formData);
-
-  // You can pass formData as a fetch body directly:
-  let userID: string = (
-    document.getElementById("nameChangeFormID") as HTMLInputElement
-  ).value;
-  userID = "http://"+globalAddr+"/users/" + userID;
-  console.log(userID);
-
-  // Or you can work with it as a plain object:
-  const formJson = Object.fromEntries(formData.entries());
-  console.log(JSON.stringify(formJson));
-  fetch(userID, { method: "POST", body: JSON.stringify(formJson) })
-    .then((response) => {
-      if (response.ok === true) {
-        console.log("Valid");
-        alert("Account has been succesfully updated");
-      } else {
-        console.log("Invalid");
-        alert("nuh uh");
-      }
-    })
-    .then((data) => console.log(data));
-  fetch("http://"+globalAddr+"/users", { method: "GET" })
-    .then((response) => response.json())
-    .then((res) => console.log(res));
+interface updateUserInfoDataName {
+  new_name: string | null;
+  // new_pswd: string | null;
 }
+
+interface updateUserInfoDataPswd {
+  // new_name: string | null;
+  new_pswd: string | null;
+}
+
 
 function Profile() {
+  const [transactionLog, setTransactionLog] = useState<TransactionLog[]>([]);
 
-  const [data, setData] = useState(null);
-  let navigate = useNavigate()
   useEffect(() => {
-    fetch("http://"+globalAddr+"/users", { method: "GET" })
+    var fetchString =
+      `http://${globalAddr}/displayTransactionslog/` +
+      localStorage.getItem("uid");
+    fetch(fetchString, { method: "GET" })
       .then((response) => response.json())
-      .then((data) => setData(data))
-      // .then((data) => console.log(data))
-      .then(data => console.log(data))
-      .catch((error) => console.error("Error: ", error));
-
-    // console.log(JSON.stringify(data));
-    console.log("seal was here")
+      .then((transactionLog) => {
+        setTransactionLog(transactionLog);
+      })
+      .catch((error) => console.log("Error: ", error));
   }, []);
 
+  const uid = localStorage.getItem("uid");
 
+  function changeUsername(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    let newUserID: string = (
+      document.getElementById("newUsername") as HTMLInputElement
+    ).value;
+    let tmp: updateUserInfoDataName = {
+      new_name: newUserID,
+    }
+    var fetchString =
+      `http://${globalAddr}/users/` +
+      localStorage.getItem("uid");
+    fetch(fetchString, {method: "POST",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+      body: JSON.stringify(tmp)
+    })
+    .then((response) => console.log(response))
+    .catch((error) => {
+      console.log(error);
+    });
+  }
 
+  function changePassword(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
 
-  // const handleClickEvent = () => {
+    let newPswd: string = (
+      document.getElementById("newUsername") as HTMLInputElement
+    ).value;
+    let tmp: updateUserInfoDataPswd = {
+      new_pswd: newPswd
+    }
+    var fetchString =
+      `http://${globalAddr}/users/` +
+      localStorage.getItem("uid");
+    fetch(fetchString, {method: "POST",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+      body: JSON.stringify(tmp)
+    })
+    .then((response) => console.log(response))
+    .catch((error) => {
+      console.log(error);
+    });
+  }
 
-  // };
-  // function myFunction(event: React.FormEvent<HTMLFormElement>) {
-  //   event.preventDefault();
-  //   const form = event.currentTarget;
-  //   const input = form.elements.namedItem('q') as HTMLInputElement;
-  //   console.log(input.value);
-  // }
-  const [uid] = useState(localStorage.getItem("uid"))
   return (
-    <>
-      <div>
-        <p className="oxanium-font">UID: {uid} </p>
-        <br></br>
-        {data ? (
-          JSON.stringify(data)
-        ) : (
-          <img src={MyImage} alt="User data"></img>
-        )}
-      </div>
-
-
-
-      <div>
-        <div className="cyber-input">
-          <input
-            type="text"
-            placeholder="Enter ID..."
-            id="nameChangeFormID"
-          ></input>
-          <form method="post" onSubmit={handleSubmit}>
+      <div className="left-right-container-profile">
+        <div className=""></div>
+        <div className="left-profile">
+          <h2>You are logged in as: {String(uid)}</h2>
+          <h1>Change Username</h1>
+          <form method="post" onSubmit={changeUsername}>
             <label>
-              <input name="token" type="text" placeholder="token..." />
-            </label>
-            <label>
-              <input
-                name="new_name"
-                type="text"
-                placeholder="Enter new username..."
-              />
+              New Username:{" "}
+              <input name="newUsername" type="text" id="newUsername" />
             </label>
             <br></br>
+            <br />
+            <button type="submit">Submit Username</button>
+            <br></br>
+            <br />
+            <hr />
+          </form>
+          <h1>Change Password</h1>
+          <form method="post" onSubmit={changePassword}>
             <label>
-              <input
-                name="new_pswd"
-                type="password"
-                placeholder="Enter new password..."
-              />
+              New Password:{" "}
+              <input name="newPassword" type="text" id="newPassword" />
             </label>
-            <button>Save changes</button> <br>
-            </br>
-            <button onClick={getToken}>Check token</button>
-            <button onClick={() => {
-              localStorage.setItem("token", "")
-              navigate('/')
-            }}>Log Out</button>
+            <br></br>
+            <br />
+            <button type="submit">Submit Password</button>
+            <br></br>
+            <br />
+            <hr />
           </form>
         </div>
-      </div>
 
-      {/* <div className="cyber-input">
-        
+        <div className="right-profile">
+          <table className="cyber-table store-table ac-custom">
+            <thead>
+              <tr className="thead">
+                <th>TransID</th>
+                <th>Price</th>
+                <th>Date</th>
+                <th>ItemID</th>
+                <th>Buyer</th>
+                <th>Seller</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactionLog && transactionLog.length > 0 ? (
+                transactionLog.map((transaction) => (
+                  <tr key={transaction.TransID}>
+                    <td>{transaction.TransID}</td>
+                    <td>{transaction.Price}</td>
+                    <td>{transaction.Date}</td>
+                    <td>{transaction.ItemID}</td>
+                    <td>{transaction.Buyer}</td>
+                    <td>{transaction.Seller}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6}>No transactions available</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-      <button className="cyber-button bg-* fg-balck" onClick={handleClickEvent}>
-        Save changes
-        <span className=""></span>
-        <span className="tag">User</span>
-      </button> */}
-    </>
   );
 }
 

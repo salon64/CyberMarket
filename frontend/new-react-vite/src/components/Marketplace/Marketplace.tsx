@@ -22,7 +22,7 @@ interface MarketplaceItems {
   UserID: number;
 
   ItemName: string;
-  ItemDescription: string;
+  ShortDescription: string;
   ImgURL: string;
   
   OfferID: number;
@@ -154,7 +154,7 @@ function Marketplace() {
                 </td> */}
                 <td style={{ cursor: 'pointer' }} onClick={() => {setFuckTS(item.TypeID); setShowComments(true); } } >{item.ItemName}</td>
                 <td className="">{item.Price}</td>
-                <td className="">{item.ItemDescription}</td>
+                <td className="">{item.ShortDescription}</td>
                 <td className="">{item.Username}</td>
                 <td>
                   <input onClick={() => buyItem(item)} className='buy-button' type='button' value='Buy' />
