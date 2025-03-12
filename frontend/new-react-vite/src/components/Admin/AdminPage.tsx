@@ -32,12 +32,12 @@ function AdminPage() {
   const handleTransactionLogIDChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setTransactionlogID(event.target.value); // Let the user type freely
+    setTransactionlogID(event.target.value); 
   };
 
   const handleBlur = () => {
     if (transactionlogID.trim() === "") {
-      setTransactionlogID("all"); // Reset only when input is empty AND user leaves
+      setTransactionlogID("all"); 
     }
   };
 
@@ -214,7 +214,7 @@ function AdminPage() {
             placeholder="Sort by ID, default: all"
             value={transactionlogID}
             onChange={handleTransactionLogIDChange}
-            onBlur={handleBlur} // Reset only when focus is lost
+            onBlur={handleBlur} 
           />
         </div>
 
