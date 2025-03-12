@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `main_db`.`Marketplace` (
 CREATE TABLE IF NOT EXISTS `main_db`.`TransactionLog` (
   `TransID` INT NOT NULL AUTO_INCREMENT,
   `Price` INT NOT NULL,
-  `Date` DATE NOT NULL,
+  `Date` DATETIME NOT NULL,
   `ItemID` INT NOT NULL,
   `Buyer` INT  NOT NULL,
   `Seller` INT  NOT NULL,

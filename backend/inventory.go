@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	// "log"
 	"net/http"
@@ -30,42 +29,26 @@ type SimpleItem struct {
 // the data returned is described by the item struct
 func createItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var newItem SimpleItem
-	if r.Body == nil {
-		log.Print("body was nil")
-		return
-	}
-
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 	err := decoder.Decode(&newItem)
 
 	if err != nil {
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "Error parsing json: %s", err.Error())
-		log.Printf("Error parsing json: %s", err.Error())
+		sendAndLogError(w,http.StatusBadRequest, "Error parsing json: ", err.Error())
 		return
 	}
 
-	json, err := json.MarshalIndent(newItem, "", "    ")
-
-	// if conversion to json failed
-	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(*w, err.Error())
-		return
-	}
 	_, err = db.Exec("insert into Inventory(UserID, TypeID) values (?, ?);", newItem.UserID, newItem.ItemType)
 
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		log.Printf("add user error: %s", err)
-		fmt.Fprintln(*w, err.Error())
+		sendAndLogError(w,http.StatusInternalServerError, "adding ItemType returned error: ", err.Error())
 		return
 	}
 
 	// send json
-	fmt.Fprint(*w, string(json))
+	(*w).WriteHeader(http.StatusOK)
 }
+
 func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// row, err := db.Query("SELECT ItemID FROM Inventory WHERE UserID = ? ODER BY ItemID", r.PathValue("id"))
 	row, err := db.Query(`
@@ -94,8 +77,7 @@ func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 		// write error and exit if scan fails
 		if err != nil {
-			(*w).WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(*w, err.Error())
+			sendAndLogError(w,http.StatusInternalServerError, "error scanning user items: ", err.Error())
 			return
 		}
 
@@ -108,8 +90,7 @@ func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	//log.Printf("test")
 	// if conversion to json failed
 	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(*w, err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "error encoding return: ", err.Error())
 		return
 	}
 

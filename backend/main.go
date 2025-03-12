@@ -150,7 +150,7 @@ func main() {
 
 	http.HandleFunc("GET /displayTransactionslog/{id}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
-		displayTransactionslog(&w, r, db)
+		displayTransactionLogs(&w, r, db)
 	})
 
 	//TODO change to OfferID
