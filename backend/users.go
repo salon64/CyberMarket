@@ -57,7 +57,7 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 
 		// write error and exit if scan fails
 		if err != nil {
-			sendAndLogError(w,http.StatusInternalServerError, "error on scanning ", err.Error())
+			sendAndLogError(w, http.StatusInternalServerError, "error on scanning ", err.Error())
 			return
 		}
 		// push user to the array
@@ -70,7 +70,7 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 
 	// write error and exit if json fails
 	if err != nil {
-		sendAndLogError(w,http.StatusInternalServerError, "error encoding return: ", err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "error encoding return: ", err.Error())
 		return
 	}
 
@@ -85,7 +85,7 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 // Errors are returned as a simple string and might not update the status code
 func userLogin(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var userInfo SimpleUserInfo
-
+	log.Print("I was here")
 	if r.Body == nil {
 		sendAndLogError(w, http.StatusBadRequest, "body was nil")
 		return
@@ -102,7 +102,7 @@ func userLogin(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// test if values aer empty strings
 	if userInfo.Name == "" || userInfo.Pswd == "" {
-		sendAndLogError(w,http.StatusBadRequest,"Either Name or Pswd is an empty string")
+		sendAndLogError(w, http.StatusBadRequest, "Either Name or Pswd is an empty string")
 		return
 	}
 
@@ -175,6 +175,14 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
+	userID, _ := strconv.Atoi(r.PathValue("id"))
+	var auth bool
+	auth, _ = AuthByHeader(r, userID, db)
+	if !auth {
+		sendAndLogError(w, http.StatusForbidden, "Auth failed")
+		return
+	}
+
 	var data map[string]string
 
 	decoder := json.NewDecoder(r.Body)
@@ -184,19 +192,7 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		sendAndLogError(w, http.StatusBadRequest, "Error parsing json: ", err.Error())
 		return
 	}
-	log.Printf("update user with data %v", data)
-
-	userID, _ := strconv.Atoi(r.PathValue("id"))
-	var auth bool
-	auth, err = AuthByHeader(r, userID, db)
-	if !auth {
-		if err != nil {
-			sendAndLogError(w, http.StatusInternalServerError, "Auth failed: ", err.Error())
-		} else {
-			sendAndLogError(w, http.StatusForbidden, "Auth failed")
-		}
-		return
-	}
+	log.Printf("with data %v", data)
 
 	new_name, name_ok := data["new_name"]
 	new_pswd, pswd_ok := data["new_pswd"]

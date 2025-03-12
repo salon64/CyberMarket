@@ -29,6 +29,7 @@ type TransactionInformation struct {
 // creates a new item type
 func createNewItemType(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var data ItemTypeInformation
+	AuthByHeader(r,-1,db)
 
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&data)
