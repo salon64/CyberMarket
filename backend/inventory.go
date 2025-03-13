@@ -14,7 +14,6 @@ type Item struct {
 	ItemID   int
 	TypeID   int
 	ItemName string
-	IsListed int
 	// these are string pointers since ItemDescription and ImgURL can be null,
 	// when scan is done null is converted to nil pointers
 	ItemDescription *string
@@ -69,7 +68,7 @@ func createItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// row, err := db.Query("SELECT ItemID FROM Inventory WHERE UserID = ? ODER BY ItemID", r.PathValue("id"))
 	row, err := db.Query(`
-		SELECT Inventory.ItemID, Inventory.TypeID, ItemTypes.ItemName, Inventory.IsListed, ItemTypes.ItemDescription, ItemTypes.ImgURL
+		SELECT Inventory.ItemID, Inventory.TypeID, ItemTypes.ItemName, ItemTypes.ItemDescription, ItemTypes.ImgURL
 		FROM Inventory
 		INNER JOIN ItemTypes on Inventory.TypeID = ItemTypes.TypeID
 		where Inventory.UserID = ?;`,
@@ -89,7 +88,7 @@ func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		var item Item
 
 		// read the columns from the row
-		err := row.Scan(&item.ItemID, &item.TypeID, &item.ItemName, &item.IsListed, &item.ItemDescription, &item.ImgURL)
+		err := row.Scan(&item.ItemID, &item.TypeID, &item.ItemName, &item.ItemDescription, &item.ImgURL)
 
 		// write error and exit if scan fails
 		if err != nil {
@@ -103,8 +102,7 @@ func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// to json
 	json, err := json.MarshalIndent(items, "", "    ")
-	//log.Printf(": %s", string(json))
-	//log.Printf("test")
+
 	// if conversion to json failed
 	if err != nil {
 		(*w).WriteHeader(http.StatusInternalServerError)
