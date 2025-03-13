@@ -30,7 +30,12 @@ function Profile() {
     var fetchString =
       `http://${globalAddr}/displayTransactionslog/` +
       localStorage.getItem("uid");
-    fetch(fetchString, { method: "GET" })
+    fetch(fetchString, {
+      method: "GET",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+    })
       .then((response) => response.json())
       .then((transactionLog) => {
         setTransactionLog(transactionLog);
