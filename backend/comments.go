@@ -83,9 +83,13 @@ func addComment(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	// insert the comment
-	db.Exec(`INSERT INTO main_db.TypeComments (UserID, TypeID, Grade, Comment, CreatedOn)
+	_, err = db.Exec(`INSERT INTO main_db.TypeComments (UserID, TypeID, Grade, Comment, CreatedOn)
 			VALUES (?,?,?,?, NOW())`,
 		commentStruct.UserID, itemTypeID, commentStruct.Grade, commentStruct.Comment)
+
+	if err != nil {
+		sendAndLogError(w,http.StatusInternalServerError, "failed to add comment: ", err.Error())
+	}
 
 	fmt.Fprint(*w, "Added the comment")
 }
