@@ -14,6 +14,7 @@ type AddComment struct {
 	Grade   int
 	UserID  *int
 	Comment string
+	ParentCommentID *int
 }
 
 // Adds a comment to the type specified in the path
@@ -83,14 +84,14 @@ func addComment(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	// insert the comment
-	_, err = db.Exec(`INSERT INTO main_db.TypeComments (UserID, TypeID, Grade, Comment, CreatedOn)
-			VALUES (?,?,?,?, NOW())`,
-		commentStruct.UserID, itemTypeID, commentStruct.Grade, commentStruct.Comment)
+	_, err = db.Exec(`INSERT INTO main_db.TypeComments (UserID, TypeID, Grade, Comment, CreatedOn, ParentComment)
+			VALUES (?,?,?,?, NOW(), ?);`,
+		commentStruct.UserID, itemTypeID, commentStruct.Grade, commentStruct.Comment, commentStruct.ParentCommentID)
 
 	if err != nil {
-		sendAndLogError(w,http.StatusInternalServerError, "failed to add comment: ", err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "Insert error ", err.Error())
+		return
 	}
-
 	fmt.Fprint(*w, "Added the comment")
 }
 
@@ -109,6 +110,7 @@ type pubComment struct {
 	Grade     int
 	Comment   string
 	PostedOn  string
+	ParentCommentID *int
 }
 
 // dont know if its the best idea to have it here, but its comment related ish
@@ -159,7 +161,8 @@ func getItemTypeInfo(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 							main_db.Users.UserID,
 							main_db.TypeComments.Grade,
 							main_db.TypeComments.Comment,
-							main_db.TypeComments.CreatedOn
+							main_db.TypeComments.CreatedOn,
+							main_db.TypeComments.ParentComment
 							FROM main_db.TypeComments
 							LEFT JOIN main_db.Users on main_db.TypeComments.UserID = main_db.Users.UserID
 							WHERE main_db.TypeComments.TypeID = ?;`,
@@ -173,7 +176,7 @@ func getItemTypeInfo(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	for rows.Next() {
 		var comment pubComment
-		err := rows.Scan(&comment.CommentID, &comment.UserName, &comment.UserID, &comment.Grade, &comment.Comment, &comment.PostedOn)
+		err := rows.Scan(&comment.CommentID, &comment.UserName, &comment.UserID, &comment.Grade, &comment.Comment, &comment.PostedOn, &comment.ParentCommentID)
 		if err != nil {
 			sendAndLogError(&w, http.StatusInternalServerError, "error while scanning comments: ", err.Error())
 			return
