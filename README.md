@@ -28,6 +28,7 @@ These items on the market would be able to be bought by other users transferring
     - [Schema](#schema)
     - [Transaction Log](#transaction-log)
     - [Comments and grading](#comments-and-grading)
+    - [Shopping basket](#shopping-basket)
   - [WebServer](#webserver)
   - [Frontend](#frontend)
   - [Debugging frontend](#debugging-frontend)
@@ -70,6 +71,12 @@ These items on the market would be able to be bought by other users transferring
   - [Get information and comments on an itemtype](#get-information-and-comments-on-an-itemtype)
   - [Buy](#buy)
 - [References](#references)
+  - [Olle](#olle)
+  - [Shaya:](#shaya)
+  - [Malcolm:](#malcolm)
+    - [Important:](#important)
+    - [Informal](#informal)
+  - [General](#general)
 
 ## Requirements, Assumptions, Limitations
 
@@ -90,7 +97,8 @@ Non-functional requirements would be;
 
 ### Assumptions
 
-The system assumes the user to be sending accurate information and not attempting to break the website in unexpected ways. Internet traffic on the website is also assumed to be low as to not put too much of a load on the backend server.
+The system assumes that there are no man in the middle attacks or other attacks on non encrypted communications. (due to ssl cert cost money)
+Internet traffic on the website is also assumed to be low as to not put too much of a load on the backend server.
 
 ### Limitations
 
@@ -212,6 +220,7 @@ erDiagram
 
     TypeComments {
         int CommentID "PK auto_inc"
+        int ParentComment "null"
         int TypeID "not null"
         int UserID "not null"
         int Grade "not null"
@@ -220,6 +229,7 @@ erDiagram
     }
     TypeComments }|--|| Users: PostedBy
     TypeComments }|--|| ItemTypes: Comment
+    TypeComments |o--o| TypeComments: "Parent comment"
 
     ShoppingBasket {
         int CartID "PK auto_inc"
@@ -230,8 +240,6 @@ erDiagram
     ShoppingBasket }|--|| Marketplace: Item
 
 ```
-<!-- TODO UPDATE SCHEMA WITH COMMENTS -->
-<!-- TODO UPDATE SCHEMA WITH BASKET -->
 
 #### Transaction Log
 
@@ -244,6 +252,10 @@ There exist the ability to comment on itemTypes, This allows user to add comment
 For a user to be allowed to comment on an itemtype, they need to have been in possession of them item, hover briefly.
 This is accomplished by looking att the transaction log, this allows us to test if that itemtype have ever been sold to the user,
 this includes when an item is created since that is also tracked in the log
+
+Comments can also be related to another comment as to achieve hierarchical comment structure,
+note that for this to work the parent comment must have the same Type ID as this is the column that is quired on,
+there currently exist no constraint to enforce this in the backend or database, the behavior of breaking this has not been studied.
 
 #### Shopping basket
 
@@ -303,44 +315,101 @@ TODO *from task description*: Test case specifications (manual testing, related 
 11. As a User I want to be able to sort the market by different metrics (time, price, alphabetically). To display the market in the way i prefer.
 
 12. As a Users I want to be able to buy items from the marketplace, In order to get that item to my inventory.
-    
+
 13. As A Admin I want to be able to create a new itemtype that can be added as an item to users inventories.
-14. As A User I want to be able to make comments on itemstypes i have owned.
+
+14. As A User I want to be able to make comments on items types i have owned.
+
 15. As A User I want to be able to remove a comment I have made.
+
 16. As A User I want to be able to view comments made on an itemtype.
-17. As A Admin I want to be able to remove commets made by users.
+
+17. As A Admin I want to be able to remove comments made by users.
+
 18. As A Admin I want to be able to remove marketplace listings made by users.
+
 19. As a Admin I want to be able to view the transaction log, and filter it based on Users.
+
+20. As a Admin i should be able to spoof a user id, allowing me to complete actions as that users.
 
 ### Testing
 
-1. To register An account The User should press on the "register your account button" that should take the user to a different page.The user should then fill in a user name and password and press the register button. When the button is pressed a http call to the backend to register a new user with the details the user filled in. The backend should take the request and make a new account in the db and return a userID and token.
-TODO add checks and handle non unique usernames
+1. To register An account The User should press on the "register your account button" that should take the user to a different page.
+The user should then fill in a user name and password and press the register button. When the button is pressed a http call to the backend to register a new user with the details the user filled in. The backend should take the request and make a new account in the db and return a userID and token.\
+**TODO** add checks and handle non unique usernames \
+**NOTE** No need to log in the user
 
-2. To log into an account the user should enter username and password in their input felids and press the button/ press enter on their keyboard. That should send a http call with the information to the backend that should return a userId and a token if matching and an error if not
+2. To log into an account the user should enter username and password in their input felids and press the button or press enter on their keyboard.
+That should send a http call with the information to the backend that should return a userId and a token if matching and an error if not.
+If the backend call was successful to user should be redirected to marketplace.
 
 3. When logged in a user should be able to press the "profile" button in the navbar, it should take them to the profile page and should display the users ID.
+It should also request the backend for transactions where user was seller of buyer, if user token is invalid the view of transactions should be empty.
 
-4. When on the profile website the User should be able to update their user information by entering the new data into the fields and pressing the "save changes" button. That should send a http call to the backend that should check the token to see if the token has permissions for that userID, If it doesn't it should return an error and if it does it should update the information in the DB and return oldname + newname or old psw + new psw.
+4. When on the profile website the User should be able to update their user information by entering the new data into the update username or update password
+and pressing the "submit username" or "submit password" button.
+That should send a http call to the backend that should check the token to see if the token has permissions for that userID,
+If it doesn't it should return an error and if it does it should update the information in the DB.
 
-5. As a user I should be able to press the inventory button in the navbar. That should display the users wallet. It should also display the users items in a table with a distinction if they are in the marketplace or not. If they are not in the marketplace it should display a sell option with a input prompt and a sell button, and if it is in the marketplace it should display a button to recall the item from the marketplace.
+5. As a user I should be able to press the inventory button in the navbar. That should display the users wallet.
+It should also display the users items in a table with a distinction if they are in the marketplace or not.
+If they are not in the marketplace it should display a sell option with a input prompt and a sell button,
+and if it is in the marketplace it should display a button to recall the item from the marketplace.
+Before data is sent to the frontend the token is validated to see if the user is the owner or an admin.
+if not an error is returned.
 
-6. To add money to to their wallet the user should type the users ID and amount in the input fields under "add money to wallet" and press the "add money" button. That should send a http call to the backend where it should check if the active user can add money to that wallet, if it cant it should return an error. If it can it should add the money (in the DB) to the wallet of the user and return the total amount of money now in that persons wallet.
+6. To add money to to their wallet the admin should type the users ID and amount in the input fields under "add money to wallet" and press the "add money" button.
+That should send a http call to the backend where it should check if the active user is an Admin, if it can't the backend should return an error.
+If it can it should add the money (in the DB) to the wallet of the user and return 200 ok.
 
-7. To add a new item to a users inventory the user should add the users id and the itemType in their respective fields under "create item" and press the button "create item". That should send a http call to the backend, where it should check if the one who sent the request can add items to that inventory. It should also check if the itemtype exists. and return an error if they dont. If it passes the checks it should send to the DB to add that the item to that users inventory and return the ItemID, userId and itemtype.
+7. To add a new item to a users inventory the admin should add the users id and the itemType in their respective fields under "create item" and press the button "create item".
+That should send a http call to the backend, where it should check if the one who sent the request is an admin.
+It should also check if the itemtype exists. And return an error if they don't.
+If it passes the checks it should send to the DB to add that the item to that users inventory and return the ItemID, userId and itemtype.
 
-8. A user should be able to sell an item from their inventory that is not already on the marketplace by entering the price in items row and press sell. That should send a http call to the backend, that should check if the caller can sell that users items, and return an error if it shouldn't. if it should it will add the item to the marketplace table in the db and return the OfferID.
-TODO
+8. A user should be able to sell an item from their inventory that is not already on the marketplace by entering the price in items row and press sell.
+That should send a http call to the backend, that should check if the caller can sell that users items (the user is the owner or an admin), and return an error if it shouldn't.
+If it can it will add the item to the marketplace table in the db and return the OfferID.
 
-9. A user should be able to remove a listed item from the marketplace that they have access to by pressing the "recall" button. That should send a http call to the backend where it checks if the caller can recall that persons items and return an error if not. If it should it should update the DB by removing the item from the marketplace table and returning the offerID
-TODO
+9. A user should be able to remove a listed item from the marketplace that they have access (either is the owner or an admin) to by pressing the "remove listing" button.
+That should send a http call to the backend where it checks if the caller can recall that persons items and return an error if not.
+If it should it should update the DB by removing the item from the marketplace table.
 
-10. When a user is on the marketplace it should display all the items on the marketplace in the sorted order, on the left side it should display what they are sorted by. This data should be gathered with an http call from when the user loads the site. that call should return all the items in json format.
+10. When a user is on the marketplace it should display all the items on the marketplace in the sorted order, on the left side it should display what they are sorted by.
+This data should be gathered with an http call from when the user loads the site. that call should return all the items in json format.
 
 11. A user should be able to change the order the items are displayed in by pressing the section bar and selecting another method. That should send a call to the backend where that calls the db for the marketplace information to be returned in that order. it should then update the table with all the items to the marketplace sorted in the new order.
+    - Newest
+    - Oldest
+    - Price_Ascending
+    - Price_Descending
+    - Alphabetically_Ascending
+    - Alphabetically_Descending
 
-12. A user should be able to buy an item by pressing the "buy" button on the row that item is displayed in. That should send a http call to the backend. The backend will perform checks to see that you are not buying your own item, you have sufficient funds etc. and return an error if it fails a check. if not the item should be transferred to the new owner, funds should be updated and and a transaction should be added to the transaction log in the db. then return the OfferID
-TODO
+12. A user should be able to buy an item by pressing the "buy" button on the row that item is displayed in.
+That should send a http call to the backend. The backend will perform checks to se if the sender of the http is the same of the buyer or an admin, and that the user have sufficient funds.
+And return an error if it fails a check. if not the item should be transferred to the new owner, funds should be updated and and a transaction should be added to the transaction log in the db.
+
+13. In the Admin page an admin should be able to add an new itemtype, by filling in information like name, descriptionUrl, imageUrl and short description, using the create itemtype button an http request should be sent to the backend, the request should be checked at the backend to see if the user is an admin otherwise return an error. If the user is an admin, the type should be added to the data base.
+
+14. A user should be able when in market place page to add a comment to ether an itemtype or another comment, by filling out the fields grade and comment.
+When user presses post button the a request should be sent to the backend where its checked if the user have ever owned the item.
+Another check is done to determine if the token matches the user or the token belongs to an admin.
+if the checks pass a new comment should be added to the database.
+
+15. A user should be able to remove a comment they have made bu pressing a button next to their comment, a request should be sent the the backend where its the token is checked to se if the user is the commenter or an admin. if so the comment is remove, as well as all its children comments.
+
+16. A user should be able to view comments on a itemtype by clicking it in the marketplace page, this should be facilitated by an request to the backend.
+The comments should be hierarchically ordered with some comments att the top level and each child comment should be more indented than the parent.
+
+17. A Admin should be able to remove a comment they have made buy pressing a button next to the comment, a request should be sent the the backend where its the token is checked to se if the user is an admin. if so the comment is remove, as well as all its children comments.
+
+18. An admin should be able to remove marketplace listings made by other users, \
+**TODO** currently this is only possible by the Spoof user feature, (changing userid while keeping the admin token, available in the admin panel)
+
+19. an admin should be able the search the transaction log in the admin page for specif user or all, this should be supported by an request to the backend with the desired userid or "all". The backend should check if the token matches the requested user or if the user is an admin, if not an error should be returned.
+
+20. An admin should be able to spoof another user by entering their userid in the admin page. This should change all outgoing request to use that userid.
 
 ## Reflection
 
@@ -351,7 +420,7 @@ TODO *from task description* A reflection of the system's limitations and the po
 The frontend framework that was decided on was React
 as it is the most popular framework today. The code was written in TypeScript to get more reliabilty from the typed nature of the language.
 
-This might have been a downside since non uf the developers had worked with neither react ot ts before causing a lot of headaches in development. Most of them stem from not knowing the right way to work with the tools leading to some hacks having to stay in place to hold it together in some places.
+This might have been a downside since non off the developers had worked with neither react ot ts before causing a lot of headaches in development. Most of them stem from not knowing the right way to work with the tools leading to some hacks having to stay in place to hold it together in some places.
 Other then that the langauge offered a lot of tools to do anything you wanted with most of our problems already having documented solutions
 on stackoverflow or other websites.
 
@@ -1024,8 +1093,10 @@ Success
 ## References
 
 ### Olle
+
 Important
 Informal
+
 - [go database/sql](https://go.dev/doc/tutorial/database-access)
 - [go database driver](https://github.com/go-sql-driver/mysql/)
 - [golang docker](https://hub.docker.com/_/golang)
@@ -1033,43 +1104,46 @@ Informal
 - [CORS managing] (Enabling CORS in Golang)
 - [go sql null](https://medium.com/@dual/ways-to-handle-sql-null-values-in-go-e237f31b82fc)
 
+### Shaya
 
-### Shaya:
-- [http connections] https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-- [general react syntax] https://react.dev/reference/react
-- [private routes] https://www.robinwieruch.de/react-router-private-routes/
-- [navigation/redirects] https://api.reactrouter.com/v7/functions/react_router.useNavigate.html
+- [http connections] <https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch>
+- [general react syntax] <https://react.dev/reference/react>
+- [private routes] <https://www.robinwieruch.de/react-router-private-routes/>
+- [navigation/redirects] <https://api.reactrouter.com/v7/functions/react_router.useNavigate.html>
 - [chatgpt] (For implementing hashroutes, due to browserRoutes causing the site to crash on reloads)
 
-### Malcolm:
-#### Important:
-- [cyberpunk css style] https://www.cssscript.com/demo/cyberpunk-2077/
-- [crt screen affects] https://medium.com/@dovid11564/using-css-animations-to-mimic-the-look-of-a-crt-monitor-3919de3318e2 
-- https://codepen.io/lbebber/pen/XJRdrV/ 
-- https://codesandbox.io/p/sandbox/crt-terminal-in-css-js-tlijm?file=%2Findex.html
-- https://stackoverflow.com/questions/70498819/retro-crt-curved-screen-effect-for-website-ccs
-- https://aleclownes.com/2017/02/01/crt-display.html
+### Malcolm
+
+#### Important
+
+- [cyberpunk css style] <https://www.cssscript.com/demo/cyberpunk-2077/>
+- [crt screen affects] <https://medium.com/@dovid11564/using-css-animations-to-mimic-the-look-of-a-crt-monitor-3919de3318e2>
+- <https://codepen.io/lbebber/pen/XJRdrV/>
+- <https://codesandbox.io/p/sandbox/crt-terminal-in-css-js-tlijm?file=%2Findex.html>
+- <https://stackoverflow.com/questions/70498819/retro-crt-curved-screen-effect-for-website-ccs>
+- <https://aleclownes.com/2017/02/01/crt-display.html>
 - And AI (to assist in putting things together)
-https://www.youtube.com/watch?v=Gy4G68WoHq4 
+<https://www.youtube.com/watch?v=Gy4G68WoHq4>
 
 #### Informal
-- [react tutorial] https://www.youtube.com/watch?v=SqcY0GlETPk
-- [CSS examples] https://getbootstrap.com/
-- [user input] https://stackoverflow.com/questions/53071851/getting-the-value-from-input-element-in-typescript
-- https://stackoverflow.com/questions/57302715/how-to-get-input-field-value-on-button-click-in-react
-- https://www.youtube.com/watch?v=zR5FoKMAJp4
+
+- [react tutorial] <https://www.youtube.com/watch?v=SqcY0GlETPk>
+- [CSS examples] <https://getbootstrap.com/>
+- [user input] <https://stackoverflow.com/questions/53071851/getting-the-value-from-input-element-in-typescript>
+- <https://stackoverflow.com/questions/57302715/how-to-get-input-field-value-on-button-click-in-react>
+- <https://www.youtube.com/watch?v=zR5FoKMAJp4>
 
 ### General
-- https://stackoverflow.com/questions/54300334/react-change-state-based-on-select-option
-- https://www.w3schools.com/react/react_useeffect.asp
-- https://stackoverflow.com/questions/3304014/how-to-interpolate-variables-in-strings-in-javascript-without-concatenation
-- https://stackoverflow.com/questions/29051368/how-do-i-make-a-button-fill-in-a-td-completely
-- https://stackoverflow.com/questions/47270595/how-to-parse-json-string-to-struct
-- https://medium.com/@prashant2018/parse-json-string-to-struct-object-in-golang-59d3cf6bce7
-- https://www.w3schools.com/css/css_text.asp
-- https://dev.to/writech/how-to-handle-the-mouse-hover-event-in-react-h7h
-- https://stackoverflow.com/questions/27827234/how-to-handle-the-onkeypress-event-in-reactjs
-- https://dev.to/silvenleaf/fetch-api-easiest-explanation-part-4-4-delete-by-silvenleaf-4376
-- https://go.dev/blog/routing-enhancements
-- https://git-scm.com/docs/git-merge
 
+- <https://stackoverflow.com/questions/54300334/react-change-state-based-on-select-option>
+- <https://www.w3schools.com/react/react_useeffect.asp>
+- <https://stackoverflow.com/questions/3304014/how-to-interpolate-variables-in-strings-in-javascript-without-concatenation>
+- <https://stackoverflow.com/questions/29051368/how-do-i-make-a-button-fill-in-a-td-completely>
+- <https://stackoverflow.com/questions/47270595/how-to-parse-json-string-to-struct>
+- <https://medium.com/@prashant2018/parse-json-string-to-struct-object-in-golang-59d3cf6bce7>
+- <https://www.w3schools.com/css/css_text.asp>
+- <https://dev.to/writech/how-to-handle-the-mouse-hover-event-in-react-h7h>
+- <https://stackoverflow.com/questions/27827234/how-to-handle-the-onkeypress-event-in-reactjs>
+- <https://dev.to/silvenleaf/fetch-api-easiest-explanation-part-4-4-delete-by-silvenleaf-4376>
+- <https://go.dev/blog/routing-enhancements>
+- <https://git-scm.com/docs/git-merge>
