@@ -56,6 +56,7 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
   }, [onClose]);
 
   const listComments = () => {
+    // e.preventDefault()
     if (itemId === null) return; // Handle case when itemId is null
     const fetchString = `http://${globalAddr}/ItemType/${itemId}`;
     fetch(fetchString, { method: "GET" })
@@ -75,13 +76,13 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
     return <div>Loading...</div>;
   }
 
-  function MakeReview(parentID: number | null) {
+  function MakeReview1(parentID: number | null) {
     // e.preventDefault();
 
-    let rating: number = (document.getElementById("rating") as HTMLInputElement)
+    let rating: number = (document.getElementById("rating1") as HTMLInputElement)
       .valueAsNumber;
     let comment: string = (
-      document.getElementById("comment") as HTMLInputElement
+      document.getElementById("comment1") as HTMLInputElement
     ).value;
 
     let tmp: MakeComment = {
@@ -90,7 +91,39 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
       Comment: comment,
       ParentCommentID: parentID,
     };
-    console.log(tmp);
+    // console.log(tmp);
+
+    const fetchString = `http://${globalAddr}/ItemType/${itemId}`;
+    fetch(fetchString, {
+      method: "POST",
+      body: JSON.stringify(tmp),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      }); // kastar error när det funkar?????????????
+    setNum(num + 1);
+  }
+
+  function MakeReview2(parentID: number | null) {
+    // e.preventDefault();
+
+    let rating: number = (document.getElementById("rating2") as HTMLInputElement)
+      .valueAsNumber;
+    let comment: string = (
+      document.getElementById("comment2") as HTMLInputElement
+    ).value;
+
+    let tmp: MakeComment = {
+      UserID: Number(localStorage.getItem("uid")),
+      Grade: rating,
+      Comment: comment,
+      ParentCommentID: parentID,
+    };
+    // console.log(tmp);
 
     const fetchString = `http://${globalAddr}/ItemType/${itemId}`;
     fetch(fetchString, {
@@ -110,7 +143,7 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
   function DeleteComment(num: number) {
     // e.preventDefault();
     const fetchString = `http://${globalAddr}/comment/deletecomment/${num}`;
-    console.log(fetchString);
+    // console.log(fetchString);
     fetch(fetchString, { method: "GET" })
       .then((response) => console.log(response))
       .catch((error) => console.error("Error: ", error));
@@ -118,7 +151,7 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
   }
 
   function grow(commentList: PubComment[]) {
-    console.log(itemTypeReturn?.Comments);
+    // console.log(itemTypeReturn?.Comments);
     const commentDict = new Map<number, fml>();
 
     // initiates them all with their key: id, value: itself, emptyList
@@ -193,12 +226,12 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
             </p>
           </div>
         )}
-        <form method="post" onSubmit={() => MakeReview(commentStruct.theComment.CommentID)}>
+        <form method="post" onSubmit={() => MakeReview1(commentStruct.theComment.CommentID)}>
         <label>
-          rating <input name="rating" type="number" id="rating" />
+          rating <input name="rating" type="number" id="rating1" />
         </label>
         <label>
-          Comment: <input name="comment" type="text" id="comment" />
+          Comment: <input name="comment" type="text" id="comment1" />
         </label>
         <br />
         <button type="submit">Submit Comment</button>
@@ -241,13 +274,13 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
         )}
       </div>
       <h2>Review ItemType</h2>
-      <form method="post" onSubmit={() => MakeReview(null)}>
+      <form method="post" onSubmit={(event) => {MakeReview2(null); event.preventDefault();} }>
         <label>
-          rating <input name="rating" type="number" id="rating" />
+          rating <input name="rating" type="number" id="rating2" />
         </label>
         <br></br>
         <label>
-          Comment: <input name="comment" type="text" id="comment" />
+          Comment: <input name="comment" type="text" id="comment2" />
         </label>
         <br></br>
         <br />
