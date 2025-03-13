@@ -63,9 +63,8 @@ function AdminPage() {
     })
       .then((response) => {
         response.ok
-          ? console.log("Successfully executed request")
-          : alert("Invalid input");
-        window.location.reload();
+          ? window.location.reload()
+          : response.text().then((r) => alert(r));
       })
       .catch((error) => {
         alert("Error attempting to create an item :" + error);
@@ -92,7 +91,7 @@ function AdminPage() {
       method: "POST",
       body: JSON.stringify(tmp),
     })
-      .then((response) => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .then((data) => {
         console.log(data);
       })
@@ -136,7 +135,7 @@ function AdminPage() {
       method: "POST",
       body: JSON.stringify(tmp),
     })
-      .then((response) => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .then((data) => {
         console.log(data);
       })
@@ -162,7 +161,7 @@ function AdminPage() {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }),
     })
-      .then((response) => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .then((transactionLog) => {
         setTransactionLog(transactionLog);
       })

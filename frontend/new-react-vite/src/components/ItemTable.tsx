@@ -26,7 +26,7 @@ const ItemTableComponent = () => {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }),
     })
-      .then((response) => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .then((useritems) => {
         setUserItems(useritems)
         console.log(useritems)

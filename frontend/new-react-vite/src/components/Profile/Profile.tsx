@@ -36,7 +36,7 @@ function Profile() {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }),
     })
-      .then((response) => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .then((transactionLog) => {
         setTransactionLog(transactionLog);
       })
@@ -62,7 +62,7 @@ function Profile() {
       }),
       body: JSON.stringify(tmp)
     })
-    .then((response) => console.log(response))
+      .then((response) => response.ok ? null : response.text().then((r) => alert(r)))
     .catch((error) => {
       console.log(error);
     });
@@ -86,7 +86,7 @@ function Profile() {
       }),
       body: JSON.stringify(tmp)
     })
-    .then((response) => console.log(response))
+      .then((response) => response.ok ? null : response.text().then((r) => alert(r)))
     .catch((error) => {
       console.log(error);
     });

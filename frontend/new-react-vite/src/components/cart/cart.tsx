@@ -30,7 +30,7 @@ function Cart(){
           "Authorization": "Bearer " + localStorage.getItem("token")
         }),
       })
-        .then((response) => response.json())
+        .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
         .then((cartItems) => {
           setCartItems(cartItems);})
         .catch((error) => console.error("Error: ", error))},[])
@@ -43,9 +43,13 @@ function Cart(){
         "Authorization": "Bearer " + localStorage.getItem("token")
       }), body: jsonItem
     }) 
-    .then((response) => {response.json()
-      window.location.reload();
-      alert("Item successfully removed from cart")
+      .then((response) => {
+        if (response.ok) {
+          window.location.reload();
+          alert("Item successfully removed from cart")
+        } else {
+          response.text().then((r) => alert(r))
+        }
       
     })
     .catch((error) => console.error("Error: ", error));
@@ -57,8 +61,13 @@ function Cart(){
         "Authorization": "Bearer " + localStorage.getItem("token")
       }),
     }) 
-    .then((response) => {response.json()
-      alert("Items successfully checked out from cart")
+      .then((response) => {
+        if (response.ok) {
+          alert("Items successfully checked out from cart")
+        window.location.reload();
+      } else {
+        response.text().then((r) => alert(r))
+      }
     })
     .catch((error) => console.error("Error: ", error))
   }
