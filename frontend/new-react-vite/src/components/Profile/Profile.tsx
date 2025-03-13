@@ -72,7 +72,7 @@ function Profile() {
     e.preventDefault()
 
     let newPswd: string = (
-      document.getElementById("newUsername") as HTMLInputElement
+      document.getElementById("newPassword") as HTMLInputElement
     ).value;
     let tmp: updateUserInfoDataPswd = {
       new_pswd: newPswd
