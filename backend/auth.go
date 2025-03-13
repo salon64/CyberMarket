@@ -11,9 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
-// import "database/sql"
+type Queryer interface {
+    Query(string, ...interface{}) (*sql.Rows, error)
+    QueryRow(string, ...interface{}) *sql.Row
+    Prepare(string) (*sql.Stmt, error)
+    Exec(string, ...interface{}) (sql.Result, error)
+}
 
-func AuthByHeader(r *http.Request, resourceOwner int, db *sql.DB) (bool, error) {
+
+func AuthByHeader(r *http.Request, resourceOwner int, db Queryer) (bool, error) {
 	auth_row := r.Header.Get("Authorization")
 	log.Println(auth_row)
 
@@ -31,7 +37,7 @@ func AuthByHeader(r *http.Request, resourceOwner int, db *sql.DB) (bool, error) 
 
 // This returns true if the token passes is valid and the token owner matches the resourceOwner
 // Note currently that if the suer is an admin, access is always given
-func AuthByToken(token string, resourceOwner int, db *sql.DB) (bool, error) {
+func AuthByToken(token string, resourceOwner int, db Queryer) (bool, error) {
 	// select user ID user role and creation data of token
 	row := db.QueryRow(`
 		SELECT TokenTable.UserID, Users.Role, TokenTable.CreatedOn
