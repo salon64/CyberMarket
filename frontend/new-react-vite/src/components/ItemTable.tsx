@@ -20,7 +20,12 @@ const ItemTableComponent = () => {
   const [userItems, setUserItems] = useState<UserItemInterface[]>([]);
   let fetchString = "http://"+globalAddr+"/inventory/" + localStorage.getItem("uid")
   useEffect(() => {
-    fetch(fetchString, { method: "GET" }) // Replace with your actual API URL
+    fetch(fetchString, {
+      method: "GET",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+    })
       .then((response) => response.json())
       .then((useritems) => {
         setUserItems(useritems)
@@ -34,7 +39,12 @@ const ItemTableComponent = () => {
     console.log(it.ItemID);
     var adr: string = "http://"+globalAddr+"/Marketplace/removeListing/" + it.ItemID
     console.log(adr)
-    fetch(adr, { method: "GET" })
+    fetch(adr, {
+      method: "GET",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+    })
       .then((response) => {
         if (response.ok === true) {
           alert("Item removed from marketplace");
@@ -54,7 +64,13 @@ const ItemTableComponent = () => {
     //alert("test");
     console.log(JSON.stringify(tmp));
     console.log("start")
-    fetch("http://"+globalAddr+"/Marketplace/addListing", { method: "POST", body: JSON.stringify(tmp) })
+    fetch("http://" + globalAddr + "/Marketplace/addListing", {
+      method: "POST",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+      body: JSON.stringify(tmp)
+    })
       .then((response) => {
         if (response.ok === true) {
           console.log(JSON.stringify(tmp));

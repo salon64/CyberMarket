@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type inCheckout struct {
@@ -14,6 +15,21 @@ type inCheckout struct {
 
 // returns all items in users cart. same format as list marketplace
 func displayCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+
+	uid, err := strconv.Atoi(r.PathValue("UserID"))
+	if err != nil {
+		sendAndLogError(w,http.StatusBadRequest, "invalid user id: ", err.Error())
+		return
+	}
+
+	// no transaction needed since userid is used in the query and not indirectly refereed, 
+	// therefore can not change before important our evaluation
+	ok, _ := AuthByHeader(r,uid,db)
+	if !ok {
+		sendAndLogError(w,http.StatusForbidden,"auth failed")
+		return
+	}
+
 	row, err := db.Query((`SELECT inv.ItemID, inv.TypeID, inv.UserID,
 		u.Username,
 		it.ItemName, it.ItemDescription, it.ImgURL, 
@@ -22,7 +38,7 @@ func displayCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		INNER JOIN Inventory inv ON mp.ItemID = inv.ItemID
 		INNER JOIN ItemTypes it ON inv.TypeID = it.TypeID
 		INNER JOIN Users u ON u.UserID = inv.UserID 
-		WHERE mp.OfferID IN (SELECT OfferID FROM ShoppingCart WHERE UserID = ?);`), r.PathValue("UserID"))
+		WHERE mp.OfferID IN (SELECT OfferID FROM ShoppingCart WHERE UserID = ?);`), uid)
 
 	if isErrLog(w, err) {
 		return
@@ -79,12 +95,18 @@ func addToCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err := decoder.Decode(&data)
 
 	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		sendAndLogError(w, http.StatusBadRequest, "Error decoding json: ", err.Error())
 		return
 	}
-	log.Printf("with data %v", data)
+
+	// is the user making the cart order the owner of the cart or an admin
+	// no transaction needed since userid is used in the query and not indirectly refereed, 
+	// therefore can not change before important our evaluation
+	ok, _ := AuthByHeader(r,data.UserID, db)
+	if !ok {
+		sendAndLogError(w, http.StatusForbidden, "auth failed")
+		return
+	}
 
 	t, _ := db.Begin()
 	_, err = t.Exec("insert into ShoppingCart(UserID, OfferID) values (?, ?);", data.UserID, r.PathValue("OfferID"))
@@ -92,12 +114,15 @@ func addToCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// if error write error and exit
 	if err != nil {
 		t.Rollback()
-		(*w).WriteHeader(http.StatusInternalServerError)
-		log.Printf("ShoppingCart insertion error: %s", err)
-		fmt.Fprintf(*w, "ShoppingCart insertion error: %s", err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "ShoppingCart insertion error: ", err.Error())
 		return
 	}
-	t.Commit()
+	err = t.Commit()
+	if err != nil {
+		t.Rollback()
+		sendAndLogError(w, http.StatusInternalServerError, "failed to commit new cart row: ", err.Error())
+		return
+	}
 
 	fmt.Fprintf(*w, "%s", r.PathValue("OfferID"))
 
@@ -116,27 +141,30 @@ func checkCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err := decoder.Decode(&data)
 
 	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
+		sendAndLogError(w, http.StatusBadRequest, "error decoding: ", err.Error())
 		return
 	}
-	log.Printf("with data %v", data)
 
-	t, _ := db.Begin()
+	// test if user owns the cart, or is an admin
+	// no transaction needed since userid is used in the query and not indirectly referenced, 
+	// therefore can not change before important our evaluation
+	ok, _ := AuthByHeader(r,data.UserID,db)
+	if !ok {
+		sendAndLogError(w, http.StatusForbidden, "auth failed")
+		return
+	}
+
 	var count int
-	err = db.QueryRow("SELECT COUNT(*) FROM ShoppingCart WHERE UserID = ? AND OfferID = ?", data.UserID, r.PathValue("OfferID")).Scan(&count)
+	err = db.QueryRow("SELECT COUNT(1) FROM ShoppingCart WHERE UserID = ? AND OfferID = ?", data.UserID, r.PathValue("OfferID")).Scan(&count)
 
 	// if error write error and exit
 	if err != nil {
-		t.Rollback()
 		(*w).WriteHeader(http.StatusInternalServerError)
 		log.Printf("ShoppingCart check query error: %s", err)
 		fmt.Fprintf(*w, "ShoppingCart check query error: %s", err.Error())
 		return
 	}
 
-	t.Commit()
 	tmp := inCheckout{InCheckout: count}
 	json, err := json.MarshalIndent(tmp, "", "    ")
 
@@ -151,7 +179,7 @@ func checkCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Fprint(*w, string(json))
 }
 
-// Removes an item forom the users cart, pahtvalue is offerid and struct contains userod
+// Removes an item from the users cart, path value is offer id and struct contains userid
 func removeFromCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var data UserStruct
 
@@ -167,6 +195,15 @@ func removeFromCart(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		sendAndLogError(w, http.StatusBadRequest, "error decoding: ", err.Error())
 		return
 	}
+
+	// no transaction needed since userid is used in the query and not indirectly referenced, 
+	// therefore can not change before important our evaluation
+	ok, _ := AuthByHeader(r,data.UserID,db)
+	if !ok {
+		sendAndLogError(w, http.StatusForbidden, "auth failed")
+		return
+	}
+
 
 	_, err = db.Exec("DELETE FROM ShoppingCart WHERE (UserID, OfferID) = (?, ?);", data.UserID, r.PathValue("OfferID"))
 
@@ -187,13 +224,26 @@ type cartStruckt struct {
 
 func buyCart(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
+	uid, err := strconv.Atoi(r.PathValue("UserID"))
+	if err != nil {
+		sendAndLogError(&w,http.StatusBadRequest, "invalid user id: ", err.Error())
+		return
+	}
+
+
+	// no transaction needed since userid is used directly in the query and not indirectly referenced, 
+	// therefore can not change before important our evaluation
+	ok, _ := AuthByHeader(r,uid,db)
+	if !ok {
+		sendAndLogError(&w, http.StatusForbidden, "auth failed")
+		return
+	}
+
 	// begin a sql transaction
 	t, err := db.Begin()
 
-	// TODO use other util func here
 	if isErrLog(&w, err) {
-		log.Print("HERE")
-
+		sendAndLogError(&w,http.StatusInternalServerError, "failed to begin transaction: ", err.Error())
 		return
 	}
 
@@ -246,9 +296,8 @@ func buyCart(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		LEFT JOIN Inventory ON Marketplace.ItemID = Inventory.ItemID
 		WHERE ShoppingCart.UserID = ?;`, r.PathValue("UserID"))
 	if isErrLog(&w, err) {
-		log.Print("HERE 6")
-
 		t.Rollback()
+		sendAndLogError(&w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	defer rows.Close()
@@ -260,8 +309,7 @@ func buyCart(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		var price, owner, itemID int
 		err = rows.Scan(&price, &itemID, &owner)
 		if isErrLog(&w, err) {
-			log.Print("HERE 7")
-
+			sendAndLogError(&w, http.StatusInternalServerError, err.Error())
 			t.Rollback()
 			return
 		}
@@ -273,8 +321,7 @@ func buyCart(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		// update owner
 		_, err = t.Exec(`UPDATE Inventory SET UserID = ? WHERE Inventory.ItemID = ? ;`, r.PathValue("UserID"), cart_item.itemid)
 		if err != nil {
-			log.Print("HERE 8")
-
+			sendAndLogError(&w, http.StatusInternalServerError, err.Error())
 			t.Rollback()
 			return
 		}
@@ -282,8 +329,7 @@ func buyCart(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		// add funds to item owner
 		_, err = t.Exec(`UPDATE Users SET Wallet = Wallet + ? WHERE Users.UserID = ? ;`, cart_item.price, cart_item.owner)
 		if err != nil {
-			log.Print("HERE 9")
-
+			sendAndLogError(&w, http.StatusInternalServerError, err.Error())
 			t.Rollback()
 			return
 		}
@@ -292,8 +338,7 @@ func buyCart(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		// will also delete from the cart as the relation is set to cascade
 		_, err = db.Exec("DELETE FROM Marketplace WHERE ItemID = ?;", cart_item.itemid)
 		if err != nil {
-			log.Print("HERE 10")
-
+			sendAndLogError(&w, http.StatusInternalServerError, err.Error())
 			t.Rollback()
 			return
 		}
@@ -301,8 +346,7 @@ func buyCart(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		_, err = t.Exec(`INSERT INTO TransactionLog (Price, Date, ItemID, Buyer, Seller) 
 			VALUES (?, NOW(), ?, ?, ?);`, cart_item.price, cart_item.itemid, r.PathValue("UserID"), cart_item.owner)
 		if err != nil {
-			log.Printf("HERE 11 %s", err.Error())
-
+			sendAndLogError(&w, http.StatusInternalServerError, err.Error())
 			t.Rollback()
 			return
 		}
@@ -310,8 +354,7 @@ func buyCart(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	err = t.Commit()
 	if isErrLog(&w, err) {
-		log.Print("HERE 12")
-
+		sendAndLogError(&w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	fmt.Fprint(w, "bought items from cart")

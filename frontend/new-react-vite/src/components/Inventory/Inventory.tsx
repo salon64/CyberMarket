@@ -8,7 +8,13 @@ const Inventory = () => {
   getMoney()
 
   function getMoney() {
-    fetch("http://"+globalAddr+"/user/getMoney/" + localStorage.getItem("uid"), { method: "GET" })
+    fetch("http://" + globalAddr + "/user/getMoney/" + localStorage.getItem("uid"),
+      {
+        method: "GET",
+        headers: new Headers({
+          "Authorization": "Bearer " + localStorage.getItem("token")
+        }),
+      })
       .then(response => response.json())
       .then(data => {
         console.count(data)

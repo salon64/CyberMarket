@@ -80,6 +80,9 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
   
       const fetchString = `http://${globalAddr}/ItemType/${itemId}`;
       fetch(fetchString, {
+        headers: new Headers({
+          "Authorization": "Bearer " + localStorage.getItem("token")
+        }),
         method: "POST",
         body: JSON.stringify(tmp),
       })
@@ -95,7 +98,12 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
     // e.preventDefault();
     const fetchString = `http://${globalAddr}/comment/deletecomment/${num}`;
     console.log(fetchString)
-    fetch(fetchString, {method: 'GET'})
+    fetch(fetchString, {
+      method: 'GET',
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+    })
       .then((response) => console.log(response))
       .catch((error) => console.error("Error: ", error))
   };

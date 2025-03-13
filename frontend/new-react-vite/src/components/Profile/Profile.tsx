@@ -30,7 +30,12 @@ function Profile() {
     var fetchString =
       `http://${globalAddr}/displayTransactionslog/` +
       localStorage.getItem("uid");
-    fetch(fetchString, { method: "GET" })
+    fetch(fetchString, {
+      method: "GET",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+    })
       .then((response) => response.json())
       .then((transactionLog) => {
         setTransactionLog(transactionLog);
@@ -67,7 +72,7 @@ function Profile() {
     e.preventDefault()
 
     let newPswd: string = (
-      document.getElementById("newUsername") as HTMLInputElement
+      document.getElementById("newPassword") as HTMLInputElement
     ).value;
     let tmp: updateUserInfoDataPswd = {
       new_pswd: newPswd

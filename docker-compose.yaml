@@ -17,6 +17,11 @@ services:
       - DBHOST=mysql:3306
       - DBUSER=root
       - DBPASS=pswd
+      # - CERT_FILE_PATH=/CERT/CERT
+      # - CERT_KEY_FILE_PATH=/CERT/KEY
+    # volumes:
+    #   - ${CERT_FILE_PATH}:/CERT/CERT
+    #   - ${CERT_KEY_FILE_PATH}:/CERT/KEY
 
   mysql:
     image: mysql:8.0

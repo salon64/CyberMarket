@@ -20,18 +20,18 @@ type PubUser struct {
 	Id   int
 	Name string
 }
-
-type UserMoney struct {
-	UserID int
-	Money  int
-}
-
 type Money struct {
 	Amount int
 }
 
 // list all the users
-func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
+func listAllUsers(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+
+	ok, _ := AuthByHeader(r,-1,db)
+	if !ok {
+		sendAndLogError(w,http.StatusForbidden, "Auth failed")
+	}
+
 	// execute sql query to get username id pairs
 	row, err := db.Query("select userid, username from Users")
 
@@ -57,7 +57,7 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 
 		// write error and exit if scan fails
 		if err != nil {
-			sendAndLogError(w,http.StatusInternalServerError, "error on scanning ", err.Error())
+			sendAndLogError(w, http.StatusInternalServerError, "error on scanning ", err.Error())
 			return
 		}
 		// push user to the array
@@ -70,7 +70,7 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 
 	// write error and exit if json fails
 	if err != nil {
-		sendAndLogError(w,http.StatusInternalServerError, "error encoding return: ", err.Error())
+		sendAndLogError(w, http.StatusInternalServerError, "error encoding return: ", err.Error())
 		return
 	}
 
@@ -85,7 +85,7 @@ func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 // Errors are returned as a simple string and might not update the status code
 func userLogin(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var userInfo SimpleUserInfo
-
+	log.Print("I was here")
 	if r.Body == nil {
 		sendAndLogError(w, http.StatusBadRequest, "body was nil")
 		return
@@ -102,7 +102,7 @@ func userLogin(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// test if values aer empty strings
 	if userInfo.Name == "" || userInfo.Pswd == "" {
-		sendAndLogError(w,http.StatusBadRequest,"Either Name or Pswd is an empty string")
+		sendAndLogError(w, http.StatusBadRequest, "Either Name or Pswd is an empty string")
 		return
 	}
 
@@ -175,6 +175,16 @@ func addUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
+	userID, _ := strconv.Atoi(r.PathValue("id"))
+	
+	// no transaction needed since userid is used in the query and not indirectly referenced, 
+	// therefore can not change before important our evaluation
+	auth, _ := AuthByHeader(r, userID, db)
+	if !auth {
+		sendAndLogError(w, http.StatusForbidden, "Auth failed")
+		return
+	}
+
 	var data map[string]string
 
 	decoder := json.NewDecoder(r.Body)
@@ -184,19 +194,7 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		sendAndLogError(w, http.StatusBadRequest, "Error parsing json: ", err.Error())
 		return
 	}
-	log.Printf("update user with data %v", data)
-
-	userID, _ := strconv.Atoi(r.PathValue("id"))
-	var auth bool
-	auth, err = AuthByHeader(r, userID, db)
-	if !auth {
-		if err != nil {
-			sendAndLogError(w, http.StatusInternalServerError, "Auth failed: ", err.Error())
-		} else {
-			sendAndLogError(w, http.StatusForbidden, "Auth failed")
-		}
-		return
-	}
+	log.Printf("with data %v", data)
 
 	new_name, name_ok := data["new_name"]
 	new_pswd, pswd_ok := data["new_pswd"]
@@ -221,33 +219,26 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	(*w).WriteHeader(http.StatusOK)
 }
 
-func addMoneyToUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var data UserMoney
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&data)
-
-	if err != nil {
-		sendAndLogError(w, http.StatusBadRequest, "Error parsing json: ", err.Error())
-		return
-	}
-
-	// TODO token stuff
-	_, err = db.Exec("UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?", data.Money, data.UserID)
-	if err != nil {
-		sendAndLogError(w, http.StatusInternalServerError, "error updating user wallet: ", err.Error())
-		return
-	}
-	(*w).WriteHeader(http.StatusOK)
-}
-
 func getUserMoney(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
+	uid, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		sendAndLogError(w,http.StatusBadRequest, "invalid user id: ", err.Error())
+		return
+	}
+
+	ok, _ := AuthByHeader(r,uid,db)
+	if !ok {
+		sendAndLogError(w,http.StatusForbidden,"auth failed")
+		return
+	}
+
 	// execute sql query to get username id pairs
-	row := db.QueryRow("SELECT Wallet FROM Users WHERE UserID = ?;", r.PathValue("id"))
+	row := db.QueryRow("SELECT Wallet FROM Users WHERE UserID = ?;", uid)
 	// close the row connection when function exits
 
 	var money Money
 	// read data into user struct
-	err := row.Scan(&money.Amount)
+	err = row.Scan(&money.Amount)
 
 	// write error and exit if scan fails
 	if err != nil {

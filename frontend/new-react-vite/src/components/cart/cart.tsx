@@ -24,7 +24,12 @@ function Cart(){
   const [cartItems, setCartItems] = useState<CartItems[]>([]);
     useEffect(() => {
       var fetchString = `http://${globalAddr}/Marketplace/displayCart/` + localStorage.getItem("uid");
-      fetch(fetchString, { method: "GET" })
+      fetch(fetchString, {
+        method: "GET",
+        headers: new Headers({
+          "Authorization": "Bearer " + localStorage.getItem("token")
+        }),
+      })
         .then((response) => response.json())
         .then((cartItems) => {
           setCartItems(cartItems);})
@@ -32,7 +37,12 @@ function Cart(){
   const removeFromCart = (item: CartItems) => {
     var tmpInt: userIDInt = {UserID: Number(localStorage.getItem("uid"))}
     const jsonItem = JSON.stringify(tmpInt)
-    fetch("http://"+globalAddr+"/Marketplace/removeFromCart/"+ item.OfferID, { method: "POST", body:  jsonItem}) 
+    fetch("http://" + globalAddr + "/Marketplace/removeFromCart/" + item.OfferID, {
+      method: "POST",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }), body: jsonItem
+    }) 
     .then((response) => {response.json()
       window.location.reload();
       alert("Item successfully removed from cart")
@@ -41,7 +51,12 @@ function Cart(){
     .catch((error) => console.error("Error: ", error));
   }
   const cartCheckout = () => {
-    fetch("http://"+globalAddr+"/Marketplace/cartCheckout/"+ localStorage.getItem("uid"), { method: "GET"}) 
+    fetch("http://" + globalAddr + "/Marketplace/cartCheckout/" + localStorage.getItem("uid"), {
+      method: "GET",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+    }) 
     .then((response) => {response.json()
       alert("Items successfully checked out from cart")
     })
