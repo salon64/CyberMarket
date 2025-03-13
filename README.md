@@ -227,6 +227,12 @@ TODO *from task description*: Test case specifications (manual testing, related 
 
 12. As a Users I want to be able to buy items from the marketplace, In order to get that item to my inventory.
 
+13. As a user, I want to be able to add items/remove items from the marketplace to my cart.
+
+14. As a user, I want to be able to remove items from inside my cart.
+
+15. As a user, I want to be able to checkout all items from my cart for them to then be added to my inventory.
+
 ### Testing
 
 1. To register An account The User should press on the "register your account button" that should take the user to a different page. The user should then fill in a user name and password and press the register button. When the button is pressed a http call to the backend to register a new user with the details the user filled in. The backend should take the request and make a new account in the db and return a userID and toeken. 
