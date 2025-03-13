@@ -74,7 +74,13 @@ function Marketplace() {
     console.log(jsonItem)
     var fetchString = `http://`+globalAddr+`/Marketplace/buy/` + item.ItemID
     
-    fetch(fetchString, { method: "POST", body:  jsonItem}) 
+    fetch(fetchString, {
+      method: "POST",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+      body: jsonItem
+    }) 
             .then((response) => response.json())
             .then((marketplaceItems) => {setMarketplaceItems(marketplaceItems)
               window.location.reload();
@@ -86,17 +92,29 @@ function Marketplace() {
   const addToCart = (item: MarketplaceItems) => {
     var tmpInt: userIDInt = {UserID: Number(localStorage.getItem("uid"))}
     const jsonItem = JSON.stringify(tmpInt)
-    fetch("http://"+globalAddr+"/Marketplace/addToCart/"+ item.OfferID, { method: "POST", body:  jsonItem}) 
-    .then((response) => {response.json()
-      alert("Item successfully added to cart")
-      window.location.reload();
+    fetch("http://" + globalAddr + "/Marketplace/addToCart/" + item.OfferID, {
+      method: "POST",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+      body: jsonItem
     })
+      .then((response) => {
+        response.json()
+        alert("Item successfully added to cart")
+        window.location.reload();
+      })
     .catch((error) => console.error("Error: ", error));
   }
   const removeFromCart = (item: MarketplaceItems) => {
     var tmpInt: userIDInt = {UserID: Number(localStorage.getItem("uid"))}
     const jsonItem = JSON.stringify(tmpInt)
-    fetch("http://"+globalAddr+"/Marketplace/removeFromCart/"+ item.OfferID, { method: "POST", body:  jsonItem}) 
+    fetch("http://" + globalAddr + "/Marketplace/removeFromCart/" + item.OfferID, {
+      method: "POST", headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+      body: jsonItem
+    }) 
     .then((response) => {response.json()
       alert("Item successfully removed from cart")
       window.location.reload();
@@ -111,6 +129,9 @@ function Marketplace() {
     try {
       const response = await fetch(`http://${globalAddr}/Marketplace/checkCart/${item.OfferID}`, {
         method: "POST",
+        headers: new Headers({
+          "Authorization": "Bearer " + localStorage.getItem("token")
+        }),
         body: jsonItem,
       });
   

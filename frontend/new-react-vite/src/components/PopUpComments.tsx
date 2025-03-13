@@ -143,8 +143,13 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
   function DeleteComment(num: number) {
     // e.preventDefault();
     const fetchString = `http://${globalAddr}/comment/deletecomment/${num}`;
-    // console.log(fetchString);
-    fetch(fetchString, { method: "GET" })
+    console.log(fetchString)
+    fetch(fetchString, {
+      method: 'GET',
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+    })
       .then((response) => console.log(response))
       .catch((error) => console.error("Error: ", error));
     setNum(num + 1);

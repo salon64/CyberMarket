@@ -45,6 +45,15 @@ func addComment(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
+	// is the user in the struct the same as the one posting or admin? 
+	ok, _ := AuthByHeader(r,*commentStruct.UserID,db)
+	if !ok {
+		sendAndLogError(w,http.StatusForbidden,"auth failed")
+		return
+	}
+	
+
+
 	// no transaction is needed since adding a comment isn't critical
 	// if fore some reason the user writes a review in the same times as it buys the item
 	// an error could occur since the order of adding and checking is not guarantied
@@ -194,10 +203,41 @@ func deleteComment(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		sendAndLogError(&w, http.StatusBadRequest, "can't convert ", r.PathValue("CommentID"), " to valid int")
 		return
 	}
-	_, err = db.Exec(`DELETE FROM main_db.TypeComments WHERE CommentID = ?;`, commentID)
+
+	t, err := db.Begin()
 	if err != nil {
+		sendAndLogError(&w, http.StatusInternalServerError, "can't begin transaction: ", err.Error())
+	}
+
+	row := t.QueryRow("select UserID from main_db.TypeComments where CommentID = ?;",commentID)
+	
+	var ownerID int
+	err = row.Scan(&ownerID)
+	
+	if errors.Is(err,sql.ErrNoRows) {
+		t.Rollback()
+		sendAndLogError(&w,http.StatusNotFound, "Cant find comment: ", err.Error())
+		return
+	} else if err != nil {
+		t.Rollback()
+		sendAndLogError(&w, http.StatusInternalServerError, "scan error: ", err.Error())
+		return
+	}
+
+	ok, _ := AuthByHeader(r,ownerID,t)
+	if !ok {
+		t.Rollback()
+		sendAndLogError(&w,http.StatusForbidden,"auth failed")
+		return
+	}
+
+	_, err = t.Exec(`DELETE FROM main_db.TypeComments WHERE CommentID = ?;`, commentID)
+	if err != nil {
+		t.Rollback()
 		sendAndLogError(&w,http.StatusInternalServerError, "error deleting comment: ", err.Error())
 		return
 	}
+
+	t.Commit()
 	fmt.Fprint(w, "Deleted comment")
 }

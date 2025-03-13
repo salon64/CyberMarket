@@ -88,24 +88,32 @@ func main() {
 
 	// TODO set max life time and other
 
+
+	http.HandleFunc("OPTIONS /", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		w.Header().Add("Access-control-allow-methods", "POST, GET")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	})
+	
 	// function that returns an array containing PubUser struct {id,name} in json format
 	http.HandleFunc("GET /users", func(w http.ResponseWriter, r *http.Request) {
 		// allow CORS
 		enableCors(&w)
 		listAllUsers(&w, r, db)
 	})
-
+	
 	http.HandleFunc("POST /user", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		addUser(&w, r, db)
 	})
-
+	
 	http.HandleFunc("POST /login", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		userLogin(&w, r, db)
 	})
-
+	
 	http.HandleFunc("POST /users/{id}", func(w http.ResponseWriter, r *http.Request) {
+		log.Print("I got post ", time.Now().GoString())
 		enableCors(&w)
 		updateUserInfo(&w, r, db)
 	})
@@ -221,8 +229,13 @@ func main() {
 		}
 	})
 
+	// err = http.ListenAndServeTLS(":5687",os.Getenv("CERT_FILE_PATH"),os.Getenv("CERT_KEY_FILE_PATH"),nil)
+	// if err != nil {
+	// 	log.Print("HTTPS ", err.Error())
+	// }
+
 	err = http.ListenAndServe(":5687", nil)
 	if err != nil {
-		log.Print(err.Error())
+		log.Print("HTTP ", err.Error())
 	}
 }

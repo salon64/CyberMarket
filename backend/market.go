@@ -6,10 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
-
-	// "log"
 	"net/http"
+	"strconv"
 )
 
 type UserStruct struct {
@@ -56,13 +54,47 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 		return
 	}
 
-	// TODO check if i own the item
-	// TODO ERROR handling
+	// start an transaction
 	t, err := db.Begin()
 	if err != nil {
 		sendAndLogError(w, http.StatusInternalServerError, "Error starting transaction: ", err.Error())
 		return
 	}
+
+	// test if user is allowed to place listing
+	row := t.QueryRow("select UserID from main_db.Inventory where ItemID = ?;",data.ItemID)
+	
+	var ownerID int
+	err = row.Scan(&ownerID)
+	
+	if errors.Is(err,sql.ErrNoRows) {
+		t.Rollback()
+		sendAndLogError(w,http.StatusNotFound, "Cant find item: ", err.Error())
+		return
+	} else if err != nil {
+		t.Rollback()
+		sendAndLogError(w, http.StatusInternalServerError, "scan error: ", err.Error())
+		return
+	}
+
+	// this needs to be part of the transaction, 
+	// imagine if not
+	// 1. Alice buys an item from Bob, a transaction is started to Transfer owner ship
+	// 2. Bob add begins adding a listing for the same item Alice is buying
+	// 3. Bobs auth check is passed when adding
+	// 4. Alice transaction is completed
+	// 5. Bob have passed auth and now an listing is added for the item now Alice owns
+	// 6. Bob chose the price of zero euro dollar and buys the item again from Alice
+	//
+	// The result of this is that Alice Paid for an item that was immediately "stolen"
+	ok, _ := AuthByHeader(r,ownerID,t)
+	if !ok {
+		t.Rollback()
+		sendAndLogError(w,http.StatusForbidden,"auth failed")
+		return
+	}
+
+	// add marketplace listing
 	res, err := t.Exec("insert into Marketplace(ItemID, Price, CreationDate) values (?, ?, now());", data.ItemID, data.Price)
 
 	// if error write error and exit
@@ -71,7 +103,7 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 		sendAndLogError(w, http.StatusInternalServerError, "Error inserting listing: ", err.Error())
 		return
 	}
-	// TODO: WE NEED A TRANSACTION HERE
+
 	OfferID, err := res.LastInsertId()
 	// if error write error and exit
 	if err != nil {
@@ -87,15 +119,57 @@ func addListingToMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB
 		sendAndLogError(w, http.StatusInternalServerError, "Error committing listing: ", err.Error())
 	}
 
-	fmt.Fprintf(*w, "%d", OfferID)
+	fmt.Fprintf(*w, "added listing with id: %d", OfferID)
 }
 
 func removeListingFromMarketplace(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	_, err := db.Exec("DELETE FROM Marketplace WHERE ItemID = ?;", r.PathValue("ItemID"))
+
+
+	// start an transaction
+	t, err := db.Begin()
+	if err != nil {
+		sendAndLogError(w, http.StatusInternalServerError, "Error starting transaction: ", err.Error())
+		return
+	}
+
+	// test if user is allowed to delete listing
+	// get the listing owner
+	row := t.QueryRow("select UserID from main_db.Inventory where ItemID = ?;",r.PathValue("ItemID"))
+	
+	var ownerID int
+	err = row.Scan(&ownerID)
+	
+	if errors.Is(err,sql.ErrNoRows) {
+		t.Rollback()
+		sendAndLogError(w,http.StatusNotFound, "Cant find item: ", err.Error())
+		return
+	} else if err != nil {
+		t.Rollback()
+		sendAndLogError(w, http.StatusInternalServerError, "scan error: ", err.Error())
+		return
+	}
+	// is the user the owner or an admin
+	ok, _ := AuthByHeader(r,ownerID,t)
+	if !ok {
+		t.Rollback()
+		sendAndLogError(w,http.StatusForbidden,"auth failed")
+		return
+	}
+
+	// delete the listing
+	_, err = t.Exec("DELETE FROM Marketplace WHERE ItemID = ?;", r.PathValue("ItemID"))
 
 	// if error write error and exit
 	if err != nil {
+		t.Rollback()
 		sendAndLogError(w, http.StatusInternalServerError, "Error deleting listing: ", err.Error())
+		return
+	}
+
+	// commit the deletion
+	err = t.Commit()
+	if err != nil {
+		sendAndLogError(w,http.StatusInternalServerError, "error committing transaction: ", err.Error())
 		return
 	}
 
@@ -221,8 +295,16 @@ func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		(*w).WriteHeader(http.StatusBadRequest)
 		return err
 	}
-	log.Printf("%+v", data)
-	log.Print(itemID)
+
+	// no transaction needed since userid is used in the query and not indirectly referenced, 
+	// therefore can not change before important our evaluation
+	ok, _ := AuthByHeader(r,data.UserID, db)
+	if !ok {
+		(*w).WriteHeader(http.StatusForbidden)
+		return errors.New("auth failed")
+	}
+
+
 	// begin transaction
 	t, err := db.Begin()
 	if err != nil {

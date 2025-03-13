@@ -55,7 +55,9 @@ function AdminPage() {
     console.log(tmp);
     // You can pass formData as a fetch body directly:
     fetch("http://"+globalAddr+"/Marketplace/CreateItem", { 
-      
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -84,7 +86,9 @@ function AdminPage() {
     console.log(tmp);
 
     fetch("http://"+globalAddr+"/user/AddMoney", {
-     
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -126,7 +130,9 @@ function AdminPage() {
 
 
     fetch("http://"+globalAddr+"/Admin/CreateNewItemType", {
-      
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
       method: "POST",
       body: JSON.stringify(tmp),
     })
@@ -141,9 +147,21 @@ function AdminPage() {
   }
 
   useEffect(() => {
+    // get transaction log called each time someone changes the search bar? @salon64 please document your code
+    // @pelleGH to, this is a mess
+    // I ran CLOC there exist 1228 rows of **ts**
+    // and only 87 rows of comments
+    // this means there are only ONE line of comment per 14 lines of code
+    // this is excluding the html and java script which makes things worse
     var fetchString =
       `http://${globalAddr}/displayTransactionslog/` + transactionlogID;
-    fetch(fetchString, { method: "GET" })
+
+    fetch(fetchString, {
+      method: "GET",
+      headers: new Headers({
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }),
+    })
       .then((response) => response.json())
       .then((transactionLog) => {
         setTransactionLog(transactionLog);

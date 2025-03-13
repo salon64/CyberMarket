@@ -4,9 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-
-	// "log"
 	"net/http"
+	"strconv"
 )
 
 type Item struct {
@@ -20,44 +19,30 @@ type Item struct {
 	ImgURL          *string
 }
 
-type SimpleItem struct {
-	UserID   int
-	ItemType int
-}
-
-// this functions writes out a json of all the items belonging to the users which is given in the url
-// the data returned is described by the item struct
-func createItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var newItem SimpleItem
-	decoder := json.NewDecoder(r.Body)
-	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&newItem)
-
-	if err != nil {
-		sendAndLogError(w,http.StatusBadRequest, "Error parsing json: ", err.Error())
-		return
-	}
-
-	_, err = db.Exec("insert into Inventory(UserID, TypeID) values (?, ?);", newItem.UserID, newItem.ItemType)
-
-	if err != nil {
-		sendAndLogError(w,http.StatusInternalServerError, "adding ItemType returned error: ", err.Error())
-		return
-	}
-
-	// send json
-	(*w).WriteHeader(http.StatusOK)
-}
-
 func listUserItems(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	// row, err := db.Query("SELECT ItemID FROM Inventory WHERE UserID = ? ODER BY ItemID", r.PathValue("id"))
+
+	ownerID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		sendAndLogError(w, http.StatusBadRequest, "Cant convert to ItemID ", err.Error())
+		return
+	}
+
+	// no need for transaction
+	// since the owner id
+	ok, _ := AuthByHeader(r,ownerID,db)
+	if !ok {
+		sendAndLogError(w,http.StatusForbidden,"auth failed")
+		return
+	}
+	
+
 	row, err := db.Query(`
-		SELECT Inventory.ItemID, Inventory.TypeID, ItemTypes.ItemName, ItemTypes.ItemDescription, ItemTypes.ImgURL, Marketplace.OfferID
+		SELECT Inventory.ItemID, Inventory.TypeID, ItemTypes.ItemName, ItemTypes.ShortDescription, ItemTypes.ImgURL, Marketplace.OfferID
 		FROM Inventory
 		INNER JOIN ItemTypes on Inventory.TypeID = ItemTypes.TypeID
         LEFT JOIN Marketplace on Inventory.ItemID = Marketplace.ItemID
 		where Inventory.UserID = ?;`,
-		r.PathValue("id"))
+		ownerID)
 
 	if isErrLog(w, err) {
 		return
