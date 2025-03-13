@@ -76,13 +76,13 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
     return <div>Loading...</div>;
   }
 
-  function MakeReview1(parentID: number | null) {
+  function MakeReview1(parentID: number) {
     // e.preventDefault();
 
-    let rating: number = (document.getElementById("rating1") as HTMLInputElement)
+    let rating: number = (document.getElementById(`rating${parentID}`) as HTMLInputElement)
       .valueAsNumber;
     let comment: string = (
-      document.getElementById("comment1") as HTMLInputElement
+      document.getElementById(`comment${parentID}`) as HTMLInputElement
     ).value;
 
     let tmp: MakeComment = {
@@ -226,12 +226,12 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
             </p>
           </div>
         )}
-        <form method="post" onSubmit={() => MakeReview1(commentStruct.theComment.CommentID)}>
+        <form method="post" onSubmit={(event) => {MakeReview1(commentStruct.theComment.CommentID); event.preventDefault();} }>
         <label>
-          rating <input name="rating" type="number" id="rating1" />
+          rating <input name="rating" type="number" id={`rating${commentStruct.theComment.CommentID}`}  />
         </label>
         <label>
-          Comment: <input name="comment" type="text" id="comment1" />
+          Comment: <input name="comment" type="text" id={`comment${commentStruct.theComment.CommentID}`} />
         </label>
         <br />
         <button type="submit">Submit Comment</button>
