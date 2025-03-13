@@ -76,7 +76,7 @@ func addComment(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// insert the comment
 	_, err = db.Exec(`INSERT INTO main_db.TypeComments (UserID, TypeID, Grade, Comment, CreatedOn, ParentComment)
-			VALUES (?,?,?,?, NOW()), ?`,
+			VALUES (?,?,?,?, NOW(), ?);`,
 		commentStruct.UserID, itemTypeID, commentStruct.Grade, commentStruct.Comment, commentStruct.ParentCommentID)
 
 	if err != nil {
