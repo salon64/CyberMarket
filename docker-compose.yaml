@@ -1,8 +1,17 @@
 services:
+
+  webserver:
+    build:
+      context: frontend/new-react-vite/.
+      args:
+        - VITE_API_ADDRESS=ronstad.se:5687
+    ports:
+      - "80:80"
+
   backend:
     build: backend/.
     ports:
-      - "80:80"
+      - "5687:5687"
     environment:
       # Setting upp the connection info for the data base
       - DBHOST=mysql:3306

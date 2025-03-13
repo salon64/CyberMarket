@@ -1,0 +1,63 @@
+.right {
+    flex: 4; /* Right side takes more space */
+/* Optional: Background color for the right */
+    padding: 50px; /* Add padding inside the right section */
+}
+
+.store-table {
+    font-family: Oxanium !important;
+    width: 100%; /* Force table to fill the entire width of the container */
+    border-collapse: collapse;
+    color: rgb(255, 0, 111);
+    text-shadow: 1px 1px rgb(94, 0, 0);
+    tr:hover {
+        color: aqua;
+        text-shadow: 2px 2px rgb(94, 0, 0);
+    }
+}
+    /* tr:hover {
+    text-shadow: 2px 2px #0072a7;
+    color: aqua;
+    } */
+
+.thead,
+tr:nth-child(even){
+    background-color: rgb(31, 31, 31);
+}
+th:nth-child(1) {
+    width: 10%; /* item */
+}
+th:nth-child(2) {
+    width: 5%; /* price */
+}
+th:nth-child(4) {
+    width: 60px; /* seller */
+}
+th:nth-child(5) {
+    width: 68px; /* button */
+}
+th:nth-child(3) {
+    width: fit-content; /* description */
+}
+.sellIcon{
+    background:url(./glorp.png) ;
+    background-size:cover;
+    width: 60px;
+    height:60px;
+    display:flex;
+    float:center;
+    margin-left: auto;
+    margin-right: auto;
+    clip:rect(0px,90px,90px,0px);
+    background-color: aliceblue;
+    border-color:aquamarine;
+    border-width: 100px;
+}
+.rm-button{
+    text-align:auto;
+    margin-left: auto;
+    margin-right:auto;
+    background-color: transparent;
+    border-color: crimson;
+    border-radius: 10px;
+}
