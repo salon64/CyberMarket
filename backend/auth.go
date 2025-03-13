@@ -12,23 +12,23 @@ import (
 )
 
 type Queryer interface {
-    Query(string, ...interface{}) (*sql.Rows, error)
-    QueryRow(string, ...interface{}) *sql.Row
-    Prepare(string) (*sql.Stmt, error)
-    Exec(string, ...interface{}) (sql.Result, error)
+	Query(string, ...interface{}) (*sql.Rows, error)
+	QueryRow(string, ...interface{}) *sql.Row
+	Prepare(string) (*sql.Stmt, error)
+	Exec(string, ...interface{}) (sql.Result, error)
 }
-
 
 func AuthByHeader(r *http.Request, resourceOwner int, db Queryer) (bool, error) {
 	auth_row := r.Header.Get("Authorization")
-	log.Println(auth_row)
 
 	token, found := strings.CutPrefix(auth_row, "Bearer ")
 	if !found {
+		log.Print("auth is not of type Bearer")
 		return false, errors.New("auth is not of type Bearer")
 	}
 
 	if token == "" {
+		log.Print("token was empty")
 		return false, errors.New("token was empty")
 	}
 
@@ -50,22 +50,26 @@ func AuthByToken(token string, resourceOwner int, db Queryer) (bool, error) {
 	var userID int
 	var role int
 	var time time.Time
-
+	
 	// read the values
 	err := row.Scan(&userID, &role, &time)
-
+	
 	// the possible errors are normal scan and row missing caused by there not being shush a token
 	if err != nil {
+		log.Print("log error: ", err.Error())
 		return false, err
 	}
 	// if user has a admin role
 	if role != 0 {
+		log.Println("user is admin, auth complete")
 		return true, nil
 		// if the user own the requested resource
 	} else if userID == resourceOwner {
+		log.Println("user ", userID, " is the owner of ", resourceOwner, ", auth complete")
 		return true, nil
 		// if not return false
 	} else {
+		log.Println("user ", userID, " is not the owner of ", resourceOwner, ", auth failed")
 		return false, nil
 	}
 
