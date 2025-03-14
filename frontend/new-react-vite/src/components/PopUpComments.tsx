@@ -60,7 +60,7 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
     if (itemId === null) return; // Handle case when itemId is null
     const fetchString = `http://${globalAddr}/ItemType/${itemId}`;
     fetch(fetchString, { method: "GET" })
-      .then((response) => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .then((itemTypeReturn) => {
         setItemTypeReturn(itemTypeReturn);
       })
@@ -98,7 +98,7 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
       method: "POST",
       body: JSON.stringify(tmp),
     })
-      .then((response) => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .then((data) => {
         console.log(data);
       })
@@ -130,7 +130,7 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
       method: "POST",
       body: JSON.stringify(tmp),
     })
-      .then((response) => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .then((data) => {
         console.log(data);
       })
@@ -150,7 +150,7 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }),
     })
-      .then((response) => console.log(response))
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .catch((error) => console.error("Error: ", error));
     setNum(num + 1);
   }

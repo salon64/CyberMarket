@@ -54,7 +54,7 @@ function Marketplace() {
   useEffect(() => {
     var fetchString = `http://${globalAddr}/Marketplace/displayMarket`;
     fetch(fetchString, { method: "POST", body: JSON.stringify(sortState) })
-      .then((response) => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .then((marketplaceItems) => {
         setMarketplaceItems(marketplaceItems);
         
@@ -81,7 +81,7 @@ function Marketplace() {
       }),
       body: jsonItem
     }) 
-            .then((response) => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
             .then((marketplaceItems) => {setMarketplaceItems(marketplaceItems)
               window.location.reload();
             })
@@ -100,9 +100,13 @@ function Marketplace() {
       body: jsonItem
     })
       .then((response) => {
-        response.json()
-        alert("Item successfully added to cart")
-        window.location.reload();
+        if (response.ok) {
+          response.json()
+          alert("Item successfully added to cart")
+          window.location.reload();
+        } else {
+          response.text().then((r) => alert(r))
+        }
       })
     .catch((error) => console.error("Error: ", error));
   }
@@ -115,9 +119,13 @@ function Marketplace() {
       }),
       body: jsonItem
     }) 
-    .then((response) => {response.json()
-      alert("Item successfully removed from cart")
-      window.location.reload();
+      .then((response) => {
+        if (response.ok) {
+          alert("Item successfully removed from cart")
+          window.location.reload();
+        } else {
+          response.text().then((r) => alert(r))
+        }
     })
     .catch((error) => console.error("Error: ", error));
   }
@@ -134,14 +142,19 @@ function Marketplace() {
         }),
         body: jsonItem,
       });
-  
-      const data = await response.json();
-      console.log(data.InCheckout);
-  
-      setCartStatus(prevState => ({
-        ...prevState,
-        [item.ItemID]: data.InCheckout || false
-      }));
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.InCheckout);
+
+        setCartStatus(prevState => ({
+          ...prevState,
+          [item.ItemID]: data.InCheckout || false
+        }));
+      } else {
+        alert(await response.text())
+      }
+
     } catch (error) {
       console.error("Error checking cart:", error);
     }

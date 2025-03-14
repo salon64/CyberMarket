@@ -18,7 +18,7 @@ function Login() {
 
     // You can pass formData as a fetch body directly:
     fetch("http://"+globalAddr+"/login", { method: "POST", body: JSON.stringify(formJson) })
-      .then(response => response.json())
+      .then((response) => response.ok ? response.json() : response.text().then((r) => alert(r)))
       .then(data => {
         if (data?.Token) {  // if token exists
           console.log(data)
