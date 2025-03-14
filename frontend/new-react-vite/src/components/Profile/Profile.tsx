@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "../cyberpunk-css-main/cyberpunk.css";
 import { globalAddr } from "../../header";
 import "./Profile.css";
+import { useNavigate } from "react-router";
 
 interface TransactionLog {
   TransID: number;
@@ -25,7 +26,7 @@ interface updateUserInfoDataPswd {
 
 function Profile() {
   const [transactionLog, setTransactionLog] = useState<TransactionLog[]>([]);
-
+  let navigate = useNavigate()
   useEffect(() => {
     var fetchString =
       `http://${globalAddr}/displayTransactionslog/` +
@@ -91,7 +92,6 @@ function Profile() {
       console.log(error);
     });
   }
-
   return (
       <div className="left-right-container-profile">
         <div className=""></div>
@@ -121,8 +121,14 @@ function Profile() {
             <button type="submit">Submit Password</button>
             <br></br>
             <br />
-            <hr />
+            <hr></hr>
           </form>
+          <button onClick={() => {
+              navigate('/')
+              localStorage.clear()
+            }}>Log Out</button>
+            <br></br>
+            <hr />
         </div>
 
         <div className="right-profile">
