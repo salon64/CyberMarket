@@ -775,6 +775,7 @@ Bearer tokens will be implemented (in most, if not all http requests) in a later
 GET /user/getMoney/12 HTTP/1.1
 Host: example.org
 User-Agent: curl/7.81.0
+Authorization: Bearer c6e88ef3-533a-40c1-b08c-ee2074a3a5dc
 Accept: */*
 
 HTTP/1.1 200 OK
@@ -801,6 +802,7 @@ Possible return values are 404 if the user is not found. 400 is returned if the 
 GET /inventory/1 HTTP/1.1
 Host: example.org
 User-Agent: curl/7.81.0
+Authorization: Bearer c6e88ef3-533a-40c1-b08c-ee2074a3a5dc
 Accept: */*
 
 HTTP/1.1 200 OK
@@ -842,6 +844,7 @@ Sending the http request ``POST /Marketplace/CreateItem`` allows a user to creat
 POST /Marketplace/CreateItem HTTP/1.1
 Host: example.org
 User-Agent: curl/7.81.0
+Authorization: Bearer c6e88ef3-533a-40c1-b08c-ee2074a3a5dc
 Accept: */*
 Content-Length: 26
 Content-Type: application/json
@@ -862,11 +865,7 @@ Content-Type: text/plain; charset=utf-8
 
 ### List Market
 
-NOTE, This will be rewrite as a GET request when i force Malcolm to follow the REST standard.
-
-NOTE 2, currently search is not implemented
-
-NOTE 3, if ``SortBy`` is not one of the valid strings an unrelated error is returned, will be fixed
+NOTE, currently search is not implemented
 
 This ``POST /Marketplace/displayMarket`` method takes the arguments ``SortBy`` and ``Search`` in json format and returns the market place items, the valid strings for OrderBy are
 
@@ -933,6 +932,7 @@ By sending a POST to ``/Marketplace/addListing`` with the fields ItemID and Pric
 POST /Marketplace/addListing HTTP/1.1
 Host: example.org
 User-Agent: curl/7.88.1
+Authorization: Bearer c6e88ef3-533a-40c1-b08c-ee2074a3a5dc
 Accept: */*
 Content-Length: 26
 Content-Type: application/x-www-form-urlencoded
@@ -959,6 +959,7 @@ where itemID is the intended itemid of the listing to be removed
 GET /Marketplace/removeListing/1 HTTP/1.1
 Host: example.org
 User-Agent: curl/7.81.0
+Authorization: Bearer c6e88ef3-533a-40c1-b08c-ee2074a3a5dc
 Accept: */*
 
 HTTP/1.1 200 OK
@@ -983,6 +984,7 @@ Note that there are currently no security, There are no checks that the userid i
 POST /ItemType/1 HTTP/1.1
 Host: example.org
 User-Agent: curl/7.88.1
+Authorization: Bearer c6e88ef3-533a-40c1-b08c-ee2074a3a5dc
 Accept: */*
 Content-Length: 53
 Content-Type: application/x-www-form-urlencoded
@@ -1014,6 +1016,7 @@ This was deemed acceptable since its meant that item types are more or less cons
 > GET /ItemType/1 HTTP/1.1
 > Host: example.org
 > User-Agent: curl/7.88.1
+> Authorization: Bearer c6e88ef3-533a-40c1-b08c-ee2074a3a5dc
 > Accept: */*
 
 < HTTP/1.1 200 OK
@@ -1053,9 +1056,7 @@ The funds from teh listing is transferred from the buyer (passed UserID) ot the 
 If the buyer does not have enough funds the plaintext "not enough funds" is returned with the status code 200 ok.
 
 Notes on security.
-Currently there is no authentication on this. This means that another user can buy stuff as another user,
-will be fixed when token authentication is implemented in this method.
-To avoid that the user does purchases in quick sequence to trick the found checking by having both checks complete before any of the purchases have happened,
+To avoid that the user does purchases in quick sequence to trick the wallet checking by having both checks complete before any of the purchases have happened,
 the whole of checking funds, transferring ownership, updating funds and removing the listing is done in a singe sql transaction
 
 **DANGEROUS FLAW, CURRENTLY BEING FIXED.**\
@@ -1075,6 +1076,7 @@ This can happen since we use itemID as the identifier, by changing to marketID t
 POST /Marketplace/buy/5 HTTP/1.1
 Host: example.org
 User-Agent: curl/7.81.0
+Authorization: Bearer c6e88ef3-533a-40c1-b08c-ee2074a3a5dc
 Accept: */*
 Content-Length: 13
 Content-Type: application/json
@@ -1095,14 +1097,26 @@ Success
 ### Olle
 
 Important
+
+- [example dockerize vite](https://dev.to/code42cate/how-to-dockerize-vite-44d3)
+- [go database/sql](https://go.dev/doc/tutorial/database-access)
+
 Informal
 
-- [go database/sql](https://go.dev/doc/tutorial/database-access)
+- [sql, overview and examples](https://www.w3schools.com/sql/) \
+    contains most of the necessary information about sql, describing syntax and functions
+- [go http documentation](https://pkg.go.dev/net/http)
+- [http preflight, mdn](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request)
+- [self signed ssl cert, https (not used in final version)](forgot_to_write_down_address)
+- [go json documentation](https://pkg.go.dev/encoding/json)
+- [go uuid documentation](https://pkg.go.dev/github.com/google/UUID)
 - [go database driver](https://github.com/go-sql-driver/mysql/)
-- [golang docker](https://hub.docker.com/_/golang)
-- [mysql docker](https://hub.docker.com/_/mysql/)
-- [CORS managing] (Enabling CORS in Golang)
+- [golang docker container](https://hub.docker.com/_/golang)
+- [mysql docker container](https://hub.docker.com/_/mysql/)
+- [docker env documentation](https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/)
+- [vite env documentation](https://vite.dev/guide/env-and-mode)
 - [go sql null](https://medium.com/@dual/ways-to-handle-sql-null-values-in-go-e237f31b82fc)
+- *old projects from when i had a webserver course in a swedish gymnasium*
 
 ### Shaya
 
