@@ -21,15 +21,6 @@ type PubUser struct {
 	Name string
 }
 
-type UserMoney struct {
-	UserID int
-	Money  int
-}
-
-type Money struct {
-	Amount int
-}
-
 // list all the users
 func listAllUsers(w *http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	// execute sql query to get username id pairs
@@ -232,60 +223,4 @@ func updateUserInfo(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// TODO return old name and pswd
 
 	(*w).WriteHeader(http.StatusOK)
-}
-
-func addMoneyToUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var data UserMoney
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&data)
-	log.Println(data.UserID)
-	log.Println(data.Money)
-	if err != nil {
-		log.Printf("error decoding: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "error decoding: %s", err.Error())
-		return
-	}
-	log.Printf("with data %v", data)
-
-	// TODO token stuff
-	_, err = db.Exec("UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?", data.Money, data.UserID)
-	if err != nil {
-		log.Printf("Error updating user Wallet: %s", err.Error())
-		(*w).WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(*w, "Error updating user Wallet: %s", err.Error())
-		return
-	}
-	(*w).WriteHeader(http.StatusOK)
-}
-
-func getUserMoney(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
-	// execute sql query to get username id pairs
-	row := db.QueryRow("SELECT Wallet FROM Users WHERE UserID = ?;", r.PathValue("id"))
-	// close the row connection when function exits
-
-	var money Money
-	// read data into user struct
-	err := row.Scan(&money.Amount)
-
-	// write error and exit if scan fails
-	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		log.Printf("GetUserMoney sql/scan error: %s", err.Error())
-		return
-	}
-
-	// convert to json
-	// using MarshalIndent to make result pretty for debugging
-	json, err := json.MarshalIndent(money, "", "    ")
-
-	// write error and exit if json fails
-	if err != nil {
-		(*w).WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(*w, err.Error())
-		return
-	}
-
-	// send json
-	fmt.Fprint(*w, string(json))
 }

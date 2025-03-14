@@ -87,6 +87,9 @@ func main() {
 	}
 
 	// TODO set max life time and other
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "%s ", os.Getenv("DBUSER"))
+	})
 
 	// function that returns an array containing PubUser struct {id,name} in json format
 	http.HandleFunc("GET /users", func(w http.ResponseWriter, r *http.Request) {
@@ -110,30 +113,9 @@ func main() {
 		updateUserInfo(&w, r, db)
 	})
 
-	http.HandleFunc("GET /user/getMoney/{id}", func(w http.ResponseWriter, r *http.Request) {
-		enableCors((&w))
-		getUserMoney(&w, r, db)
-	})
-
-	http.HandleFunc("POST /user/AddMoney", func(w http.ResponseWriter, r *http.Request) {
-		enableCors(&w)
-		addMoneyToUser(&w, r, db)
-	})
-
 	http.HandleFunc("GET /inventory/{id}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		listUserItems(&w, r, db)
-	})
-
-	// adding a comment to an item type
-	http.HandleFunc("POST /ItemType/{ItemTypeID}", func(w http.ResponseWriter, r *http.Request) {
-		enableCors(&w)
-		addComment(&w, r, db)
-	})
-
-	http.HandleFunc("GET /ItemType/{ItemTypeID}", func(w http.ResponseWriter, r *http.Request) {
-		enableCors(&w)
-		getItemTypeInfo(w, r, db)
 	})
 
 	http.HandleFunc("POST /Marketplace/displayMarket", func(w http.ResponseWriter, r *http.Request) {
@@ -141,7 +123,6 @@ func main() {
 		listMarketplaceItems(&w, r, db)
 	})
 
-	//TODO change to OfferID
 	http.HandleFunc("POST /Marketplace/buy/{ItemID}", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		err := buyItem(&w, r, db)
@@ -154,11 +135,6 @@ func main() {
 	http.HandleFunc("POST /Marketplace/addListing", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		addListingToMarketplace(&w, r, db)
-	})
-
-	http.HandleFunc("POST /Admin/CreateNewItemType", func(w http.ResponseWriter, r *http.Request) {
-		enableCors(&w)
-		createNewItemType(&w, r, db)
 	})
 
 	http.HandleFunc("GET /Marketplace/removeListing/{ItemID}", func(w http.ResponseWriter, r *http.Request) {
@@ -190,7 +166,7 @@ func main() {
 		}
 	})
 
-	err = http.ListenAndServe(":5687", nil)
+	err = http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Print(err.Error())
 	}

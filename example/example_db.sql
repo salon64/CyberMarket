@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `main_db`.`ItemTypes` (
   `ItemName` VARCHAR(45) NOT NULL,
   `ItemDescription` VARCHAR(45) NULL,
   `ImgURL` VARCHAR(45) NULL,
-  `ShortDescription` VARCHAR(255) NULL,
+
   FULLTEXT (ItemName)
   PRIMARY KEY (`TypeID`)
 );
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `main_db`.`Inventory` (
 CREATE TABLE IF NOT EXISTS `main_db`.`Marketplace` (
   `OfferID` INT NOT NULL AUTO_INCREMENT,
   `ItemID` INT NOT NULL UNIQUE,
-  `Price` INT NOT NULL,
+  `Price` VARCHAR(45) NOT NULL,
   `CreationDate` DATE NOT NULL,
 
   PRIMARY KEY (`OfferID`),
@@ -107,27 +107,4 @@ CREATE TABLE IF NOT EXISTS `main_db`.`TokenTable` (
   CONSTRAINT `TokenUser`
     FOREIGN key (`UserID`)
     REFERENCES `main_db`.`Users` (`UserID`)
-);
-
-
--- -----------------------------------------------------
--- Table `main_db`.`TypeComments`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `main_db`.`TypeComments` (
-  `CommentID` INT NOT NULL AUTO_INCREMENT,
-  `TypeID` INT NOT NULL,
-  `UserID` INT NOT NULL,
-  `Grade` INT NOT NULL,
-  `Comment` VARCHAR(255) NOT NULL,
-  `CreatedOn` DATETIME NOT NULL,
-
-  
-  PRIMARY KEY (`CommentID`),
-
-  CONSTRAINT `CommentUser`
-    FOREIGN key (`UserID`)
-    REFERENCES `main_db`.`Users` (`UserID`),
-  CONSTRAINT `CommentType`
-    FOREIGN key (`TypeID`)
-    REFERENCES `main_db`.`ItemTypes` (`TypeID`)
 );

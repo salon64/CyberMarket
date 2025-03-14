@@ -332,6 +332,15 @@ TODO *from task description*: Test case specifications (manual testing, related 
 
 20. As a Admin i should be able to spoof a user id, allowing me to complete actions as that users.
 
+21. As a Users I want to be able to buy items from the marketplace, In order to get that item to my inventory.
+
+22. As a user, I want to be able to add items/remove items from the marketplace to my cart.
+
+23. As a user, I want to be able to remove items from inside my cart.
+
+24. As a user, I want to be able to checkout all items from my cart for them to then be added to my inventory.
+
+
 ### Testing
 
 1. To register An account The User should press on the "register your account button" that should take the user to a different page.
@@ -1091,6 +1100,27 @@ Content-Type: text/plain; charset=utf-8
 
 Success
 ```
+### Shopping Cart
+
+The shopping cart class consists of several functions
+
+#### DisplayCart
+
+Here we re-use and tweak code from the marketplace function that displays items by just changing around the query a bit to only select items from the shopping cart associated with the user requesting the cart.
+
+#### Add To Cart
+
+This function exists in the marketplace where a user clicks "Add to Cart" on an item to send an http request ```POST /Marketplace/addToCart/{OfferID}``` to the backend where we just insert the item with the buyers id into the shopping cart table.
+
+#### Remove from cart
+
+Similar to the Add to Cart function, except we simply remove the item from the cart table.
+
+#### Cart Checkout
+
+Once the user decides to checkout, they send an http request ```GET /Marketplace/cartCheckout/{UserID}```. The backend then checks if the user has enough money for the total purchase by querying the total price from the DB. We then begin an SQL transaction to ensure consistency and start looping through every item in the shopping cart and do something similar to the buy function on every item. This does mean one shopping cart checkout will generate one transaction for every item in the cart. Finally, if no errors occur, we commit the SQL transaction.
+
+
 
 ## References
 
