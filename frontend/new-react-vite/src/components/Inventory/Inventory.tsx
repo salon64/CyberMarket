@@ -37,8 +37,8 @@ const Inventory = () => {
             <thead style={{ backgroundColor: "bisque" }}>
               <tr>
                 <th>Item</th>
-                <th>ItemType</th>
-                <th>ItemName</th>
+                <th>ItemID</th>
+                <th>ItemDescription</th>
                 <th>Add/Remove from market</th>
               </tr>
             </thead>
