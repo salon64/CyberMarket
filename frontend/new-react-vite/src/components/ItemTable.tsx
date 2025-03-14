@@ -48,13 +48,14 @@ const ItemTableComponent = () => {
       .then((response) => {
         if (response.ok === true) {
           alert("Item removed from marketplace");
+          window.location.reload();
         } else {
           console.log("Invalid Request");
           alert("nuh uh");
         }
       })
       .catch(error => alert(error))
-    
+      
   }
   function handleSell(itemID: number) {
 
@@ -99,9 +100,9 @@ const ItemTableComponent = () => {
     <>
       {userItems.map((item) => (
         <tr key={item.ItemID} className="">
-          <td className="">{item.ItemID}</td>
-          <td className="">{item.TypeID}</td>
           <td className="">{item.ItemName}</td>
+          <td className="">{item.ItemID}</td>
+          <td className="">{item.ItemDescription}</td>
           {/* <td className="">{item.IsListed}</td> */}
           {/*map either button or text input if item is already listed */}
           <td>

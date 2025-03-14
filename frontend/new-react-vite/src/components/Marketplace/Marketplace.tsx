@@ -61,6 +61,7 @@ function Marketplace() {
         // Run checkCart for each item
         marketplaceItems.forEach((item: MarketplaceItems) => {
           checkCart(item);
+          console.log(item.ShortDescription)
         });
       })
       .catch((error) => console.error("Error: ", error));
