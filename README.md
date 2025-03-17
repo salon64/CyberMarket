@@ -257,9 +257,18 @@ Comments can also be related to another comment as to achieve hierarchical comme
 note that for this to work the parent comment must have the same Type ID as this is the column that is quired on,
 there currently exist no constraint to enforce this in the backend or database, the behavior of breaking this has not been studied.
 
+The task of building the hierarchical structure from the rows are delegated to the frontend which uses a recursive approach of
+trying to place comments in order until the list of comments are depleted.
+
 #### Shopping basket
 
-THe shopping basket keeps tracks of a users shopping basket, it acts as a many to many between users and marketplace listings. The foreign keys relation to marketplace is set to cascading delete, so that if an item on the marketplace is bought by another user or removed, the shopping cart reference is removed.
+THe shopping basket keeps tracks of a users shopping basket, it acts as a many to many between users and marketplace listings.
+The foreign keys relation to marketplace is set to cascading delete, so that if an item on the marketplace is bought by another user or removed,
+the shopping cart reference is removed.
+
+Currently, a user is not notified when an item in their shopping basket is bought by another user or removed from the marketplace.
+Nor is the website reloaded witch leads it to still shows the old basket. However, since the website is separated from the backend,
+the updated backend information is used when the user checks out.
 
 ### WebServer
 
@@ -332,14 +341,13 @@ TODO *from task description*: Test case specifications (manual testing, related 
 
 20. As a Admin i should be able to spoof a user id, allowing me to complete actions as that users.
 
-21. As a Users I want to be able to buy items from the marketplace, In order to get that item to my inventory.
+21. As a user, I want to be able to add items/remove items from the marketplace to my cart.
 
-22. As a user, I want to be able to add items/remove items from the marketplace to my cart.
+22. As a user, I want to be alble to view my cart, showing the items and their combined price,
 
 23. As a user, I want to be able to remove items from inside my cart.
 
 24. As a user, I want to be able to checkout all items from my cart for them to then be added to my inventory.
-
 
 ### Testing
 
@@ -396,7 +404,7 @@ This data should be gathered with an http call from when the user loads the site
     - Alphabetically_Descending
 
 12. A user should be able to buy an item by pressing the "buy" button on the row that item is displayed in.
-That should send a http call to the backend. The backend will perform checks to se if the sender of the http is the same of the buyer or an admin, and that the user have sufficient funds.
+That should send a http call to the backend. The backend will perform checks to see if the sender of the http is the same of the buyer or an admin, and that the user have sufficient funds.
 And return an error if it fails a check. if not the item should be transferred to the new owner, funds should be updated and and a transaction should be added to the transaction log in the db.
 
 13. In the Admin page an admin should be able to add an new itemtype, by filling in information like name, descriptionUrl, imageUrl and short description, using the create itemtype button an http request should be sent to the backend, the request should be checked at the backend to see if the user is an admin otherwise return an error. If the user is an admin, the type should be added to the data base.
@@ -419,6 +427,15 @@ The comments should be hierarchically ordered with some comments att the top lev
 19. an admin should be able the search the transaction log in the admin page for specif user or all, this should be supported by an request to the backend with the desired userid or "all". The backend should check if the token matches the requested user or if the user is an admin, if not an error should be returned.
 
 20. An admin should be able to spoof another user by entering their userid in the admin page. This should change all outgoing request to use that userid.
+
+21. A user, should be able to add items/remove items from the marketplace to their cart. By clicking the buttons add to cart or remove from cart next to relevant item,
+in the marketplace page. This should be supported by http request to the backend which would check the passed token to see it the user is authenticated, if that fails an error should be returned.
+
+22. A suer should ba able to view their cart in a separate page, the item should be display. This should be implemented by an api call to the backend which authenticates the user by checking if the token matches the userid or the user is qn admin. If a check felid an error should be returned.
+
+23. A user, should be able to remove items from their car while in the cart page, this should remove the item from their view and send an request to the backend to update the database. if the userid doenst match the supplied token or the user is not an admin an error should be returned.
+
+24. As a user, I want to be able to checkout all items from my cart for them to then be added to my inventory.
 
 ## Reflection
 
@@ -449,6 +466,14 @@ the cors problem was solved by simply setting the response header for each reque
 As well as a simple blanket preflight check that allows the authorization header.
 While we currently avoid complex http methods such as delete and simply stuck with **post** and **get**.
 In the future it would be wise to implement the better pre-flight checks that are required to use these functions.
+
+HTTPS is implemented but commented out, this is becaus self signed certificates are deemed unsafe for obvious reasons
+which leds to the browser blocking traffic. This could be side stepped for the webserver,
+as most browser allow you to ignore the cert for the page you are looking at,
+but the api calls going to the same domain but add different bort are blocked to protect against xxs.
+in short when using self signed cert the may website works but prosers warn the user, but our api calls are completely blocked.
+This could probably be fixed by hosting the webserver and backend on the same domain port combination, but would require us to change our current architecture
+and merge the webserver and the website together.
 
 #### SQL
 
@@ -1104,20 +1129,23 @@ Success
 ```
 
 #### DisplayCart
-
+<!-- TODO, document the function not what we did, shush as it parameters and return json/effects-->
 Here we re-use and tweak code from the marketplace function that displays items by just changing around the query a bit to only select items from the shopping cart associated with the user requesting the cart.
 
 #### Add To Cart
-
-This function exists in the marketplace where a user clicks "Add to Cart" on an item to send an http request ```POST /Marketplace/addToCart/{OfferID}``` to the backend where we just insert the item with the buyers id into the shopping cart table.
+<!-- TODO, document the function not what we did, shush as it parameters and return json/effects. Note 2, the backend is separate from the frontend and should not be mentioned here-->
+This function exists in the marketplace where a user clicks "Add to Cart" on an item to send an http request ```POST /Marketplace/addToCart/{OfferID}``` to the backend where we just insert the item with the buyers id into the shopping cart table. \
+**NOTE** this function can "fail" if an item tries to be added that don't exist on the marketplace, no nice error would be returned only that a foreign key constraint failed.
 
 #### Remove from cart
-
+<!-- TODO, document the function not what we did, shush as it parameters and return json/effects-->
 Similar to the Add to Cart function, except we simply remove the item from the cart table.
 
 #### Cart Checkout
-
-Once the user decides to checkout, they send an http request ```GET /Marketplace/cartCheckout/{UserID}```. The backend then checks if the user has enough money for the total purchase by querying the total price from the DB. We then begin an SQL transaction to ensure consistency and start looping through every item in the shopping cart and do something similar to the buy function on every item. This does mean one shopping cart checkout will generate one transaction for every item in the cart. Finally, if no errors occur, we commit the SQL transaction.
+<!-- TODO, document the function not what we did, shush as it parameters and return json/effects-->
+Once the user decides to checkout, they send an http request ```GET /Marketplace/cartCheckout/{UserID}```.
+We begin an SQL transaction to ensure consistency then checks if the user has enough money for the total purchase by querying the total price from the DB.
+Start looping through every item in the shopping cart and do something similar to the buy function on every item. This does mean one shopping cart checkout will generate one transaction for every item in the cart. Finally, if no errors occur, we commit the SQL transaction.
 
 ## References
 
