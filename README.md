@@ -427,11 +427,12 @@ TODO *from task description* A reflection of the system's limitations and the po
 ### frontend specific reflection
 
 The frontend framework that was decided on was React
-as it is the most popular framework today. The code was written in TypeScript to get more reliabilty from the typed nature of the language.
+as it is the most popular framework today. The code was written in TypeScript to get more reliability from the typed nature of the language.
 
-This might have been a downside since non off the developers had worked with neither react ot ts before causing a lot of headaches in development. Most of them stem from not knowing the right way to work with the tools leading to some hacks having to stay in place to hold it together in some places.
-Other then that the langauge offered a lot of tools to do anything you wanted with most of our problems already having documented solutions
-on stackoverflow or other websites.
+This might have been a downside since non off the developers had worked with neither react ot ts before causing a lot of headaches in development.
+Most of them stem from not knowing the right way to work with the tools leading to some hacks having to stay in place to hold it together in some places.
+Other then that the language offered a lot of tools to do anything you wanted with most of our problems already having documented solutions
+on stackOverflow or other websites.
 
 ### backend specific reflection
 
@@ -445,8 +446,9 @@ The small mount of modules required did make the backend easier to work with and
 The HTTP module that is included in go is extensive and provide large about of the functnialty needed for any web application.
 This project encountered some problems regarding *CORS* policy and Complex http methods (**Delete**, **patch** and others),
 the cors problem was solved by simply setting the response header for each request to allow *CORS*.
+As well as a simple blanket preflight check that allows the authorization header.
 While we currently avoid complex http methods such as delete and simply stuck with **post** and **get**.
-In the future it would be wise to implement the pre-flight checks that are required to use these functions.
+In the future it would be wise to implement the better pre-flight checks that are required to use these functions.
 
 #### SQL
 
@@ -1100,9 +1102,6 @@ Content-Type: text/plain; charset=utf-8
 
 Success
 ```
-### Shopping Cart
-
-The shopping cart class consists of several functions
 
 #### DisplayCart
 
@@ -1119,8 +1118,6 @@ Similar to the Add to Cart function, except we simply remove the item from the c
 #### Cart Checkout
 
 Once the user decides to checkout, they send an http request ```GET /Marketplace/cartCheckout/{UserID}```. The backend then checks if the user has enough money for the total purchase by querying the total price from the DB. We then begin an SQL transaction to ensure consistency and start looping through every item in the shopping cart and do something similar to the buy function on every item. This does mean one shopping cart checkout will generate one transaction for every item in the cart. Finally, if no errors occur, we commit the SQL transaction.
-
-
 
 ## References
 
