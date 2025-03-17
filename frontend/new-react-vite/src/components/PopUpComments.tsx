@@ -199,9 +199,10 @@ const PopUpComments: React.FC<PopUpCommentsProps> = ({ onClose, itemId }) => {
       <div
         className="ml-4 border-l pl-2"
         style={{ marginLeft: `${depth * 40}px` }}
-      >
+      > 
+        {/* if the user is an admin or the owner of the comment */}
         {commentStruct.theComment.UserID ===
-        Number(localStorage.getItem("uid")) ? (
+          Number(localStorage.getItem("uid")) || Number(localStorage.getItem("role")) === 1 ? (
           <>
             <div className="display: inline-block;">
               <p>

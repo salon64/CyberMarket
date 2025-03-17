@@ -275,7 +275,7 @@ type BuyStruct struct {
 }
 
 func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) error {
-	//TODO auth by token
+	
 	var data BuyStruct
 	itemID, err := strconv.Atoi(r.PathValue("ItemID"))
 	if err != nil {
@@ -337,6 +337,7 @@ func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	// test if user have enough funds
 	if wallet < price {
 		t.Rollback()
+		(*w).WriteHeader(http.StatusBadRequest)
 		return errors.New("not enough funds")
 	}
 	// update users funds and item owner

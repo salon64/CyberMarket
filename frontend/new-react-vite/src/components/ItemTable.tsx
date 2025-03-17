@@ -16,6 +16,7 @@ interface sellItem {
 }
 
 const ItemTableComponent = () => {
+
   const [sellPrice, setSellPrice] = useState(0)
   const [userItems, setUserItems] = useState<UserItemInterface[]>([]);
   let fetchString = "http://"+globalAddr+"/inventory/" + localStorage.getItem("uid")
@@ -36,22 +37,26 @@ const ItemTableComponent = () => {
 
 
   function rmListing(it: UserItemInterface): void {
-    console.log(it.ItemID);
+    console.log("removing listing", it.ItemID);
+    // the request path
     var adr: string = "http://"+globalAddr+"/Marketplace/removeListing/" + it.ItemID
     console.log(adr)
+
+    // send path with method get to backend, with auth header
     fetch(adr, {
       method: "GET",
       headers: new Headers({
         "Authorization": "Bearer " + localStorage.getItem("token")
       }),
     })
+      // when we receive the response
       .then((response) => {
+        // of the response was ok, else alert the user with the error received from the server
         if (response.ok === true) {
           alert("Item removed from marketplace");
           window.location.reload();
         } else {
-          console.log("Invalid Request");
-          alert("nuh uh");
+          response.text().then((r) => alert(r))
         }
       })
       .catch(error => alert(error))
@@ -106,7 +111,23 @@ const ItemTableComponent = () => {
           {/* <td className="">{item.IsListed}</td> */}
           {/*map either button or text input if item is already listed */}
           <td>
-            {item.IsListed ? (<button onClick={() => rmListing(item)}>Remove Listing</button>) : (<><input type={"number"} onChange={(e) => { setSellPrice(e.target.valueAsNumber || 0) }} name="sellPrice" id="sellPrice" /> <button onClick={() => handleSell(item.ItemID)} className={"cyber-button-small bg-blue fg-yellow"}>Sell</button></>)}
+            {
+              item.IsListed ?
+                (
+                  <button onClick={() => rmListing(item)}>
+                    Remove Listing
+                  </button>
+                )
+                :
+                (
+                  <>
+                    <input type={"number"} onChange={(e) => { setSellPrice(e.target.valueAsNumber || 0) }} name="sellPrice" id="sellPrice" />
+                    <button onClick={() => handleSell(item.ItemID)} className={"cyber-button-small bg-blue fg-yellow"}>
+                      Sell
+                    </button>
+                  </>
+                )
+            }
           </td>
         </tr>
       ))}
