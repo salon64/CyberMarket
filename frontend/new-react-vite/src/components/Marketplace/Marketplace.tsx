@@ -15,7 +15,6 @@ interface userIDInt {
   UserID: number
 }
 
-
 interface MarketplaceItems {
   ItemID: number;
   TypeID: number;
@@ -32,9 +31,6 @@ interface MarketplaceItems {
   Username: string;
   InCheckout: number;
 }
-
-
-
 
 function Marketplace() {
   const [sortState, setSortState] = useState<MarketplaceState>({sortBy: "Newest", search: ""})
@@ -192,6 +188,7 @@ function Marketplace() {
                 <td className="">{item.Username}</td>
                 <td>
                   <input onClick={() => buyItem(item)} className='buy-button' type='button' value='Buy' />
+                {/* maybe add remove item here? */}
                   {cartStatus[item.ItemID] ? 
                         (<input onClick={() => removeFromCart(item)} className="buy-button" type="button" value="Remove From cart" />
                       )

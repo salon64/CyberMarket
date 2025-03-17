@@ -145,7 +145,6 @@ func addMoneyToUser(w *http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	// TODO token stuff
 	_, err = db.Exec("UPDATE Users SET Wallet = Wallet + ? WHERE UserID = ?", data.Money, data.UserID)
 	if err != nil {
 		sendAndLogError(w, http.StatusInternalServerError, "error updating user wallet: ", err.Error())

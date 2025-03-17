@@ -97,7 +97,7 @@ func CreateToken(userName string, password string, db *sql.DB) (LoginReturn, err
 
 	// If the user vas not found abort the transaction and return error
 	if err == sql.ErrNoRows {
-		t.Rollback() // TODO error handling
+		t.Rollback()
 		return LoginReturn{}, errors.New("username and password combination not found")
 	}
 

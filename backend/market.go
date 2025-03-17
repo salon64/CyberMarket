@@ -275,7 +275,7 @@ type BuyStruct struct {
 }
 
 func buyItem(w *http.ResponseWriter, r *http.Request, db *sql.DB) error {
-	//TODO auth by token
+	
 	var data BuyStruct
 	itemID, err := strconv.Atoi(r.PathValue("ItemID"))
 	if err != nil {
