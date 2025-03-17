@@ -276,6 +276,7 @@ func buyCart(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		log.Print("HERE 4")
 
 		t.Rollback()
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Insufficient funds to buy items in cart")
 		return
 	}
