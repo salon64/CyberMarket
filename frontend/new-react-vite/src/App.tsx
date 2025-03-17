@@ -9,7 +9,6 @@ import Register from "./components/Register/Register";
 import ProtectedRoute from "./components/Protection/ProtectedRoute";
 import AdminPage from "./components/Admin/AdminPage";
 import Cart from "./components/cart/cart";
-import "./App.css";
 
 const App = () => {
   return (
